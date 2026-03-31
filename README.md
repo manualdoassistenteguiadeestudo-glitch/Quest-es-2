@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Questões CESPE/CEBRASPE | Treino + Estatísticas + Tempo por Questão</title>
     <!-- Tailwind CSS + Font Awesome + Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,7 @@
         }
     </script>
     <style>
-        body { background: linear-gradient(135deg, #f8fafc 0%, #eef2f8 100%); font-family: 'Inter', system-ui, sans-serif; }
+        body { background: linear-gradient(135deg, #f8fafc 0%, #eef2f8 100%); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; margin: 0; padding: 0; }
         .card-modern { transition: all 0.2s ease; background: white; border-radius: 1.5rem; }
         .card-modern:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1); }
         .btn-certo { background: linear-gradient(135deg, #22c55e, #16a34a); }
@@ -33,43 +33,63 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        .max-w-desktop { max-width: 1600px; margin: 0 auto; }
         .break-word { word-break: break-word; }
-        /* Layout desktop mais espaçoso */
-        @media (min-width: 1280px) {
-            .desktop-grid { gap: 2rem; }
+        /* Layout desktop duas colunas – sem limite de largura máxima */
+        @media (min-width: 1024px) {
+            .desktop-layout {
+                display: grid;
+                grid-template-columns: 360px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+        }
+        .desktop-layout > * {
+            min-width: 0;
         }
     </style>
 </head>
-<body>
+<body class="p-0 m-0">
 
-<div class="max-w-desktop px-4 md:px-8 py-6 md:py-8 w-full">
-    <!-- Header -->
+<div class="w-full px-4 md:px-6 py-6 md:py-8">
+    <!-- Header com relógio e logo personalizada -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-200">
         <div class="flex items-center gap-4 flex-wrap">
-            <div class="bg-gradient-to-br from-emerald-500 to-green-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
-                <i class="fas fa-check-double text-white text-xl"></i>
-            </div>
-            <div class="hidden md:flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-full">
-                <i class="fas fa-file-alt text-green-600 text-lg"></i>
-                <i class="fas fa-arrow-right text-gray-400 text-sm"></i>
-                <i class="fas fa-pen-fancy text-blue-500 text-lg"></i>
-                <span class="text-xs font-medium text-gray-600">Modo simulado + tempo por questão</span>
+            <!-- Logo SVG customizada -->
+            <div class="flex-shrink-0">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="14" fill="url(#logoGrad)" />
+                    <text x="12" y="30" fill="white" font-family="monospace" font-size="20" font-weight="bold">C/E</text>
+                    <path d="M32 16 L38 24 L32 32" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#10b981"/>
+                            <stop offset="1" stop-color="#059669"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">Questões <span class="text-green-600">CESPE/CEBRASPE</span></h1>
                 <p class="text-gray-500 text-sm">Treine com estilo Certo/Errado | até 20 questões | tempo de resposta detalhado</p>
             </div>
         </div>
-        <div class="flex gap-2">
-            <button id="resetOnlyProgressBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i class="fas fa-undo-alt"></i> Resetar progresso</button>
-            <button id="clearAllDataBtn" class="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-100 transition shadow-sm flex items-center gap-2"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+        <div class="flex items-center gap-4">
+            <!-- Relógio digital -->
+            <div class="bg-gray-100 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                <i class="fas fa-clock text-gray-600"></i>
+                <span id="currentTime" class="font-mono text-lg font-semibold text-gray-700">--:--:--</span>
+            </div>
+            <div class="flex gap-2">
+                <button id="resetOnlyProgressBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i class="fas fa-undo-alt"></i> Resetar progresso</button>
+                <button id="clearAllDataBtn" class="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-100 transition shadow-sm flex items-center gap-2"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+            </div>
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-12 gap-6 desktop-grid">
-        <!-- Sidebar esquerda -->
-        <div class="lg:col-span-5 space-y-6">
+    <!-- Layout desktop: duas colunas com grid -->
+    <div class="desktop-layout">
+        <!-- Coluna esquerda (menu/importação) -->
+        <div class="space-y-6">
             <!-- Card Importação -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 card-modern">
                 <div class="flex items-center gap-3 mb-4">
@@ -158,7 +178,7 @@ Gabarito: Certo'></textarea>
         </div>
 
         <!-- Coluna direita: Questão ativa -->
-        <div class="lg:col-span-7">
+        <div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-7 card-modern min-h-[600px] transition-all" id="questionPanel">
                 <div class="flex flex-col items-center justify-center py-12 text-gray-400">
                     <i class="fas fa-brain text-5xl mb-3 text-gray-300"></i>
@@ -181,18 +201,16 @@ Gabarito: Certo'></textarea>
         "Geografia do Rio Grande do Norte"
     ];
     
-    let questions = [];            // { id, number, text, comment, answer, discipline }
-    let answers = [];              // { questionId, isCorrect, userChoice, timestamp, timeSpentSeconds }
+    let questions = [];
+    let answers = [];
     let currentIndex = 0;
-    let commentVisibleMap = new Map();   // questionId -> bool
-    let questionStartTimes = new Map();    // questionId -> timestamp (ms) when first displayed
+    let commentVisibleMap = new Map();
+    let questionStartTimes = new Map();
     
-    // Cronômetro global
     let timerInterval = null;
     let timerSeconds = 0;
     let timerRunning = false;
     
-    // DOM
     const dashboardContainer = document.getElementById('dashboardContainer');
     const questionPanel = document.getElementById('questionPanel');
     const rawInput = document.getElementById('rawQuestionsInput');
@@ -212,10 +230,28 @@ Gabarito: Certo'></textarea>
     const timerStopBtn = document.getElementById('timerStopBtn');
     const downloadWrongAnswersBtn = document.getElementById('downloadWrongAnswersBtn');
     const downloadNotebookLMBtn = document.getElementById('downloadNotebookLMBtn');
+    const currentTimeSpan = document.getElementById('currentTime');
     
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     
-    // ---------- localStorage ----------
+    // ---------- FUNÇÃO DE FORMATAÇÃO NEGRITO + ITÁLICO ----------
+    function formatBoldItalic(text) {
+        if (!text) return '';
+        // Escapa HTML primeiro para segurança, depois converte **texto** para <strong><em>texto</em></strong>
+        let escaped = escapeHtml(text);
+        return escaped.replace(/\*\*([^*]+)\*\*/g, '<strong><em>$1</em></strong>');
+    }
+    
+    function updateCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        currentTimeSpan.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateCurrentTime, 1000);
+    updateCurrentTime();
+    
     function saveToLocalStorage() {
         localStorage.setItem('cebraspe_questions_v3', JSON.stringify(questions));
         localStorage.setItem('cebraspe_answers_v3', JSON.stringify(answers));
@@ -223,7 +259,6 @@ Gabarito: Certo'></textarea>
         localStorage.setItem('cebraspe_commentsVisible_v3', JSON.stringify([...commentVisibleMap.entries()]));
         localStorage.setItem('cebraspe_timerSeconds', timerSeconds.toString());
         localStorage.setItem('cebraspe_timerRunning', timerRunning.toString());
-        // Não salvamos startTimes pois são recalculados ao renderizar
     }
     
     function loadFromLocalStorage() {
@@ -250,7 +285,6 @@ Gabarito: Certo'></textarea>
             timerRunning = false;
         }
         updateTimerDisplay();
-        // Reset questionStartTimes (serão preenchidos no render)
         questionStartTimes.clear();
     }
     
@@ -282,7 +316,6 @@ Gabarito: Certo'></textarea>
         showToast("Progresso resetado. Todas as respostas foram removidas.", "success");
     }
     
-    // ---------- PARSER ----------
     function parseQuestionsFromText(text) {
         const questionsArray = [];
         const blockRegex = /Questão\s+(\d+):\s*([\s\S]*?)(?=Questão\s+\d+:|$)/gi;
@@ -312,7 +345,6 @@ Gabarito: Certo'></textarea>
                 questionsArray.push({ id: Date.now() + Math.random() * 10000 + number, number, text: questionText, comment, answer });
             }
         }
-        // fallback
         if (questionsArray.length === 0 && text.includes('Questão')) {
             const lines = text.split(/\r?\n/);
             let current = null;
@@ -352,6 +384,7 @@ Gabarito: Certo'></textarea>
         questionStartTimes.clear();
         saveToLocalStorage();
         renderAll();
+        rawInput.value = '';
         showToast(`${parsed.length} questões importadas com disciplina: ${discipline}`, "success");
         return true;
     }
@@ -378,7 +411,6 @@ Gabarito: Certo'></textarea>
         } catch (err) { showToast(err.message, "error"); }
     }
     
-    // Registrar tempo de exibição da questão (se não respondida)
     function recordDisplayTimeForCurrentQuestion() {
         if (!questions.length) return;
         const q = questions[currentIndex];
@@ -389,7 +421,6 @@ Gabarito: Certo'></textarea>
         }
     }
     
-    // Resposta com tempo gasto
     function answerCurrentQuestion(choice) {
         if (questions.length === 0) return;
         const currentQ = questions[currentIndex];
@@ -397,7 +428,7 @@ Gabarito: Certo'></textarea>
         let timeSpent = 0;
         const startTime = questionStartTimes.get(currentQ.id);
         if (startTime) {
-            timeSpent = Math.round((Date.now() - startTime) / 1000); // segundos
+            timeSpent = Math.round((Date.now() - startTime) / 1000);
         }
         const isCorrect = (choice === currentQ.answer);
         answers.push({ 
@@ -442,7 +473,6 @@ Gabarito: Certo'></textarea>
         showToast(`Disciplina alterada para ${newDiscipline}`, "success");
     }
     
-    // Estatísticas
     function computeStats() {
         const totalAnswered = answers.length;
         const totalCorrect = answers.filter(a => a.isCorrect === true).length;
@@ -493,7 +523,7 @@ Gabarito: Certo'></textarea>
         
         let commentSection = '';
         if (hasAnswered && !isCommentVisible) commentSection = `<button id="showCommentBtn" class="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 font-medium transition flex items-center justify-center gap-2 mt-2"><i class="far fa-comment-dots"></i> Ver comentário</button>`;
-        else if (hasAnswered && isCommentVisible) commentSection = `<div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200"><i class="fas fa-quote-left text-gray-400 mr-2"></i><span class="font-semibold text-gray-800">Comentário:</span><p class="text-gray-600 text-sm mt-1 leading-relaxed">${escapeHtml(currentQ.comment)}</p></div>`;
+        else if (hasAnswered && isCommentVisible) commentSection = `<div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200"><i class="fas fa-quote-left text-gray-400 mr-2"></i><span class="font-semibold text-gray-800">Comentário:</span><p class="text-gray-600 text-sm mt-1 leading-relaxed">${formatBoldItalic(currentQ.comment)}</p></div>`;
         
         const nextDisabled = !hasAnswered;
         const nextButtonText = (currentIndex + 1 >= total) ? '🏁 Finalizar simulado' : 'Próxima questão →';
@@ -506,7 +536,7 @@ Gabarito: Certo'></textarea>
                     <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full"><i class="far fa-file-alt mr-1"></i> Questão ${currentQ.number}</span>
                     <div class="flex items-center gap-2"><label class="text-xs text-gray-500">Disciplina:</label><select id="disciplineEditSelect" class="text-xs border rounded-lg p-1 bg-white">${disciplineOptions}</select><button id="saveDisciplineBtn" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fas fa-save"></i></button><button id="resetOnlyFromQuestionBtn" class="text-gray-400 hover:text-gray-600" title="Resetar progresso"><i class="fas fa-sync-alt"></i></button></div>
                 </div>
-                <div class="mb-6 bg-gray-50 p-5 rounded-xl"><p class="text-gray-800 text-base md:text-lg leading-relaxed break-word">${escapeHtml(currentQ.text)}</p></div>
+                <div class="mb-6 bg-gray-50 p-5 rounded-xl"><p class="text-gray-800 text-base md:text-lg leading-relaxed break-word">${formatBoldItalic(currentQ.text)}</p></div>
                 <div id="answerArea">
                     ${!hasAnswered ? `<div class="flex gap-4 mb-6"><button id="btnCerto" class="flex-1 btn-certo text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fas fa-check-circle"></i> Certo</button><button id="btnErrado" class="flex-1 btn-errado text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fas fa-times-circle"></i> Errado</button></div>` : feedbackHtml}
                     ${commentSection}
@@ -529,11 +559,9 @@ Gabarito: Certo'></textarea>
         const discSelect = document.getElementById('disciplineEditSelect');
         if (saveDiscBtn && discSelect) saveDiscBtn.addEventListener('click', () => updateDisciplineForCurrent(discSelect.value));
         
-        // Registrar tempo de início para a questão atual se ainda não respondida
         if (!hasAnswered) recordDisplayTimeForCurrentQuestion();
     }
     
-    // ---------- Cronômetro ----------
     function updateTimerDisplay() {
         const hours = Math.floor(timerSeconds / 3600);
         const minutes = Math.floor((timerSeconds % 3600) / 60);
@@ -545,7 +573,6 @@ Gabarito: Certo'></textarea>
     function pauseTimer() { if (!timerRunning) return; timerRunning = false; saveToLocalStorage(); showToast("Cronômetro pausado.", "info"); }
     function resetTimer() { timerRunning = false; if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } timerSeconds = 0; updateTimerDisplay(); saveToLocalStorage(); showToast("Cronômetro zerado.", "info"); }
     
-    // ---------- PDF Caderno de Erros (apenas erros + comentários) ----------
     async function generateWrongAnswersPDF() {
         if (questions.length === 0) { showToast("Nenhuma questão importada.", "warning"); return; }
         const wrongAnswers = answers.filter(a => a.isCorrect === false);
@@ -583,7 +610,6 @@ Gabarito: Certo'></textarea>
         showToast("Caderno de Erros gerado (apenas erros + comentários).", "success");
     }
     
-    // Relatório completo com tempo gasto por questão
     async function generatePDFReport() {
         if (questions.length === 0) { showToast("Nenhuma questão para gerar relatório.", "warning"); return; }
         const stats = computeStats();
@@ -655,7 +681,6 @@ Gabarito: Certo'></textarea>
     
     function renderAll() { renderDashboard(); renderQuestion(); saveToLocalStorage(); updateCounterDisplay(); }
     
-    // Eventos
     importBtn.addEventListener('click', () => { const raw = rawInput.value; if (importQuestions(raw)) rawInput.value = ''; });
     loadExampleBtn.addEventListener('click', () => {
         const example = `Questão 1: "Embora João de Barros tenha sido o donatário original da Capitania do Rio Grande por meio da Carta de Doação de 1535, a historiografia registra que ele jamais tomou posse física de suas terras, administrando-as por intermédio de um procurador."\nComentário: "João de Barros enfrentou dificuldades financeiras e resistência indígena, nunca assumindo pessoalmente a capitania."\nGabarito: Certo\n\nQuestão 2: "No contexto da ocupação holandesa na Capitania do Rio Grande no século XVII, o massacre de Uruaçu ocorreu cronologicamente antes do massacre de Cunhaú."\nComentário: "O massacre de Cunhaú ocorreu em 16 de julho de 1645, enquanto o de Uruaçu aconteceu cerca de três meses depois."\nGabarito: Errado\n\nQuestão 3: "O sistema de sesmarias implementado para estimular a colonização da capitania previa que o sesmeiro teria a propriedade plena da terra desde que nela se fizesse produzir no prazo máximo de cinco anos."\nComentário: "A legislação sesmarial estabelecia o prazo de cinco anos para a produção da terra, sob pena de perda."\nGabarito: Certo`;
