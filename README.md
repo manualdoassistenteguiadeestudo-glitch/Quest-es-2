@@ -546,6 +546,10 @@ Gabarito: Certo"></textarea>
         if(hasAnswered && !showComment) commentSection = `<button id="showCommentBtn" class="w-full mt-3 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition"><i class="far fa-comment-dots"></i> Ver comentário</button>`;
         else if(hasAnswered && showComment) commentSection = `<div class="mt-5 p-5 bg-gray-50 rounded-xl border border-gray-200"><i class="fas fa-quote-left text-gray-400 mr-2"></i><span class="font-semibold">Comentário do professor:</span><p class="text-gray-700 text-sm mt-2 leading-relaxed">${formatBoldItalic(q.comment)}</p></div>`;
         const disciplineOptions = DISCIPLINAS_LIST.map(d => `<option value="${d}" ${q.discipline===d?'selected':''}>${d}</option>`).join('');
+        
+        // Botão próxima questão (aparece apenas se respondida)
+        const nextButtonHtml = hasAnswered ? `<div class="mb-5"><button id="nextBtnAction" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"><i class="fas fa-arrow-right"></i> ${currentIndex+1>=questions.length ? 'Finalizar simulado' : 'Próxima questão'}</button></div>` : '';
+        
         const html = `
             <div>
                 <div class="mb-4"><div class="flex justify-between text-sm text-gray-500 mb-1"><span>Progresso ${currentIndex+ (hasAnswered?1:0)}/${questions.length}</span><span>${Math.round(progress)}%</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="progress-bar-animated h-full bg-emerald-500 rounded-full" style="width:${progress}%"></div></div></div>
@@ -553,11 +557,11 @@ Gabarito: Certo"></textarea>
                     <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="far fa-question-circle mr-1"></i> Questão ${q.number}</span>
                     <div class="flex gap-2 items-center"><label class="text-xs text-gray-500">Disciplina:</label><select id="discEditSelect" class="text-xs border rounded-lg p-1 bg-white">${disciplineOptions}</select><button id="saveDiscBtn" class="text-emerald-600 text-xs"><i class="fas fa-save"></i></button></div>
                 </div>
+                ${nextButtonHtml}  <!-- Botão posicionado acima do enunciado -->
                 <div class="bg-gray-50/80 p-6 rounded-2xl mb-6"><p class="question-text text-gray-800 font-medium leading-relaxed">${formatBoldItalic(q.text)}</p></div>
                 <div id="answerArea">
                     ${!hasAnswered ? `<div class="flex gap-4 mb-5"><button id="btnCertoQuest" class="flex-1 btn-certo text-white font-bold py-4 rounded-xl text-lg shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Certo</button><button id="btnErradoQuest" class="flex-1 btn-errado text-white font-bold py-4 rounded-xl text-lg shadow-md flex items-center justify-center gap-2"><i class="fas fa-times-circle"></i> Errado</button></div>` : feedbackHtml}
                     ${commentSection}
-                    ${hasAnswered ? `<div class="mt-6"><button id="nextBtnAction" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"><i class="fas fa-arrow-right"></i> ${currentIndex+1>=questions.length ? 'Finalizar simulado' : 'Próxima questão'}</button></div>` : ''}
                 </div>
             </div>
         `;
