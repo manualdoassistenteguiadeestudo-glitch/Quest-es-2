@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>GranQuest — Simulador CESPE/CEBRASPE</title>
+    <title>AuditorQuest — Simulador CESPE/CEBRASPE</title>
     <!-- Tailwind + Font Awesome + Chart.js + PDF libs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -12,25 +12,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body {
+        /* Reset completo para ocupar 100% da tela */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* evita rolagem dupla */
             background: linear-gradient(145deg, #f0f4fa 0%, #e9eef5 100%);
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
         }
-        /* Layout principal ocupa toda a tela */
+        /* Layout principal ocupa toda a altura */
         .main-app {
-            height: 100vh;
-            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
+        /* Grid das colunas com altura flexível */
         .gran-layout {
+            flex: 1;
+            min-height: 0; /* importante para overflow funcionar */
             display: grid;
             grid-template-columns: 380px 1fr;
             gap: 28px;
-            height: calc(100vh - 100px); /* Ajuste para o cabeçalho */
+            padding: 0 20px 20px 20px;
             overflow: hidden;
-            padding: 0 20px;
         }
         /* Coluna esquerda com rolagem independente */
         .left-col {
@@ -38,19 +47,18 @@
             padding-right: 8px;
             height: 100%;
         }
-        /* Coluna direita (questão) com altura total e rolagem */
+        /* Coluna direita com rolagem independente */
         .right-col {
             overflow-y: auto;
             height: 100%;
-            background: transparent;
         }
-        /* Card da questão expandido */
+        /* Card da questão ocupa toda a largura da coluna */
         .question-card {
             background: rgba(255,255,255,0.98);
             border-radius: 2rem;
             box-shadow: 0 8px 30px rgba(0,0,0,0.05);
             padding: 2rem;
-            min-height: 100%;
+            width: 100%;
             transition: all 0.2s ease;
         }
         .card-gran {
@@ -122,14 +130,33 @@
             padding: 2rem;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-        /* Ajuste para cabeçalho fixo */
+        /* Header fixo sem margens */
         .header-area {
             padding: 1rem 2rem;
             background: transparent;
+            flex-shrink: 0;
+        }
+        /* Responsividade: empilhar colunas em telas pequenas */
+        @media (max-width: 900px) {
+            .gran-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                overflow-y: auto;
+            }
+            .left-col, .right-col {
+                overflow-y: visible;
+                height: auto;
+            }
+            .main-app {
+                overflow-y: auto;
+            }
+            .right-col {
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
 <!-- TELA DE LOGIN -->
 <div id="loginScreen" class="login-overlay">
@@ -138,7 +165,7 @@
             <div class="bg-gradient-to-br from-emerald-700 to-green-600 rounded-2xl w-16 h-16 flex items-center justify-center mx-auto shadow-md">
                 <i class="fas fa-graduation-cap text-white text-3xl"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mt-4">Gran<span class="text-emerald-700">Quest</span></h2>
+            <h2 class="text-2xl font-bold text-gray-800 mt-4">Auditor<span class="text-emerald-700">Quest</span></h2>
             <p id="greetingMessage" class="text-gray-500 mt-1"></p>
         </div>
         <form id="loginForm" onsubmit="event.preventDefault(); doLogin();">
@@ -159,7 +186,7 @@
 </div>
 
 <!-- CONTEÚDO PRINCIPAL (inicialmente oculto) -->
-<div id="mainApp" style="display: none;" class="main-app flex flex-col">
+<div id="mainApp" style="display: none;" class="main-app">
     <!-- HEADER -->
     <div class="header-area flex flex-wrap justify-between items-center gap-4 pb-2 border-b border-gray-200/80">
         <div class="flex items-center gap-3">
@@ -167,7 +194,7 @@
                 <i class="fas fa-graduation-cap text-white text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-gray-800">Gran<span class="text-emerald-700">Quest</span></h1>
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-800">Auditor<span class="text-emerald-700">Quest</span></h1>
                 <p class="text-xs text-gray-500 -mt-1">Simulador CESPE / CEBRASPE — Certo ou Errado</p>
             </div>
         </div>
@@ -191,30 +218,7 @@
                     <div><h2 class="font-bold text-gray-800">Banco de questões</h2><p class="text-xs text-gray-500">Importe até 20 itens (formato CESPE)</p></div>
                 </div>
                 <select id="disciplineSelect" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm bg-gray-50 mb-3 focus:ring-2 focus:ring-emerald-400">
-                    <option value="Língua Portuguesa">📖 Língua Portuguesa</option>
-<option value="Raciocínio Lógico-Matemático">🧠 Raciocínio Lógico</option>
-<option value="Direito Constitucional">⚖️ Direito Constitucional</option>
-<option value="Direito Administrativo">📜 Direito Administrativo</option>
-<option value="Administração Pública">🏛️ Administração Pública</option>
-<option value="Administração Financeira e Orçamentária">💰 AFO</option>
-<option value="Contabilidade Geral">📊 Contabilidade Geral</option>
-<option value="Contabilidade Pública">🏦 Contabilidade Pública</option>
-<option value="Controle Externo">🔍 Controle Externo</option>
-<option value="Auditoria Governamental">🧾 Auditoria Governamental</option>
-<option value="Economia">📈 Economia</option>
-<option value="Finanças Públicas">💵 Finanças Públicas</option>
-<option value="Licitações e Contratos">📑 Licitações e Contratos</option>
-<option value="Lei de Responsabilidade Fiscal">⚠️ LRF</option>
-<option value="Políticas Públicas">📌 Políticas Públicas</option>
-<option value="Gestão de Materiais">📦 Gestão de Materiais</option>
-<option value="Informática">💻 Informática</option>
-<option value="Análise de Dados">📊 Análise de Dados</option>
-<option value="Estatística">📉 Estatística</option>
-<option value="Inglês">🌍 Inglês</option>
-<option value="Legislação Institucional">🏢 Legislação Institucional</option>
-<option value="História do Rio Grande do Norte">📘 História do RN</option>
-<option value="Geografia do Rio Grande do Norte">🌎 Geografia do RN</option>
-<option value="Jurisprudência">⚖️ Jurisprudência</option>
+                    <!-- Lista completa de disciplinas -->
                 </select>
                 <textarea id="rawQuestionsInput" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-sm font-mono bg-gray-50 focus:ring-2 focus:ring-emerald-400" placeholder="Questão 1: &quot;A Declaração Universal foi adotada em 1948.&quot;
 
@@ -275,7 +279,16 @@ Gabarito: Certo"></textarea>
 <script>
     // ------------------ CONSTANTES ------------------
     const MAX_QUESTIONS = 20;
-    const DISCIPLINAS_LIST = ["História do Rio Grande do Norte","Língua Portuguesa","Raciocínio Lógico-Matemático","Direito Constitucional","Administração Pública","Informática"];
+    // Lista completa de disciplinas (atualizada)
+    const DISCIPLINAS_LIST = [
+        "Língua Portuguesa", "Raciocínio Lógico-Matemático", "Direito Constitucional",
+        "Direito Administrativo", "Administração Pública", "Administração Financeira e Orçamentária",
+        "Contabilidade Geral", "Contabilidade Pública", "Controle Externo", "Auditoria Governamental",
+        "Economia", "Finanças Públicas", "Licitações e Contratos", "Lei de Responsabilidade Fiscal",
+        "Políticas Públicas", "Gestão de Materiais", "Informática", "Análise de Dados", "Estatística",
+        "Inglês", "Legislação Institucional", "História do Rio Grande do Norte", "Geografia do Rio Grande do Norte",
+        "Jurisprudência"
+    ];
     let questions = [];
     let answers = [];
     let currentIndex = 0;
@@ -311,6 +324,14 @@ Gabarito: Certo"></textarea>
     const resetOnlyProgressBtn = document.getElementById('resetOnlyProgressBtn');
     const clearAllDataBtn = document.getElementById('clearAllDataBtn');
 
+    // Preencher select de disciplinas
+    DISCIPLINAS_LIST.forEach(disc => {
+        const option = document.createElement('option');
+        option.value = disc;
+        option.textContent = disc;
+        disciplineSelect.appendChild(option);
+    });
+
     // Config pdf.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     
@@ -331,27 +352,27 @@ Gabarito: Certo"></textarea>
     }
     function updateCounterDisplay() { questionCounterSpan.innerText = `${questions.length}/${MAX_QUESTIONS}`; }
     function saveToLocalStorage() {
-        localStorage.setItem('gran_questions', JSON.stringify(questions));
-        localStorage.setItem('gran_answers', JSON.stringify(answers));
-        localStorage.setItem('gran_currentIndex', currentIndex.toString());
-        localStorage.setItem('gran_commentsVisible', JSON.stringify([...commentVisibleMap.entries()]));
-        localStorage.setItem('gran_timerSeconds', timerSeconds.toString());
-        localStorage.setItem('gran_timerRunning', timerRunning.toString());
+        localStorage.setItem('auditor_questions', JSON.stringify(questions));
+        localStorage.setItem('auditor_answers', JSON.stringify(answers));
+        localStorage.setItem('auditor_currentIndex', currentIndex.toString());
+        localStorage.setItem('auditor_commentsVisible', JSON.stringify([...commentVisibleMap.entries()]));
+        localStorage.setItem('auditor_timerSeconds', timerSeconds.toString());
+        localStorage.setItem('auditor_timerRunning', timerRunning.toString());
         updateGlobalAccuracy();
     }
     function loadFromLocalStorage() {
-        const storedQ = localStorage.getItem('gran_questions');
-        const storedA = localStorage.getItem('gran_answers');
-        const storedIdx = localStorage.getItem('gran_currentIndex');
-        const storedComments = localStorage.getItem('gran_commentsVisible');
+        const storedQ = localStorage.getItem('auditor_questions');
+        const storedA = localStorage.getItem('auditor_answers');
+        const storedIdx = localStorage.getItem('auditor_currentIndex');
+        const storedComments = localStorage.getItem('auditor_commentsVisible');
         if(storedQ) questions = JSON.parse(storedQ);
         if(storedA) answers = JSON.parse(storedA);
         if(storedIdx) currentIndex = parseInt(storedIdx,10);
         if(storedComments) commentVisibleMap = new Map(JSON.parse(storedComments));
         if(questions.length && currentIndex >= questions.length) currentIndex = questions.length-1;
         if(currentIndex<0) currentIndex=0;
-        const storedSec = localStorage.getItem('gran_timerSeconds');
-        const storedRun = localStorage.getItem('gran_timerRunning');
+        const storedSec = localStorage.getItem('auditor_timerSeconds');
+        const storedRun = localStorage.getItem('auditor_timerRunning');
         if(storedSec) timerSeconds = parseInt(storedSec,10);
         if(storedRun === 'true') { timerRunning=true; startTimerInterval(); }
         updateTimerDisplay();
@@ -390,7 +411,6 @@ Gabarito: Certo"></textarea>
             }
         }
         if(questionsArray.length===0 && text.includes('Questão')) {
-            // fallback linha a linha
             const lines = text.split(/\r?\n/);
             let current = null;
             for(let line of lines) {
@@ -468,7 +488,6 @@ Gabarito: Certo"></textarea>
     
     function renderDashboard() {
         const stats = computeStats();
-        const totalQ = questions.length;
         dashboardContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-2 mb-3">
                 <div class="bg-gray-50 rounded-xl p-2 text-center"><i class="fas fa-check-circle text-green-500 text-lg"></i><div class="text-xl font-bold">${stats.totalCorrect}</div><div class="text-[11px] text-gray-500">Acertos</div></div>
@@ -514,7 +533,6 @@ Gabarito: Certo"></textarea>
         const q = questions[currentIndex];
         const hasAnswered = answers.some(a=>a.questionId===q.id);
         const userRec = answers.find(a=>a.questionId===q.id);
-        const isCorrect = userRec ? userRec.isCorrect : false;
         const showComment = commentVisibleMap.get(q.id) || false;
         const progress = ((currentIndex + (hasAnswered?1:0))/questions.length)*100;
         let feedbackHtml = '';
@@ -529,7 +547,7 @@ Gabarito: Certo"></textarea>
         else if(hasAnswered && showComment) commentSection = `<div class="mt-5 p-5 bg-gray-50 rounded-xl border border-gray-200"><i class="fas fa-quote-left text-gray-400 mr-2"></i><span class="font-semibold">Comentário do professor:</span><p class="text-gray-700 text-sm mt-2 leading-relaxed">${formatBoldItalic(q.comment)}</p></div>`;
         const disciplineOptions = DISCIPLINAS_LIST.map(d => `<option value="${d}" ${q.discipline===d?'selected':''}>${d}</option>`).join('');
         const html = `
-            <div class="animate-fadeIn">
+            <div>
                 <div class="mb-4"><div class="flex justify-between text-sm text-gray-500 mb-1"><span>Progresso ${currentIndex+ (hasAnswered?1:0)}/${questions.length}</span><span>${Math.round(progress)}%</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="progress-bar-animated h-full bg-emerald-500 rounded-full" style="width:${progress}%"></div></div></div>
                 <div class="flex flex-wrap justify-between items-start gap-3 mb-5 pb-2 border-b border-gray-200">
                     <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="far fa-question-circle mr-1"></i> Questão ${q.number}</span>
@@ -556,11 +574,11 @@ Gabarito: Certo"></textarea>
     }
     
     function resetProgressOnly() { if(questions.length===0) return; answers = []; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); saveToLocalStorage(); renderAll(); showToast("Progresso reiniciado","success"); }
-    function clearAllData() { if(confirm("Apagar TODAS as questões, respostas e cronômetro?")){ localStorage.removeItem('gran_questions'); localStorage.removeItem('gran_answers'); localStorage.removeItem('gran_currentIndex'); localStorage.removeItem('gran_commentsVisible'); localStorage.removeItem('gran_timerSeconds'); localStorage.removeItem('gran_timerRunning'); questions=[]; answers=[]; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); resetTimer(); renderAll(); showToast("Todos os dados removidos","info"); } }
+    function clearAllData() { if(confirm("Apagar TODAS as questões, respostas e cronômetro?")){ localStorage.removeItem('auditor_questions'); localStorage.removeItem('auditor_answers'); localStorage.removeItem('auditor_currentIndex'); localStorage.removeItem('auditor_commentsVisible'); localStorage.removeItem('auditor_timerSeconds'); localStorage.removeItem('auditor_timerRunning'); questions=[]; answers=[]; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); resetTimer(); renderAll(); showToast("Todos os dados removidos","info"); } }
     
-    async function generateWrongAnswersPDF() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const wrongs = answers.filter(a=>!a.isCorrect); if(wrongs.length===0){ showToast("Nenhum erro! 🎉","success"); return; } const doc = new jspdf.jsPDF(); doc.setFontSize(18); doc.text("Caderno de Erros - GranQuest",14,20); doc.setFontSize(10); doc.text(`Gerado: ${new Date().toLocaleString()}`,14,30); let y=40; for(let wa of wrongs){ const q=questions.find(qq=>qq.id===wa.questionId); if(!q) continue; if(y>260){ doc.addPage(); y=20; } doc.setFont(undefined,'bold'); doc.text(`Questão ${q.number} - ${q.discipline}`,14,y); y+=7; doc.setFont(undefined,'normal'); const txt=doc.splitTextToSize(`Enunciado: ${q.text}`,180); doc.text(txt,14,y); y+=txt.length*5; doc.text(`Sua resposta: ${wa.userChoice} | Gabarito: ${q.answer}`,14,y); y+=6; const com=doc.splitTextToSize(`Comentário: ${q.comment}`,180); doc.text(com,14,y); y+=com.length*5+6; doc.line(14,y-3,200,y-3); } doc.save(`caderno_erros_${Date.now()}.pdf`); showToast("Caderno de erros gerado","success"); }
-    async function generatePDFReport() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); const doc = new jspdf.jsPDF({orientation:'landscape'}); doc.setFontSize(16); doc.text("Relatório de Desempenho",14,18); doc.setFontSize(10); doc.text(`Data: ${new Date().toLocaleString()} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong} | Aproveitamento: ${stats.percentage}%`,14,28); const totalTime=answers.reduce((s,a)=>s+(a.timeSpentSeconds||0),0); doc.text(`Tempo total em respostas: ${Math.floor(totalTime/60)}min ${totalTime%60}s`,14,36); const tableData = answers.map(a=>{ const q=questions.find(qq=>qq.id===a.questionId); if(!q) return null; return [q.number, q.discipline, q.text.substring(0,70), a.userChoice, q.answer, a.isCorrect?"Acertou":"Errou", a.timeSpentSeconds?`${a.timeSpentSeconds}s`:"—", q.comment.substring(0,50)]; }).filter(v=>v); if(tableData.length) doc.autoTable({ head:[["#","Disciplina","Enunciado","Resp","Gabarito","Result","Tempo","Comentário"]], body:tableData, startY:45, styles:{fontSize:7}, columnStyles:{2:{cellWidth:45},7:{cellWidth:35}} }); doc.save(`relatorio_${Date.now()}.pdf`); showToast("Relatório completo gerado","success"); }
-    function generateNotebookLMPrompt() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); let txt=`# GRANQUEST - PROMPT NOTEBOOKLM\nTotal respondidas: ${stats.totalAnswered} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong}\n\n`; questions.forEach(q=>{ const resp=answers.find(a=>a.questionId===q.id); const status=resp? (resp.isCorrect?"Acertou":"Errou") : "Não respondida"; txt+=`### Questão ${q.number} (${q.discipline})\nEnunciado: ${q.text}\nGabarito: ${q.answer}\nSua resposta: ${resp?resp.userChoice:"—"} (${status})\nComentário: ${q.comment}\n\n`; }); const blob=new Blob([txt],{type:"text/plain"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`prompt_notebooklm_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast("Prompt NotebookLM baixado","success"); }
+    async function generateWrongAnswersPDF() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const wrongs = answers.filter(a=>!a.isCorrect); if(wrongs.length===0){ showToast("Nenhum erro! 🎉","success"); return; } const doc = new jspdf.jsPDF(); doc.setFontSize(18); doc.text("Caderno de Erros - AuditorQuest",14,20); doc.setFontSize(10); doc.text(`Gerado: ${new Date().toLocaleString()}`,14,30); let y=40; for(let wa of wrongs){ const q=questions.find(qq=>qq.id===wa.questionId); if(!q) continue; if(y>260){ doc.addPage(); y=20; } doc.setFont(undefined,'bold'); doc.text(`Questão ${q.number} - ${q.discipline}`,14,y); y+=7; doc.setFont(undefined,'normal'); const txt=doc.splitTextToSize(`Enunciado: ${q.text}`,180); doc.text(txt,14,y); y+=txt.length*5; doc.text(`Sua resposta: ${wa.userChoice} | Gabarito: ${q.answer}`,14,y); y+=6; const com=doc.splitTextToSize(`Comentário: ${q.comment}`,180); doc.text(com,14,y); y+=com.length*5+6; doc.line(14,y-3,200,y-3); } doc.save(`caderno_erros_${Date.now()}.pdf`); showToast("Caderno de erros gerado","success"); }
+    async function generatePDFReport() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); const doc = new jspdf.jsPDF({orientation:'landscape'}); doc.setFontSize(16); doc.text("Relatório de Desempenho - AuditorQuest",14,18); doc.setFontSize(10); doc.text(`Data: ${new Date().toLocaleString()} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong} | Aproveitamento: ${stats.percentage}%`,14,28); const totalTime=answers.reduce((s,a)=>s+(a.timeSpentSeconds||0),0); doc.text(`Tempo total em respostas: ${Math.floor(totalTime/60)}min ${totalTime%60}s`,14,36); const tableData = answers.map(a=>{ const q=questions.find(qq=>qq.id===a.questionId); if(!q) return null; return [q.number, q.discipline, q.text.substring(0,70), a.userChoice, q.answer, a.isCorrect?"Acertou":"Errou", a.timeSpentSeconds?`${a.timeSpentSeconds}s`:"—", q.comment.substring(0,50)]; }).filter(v=>v); if(tableData.length) doc.autoTable({ head:[["#","Disciplina","Enunciado","Resp","Gabarito","Result","Tempo","Comentário"]], body:tableData, startY:45, styles:{fontSize:7}, columnStyles:{2:{cellWidth:45},7:{cellWidth:35}} }); doc.save(`relatorio_${Date.now()}.pdf`); showToast("Relatório completo gerado","success"); }
+    function generateNotebookLMPrompt() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); let txt=`# AUDITORQUEST - PROMPT NOTEBOOKLM\nTotal respondidas: ${stats.totalAnswered} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong}\n\n`; questions.forEach(q=>{ const resp=answers.find(a=>a.questionId===q.id); const status=resp? (resp.isCorrect?"Acertou":"Errou") : "Não respondida"; txt+=`### Questão ${q.number} (${q.discipline})\nEnunciado: ${q.text}\nGabarito: ${q.answer}\nSua resposta: ${resp?resp.userChoice:"—"} (${status})\nComentário: ${q.comment}\n\n`; }); const blob=new Blob([txt],{type:"text/plain"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`prompt_notebooklm_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast("Prompt NotebookLM baixado","success"); }
     
     function renderAll() { renderDashboard(); renderQuestion(); saveToLocalStorage(); updateCounterDisplay(); }
     
