@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>GranQuest — Simulador CESPE/CEBRASPE</title>
     <!-- Tailwind + Font Awesome + Chart.js + PDF libs -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -15,17 +15,49 @@
         body {
             background: linear-gradient(145deg, #f0f4fa 0%, #e9eef5 100%);
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Layout principal ocupa toda a tela */
+        .main-app {
+            height: 100vh;
+            overflow: hidden;
+        }
+        .gran-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 28px;
+            height: calc(100vh - 100px); /* Ajuste para o cabeçalho */
+            overflow: hidden;
+            padding: 0 20px;
+        }
+        /* Coluna esquerda com rolagem independente */
+        .left-col {
+            overflow-y: auto;
+            padding-right: 8px;
+            height: 100%;
+        }
+        /* Coluna direita (questão) com altura total e rolagem */
+        .right-col {
+            overflow-y: auto;
+            height: 100%;
+            background: transparent;
+        }
+        /* Card da questão expandido */
+        .question-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            padding: 2rem;
+            min-height: 100%;
+            transition: all 0.2s ease;
         }
         .card-gran {
             background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(0px);
-            border-radius: 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02);
-            transition: all 0.25s ease;
-        }
-        .card-gran:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
         }
         .btn-primary {
             background: linear-gradient(105deg, #0f3b2c 0%, #1e5a3e 100%);
@@ -57,19 +89,8 @@
             border-radius: 12px;
         }
         .question-text {
-            font-size: 1.15rem;
-            line-height: 1.5;
-        }
-        @media (min-width: 1280px) {
-            .gran-layout {
-                display: grid;
-                grid-template-columns: 380px 1fr;
-                gap: 28px;
-            }
-        }
-        .badge-disciplina {
-            background: #eef2ff;
-            color: #1e3a8a;
+            font-size: 1.2rem;
+            line-height: 1.6;
         }
         .answer-feedback-correct {
             background: #e8f5e9;
@@ -79,13 +100,68 @@
             background: #ffebee;
             border-left: 6px solid #c62828;
         }
+        /* Tela de login */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 2rem;
+            width: 90%;
+            max-width: 440px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        /* Ajuste para cabeçalho fixo */
+        .header-area {
+            padding: 1rem 2rem;
+            background: transparent;
+        }
     </style>
 </head>
-<body class="antialiased p-5 md:p-8">
+<body class="antialiased">
 
-<div class="max-w-[1600px] mx-auto">
-    <!-- HEADER profissional -->
-    <div class="flex flex-wrap justify-between items-center gap-4 mb-8 pb-2 border-b border-gray-200/80">
+<!-- TELA DE LOGIN -->
+<div id="loginScreen" class="login-overlay">
+    <div class="login-card">
+        <div class="text-center mb-6">
+            <div class="bg-gradient-to-br from-emerald-700 to-green-600 rounded-2xl w-16 h-16 flex items-center justify-center mx-auto shadow-md">
+                <i class="fas fa-graduation-cap text-white text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mt-4">Gran<span class="text-emerald-700">Quest</span></h2>
+            <p id="greetingMessage" class="text-gray-500 mt-1"></p>
+        </div>
+        <form id="loginForm" onsubmit="event.preventDefault(); doLogin();">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">E-mail</label>
+                <input type="email" id="loginEmail" value="usuario@exemplo.com" class="w-full border border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-emerald-400" />
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Senha</label>
+                <input type="password" id="loginPassword" value="senha123" class="w-full border border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-emerald-400" />
+            </div>
+            <button type="submit" class="w-full btn-primary text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+            <p class="text-xs text-center text-gray-400 mt-4">Acesso livre – apenas simulação</p>
+        </form>
+    </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL (inicialmente oculto) -->
+<div id="mainApp" style="display: none;" class="main-app flex flex-col">
+    <!-- HEADER -->
+    <div class="header-area flex flex-wrap justify-between items-center gap-4 pb-2 border-b border-gray-200/80">
         <div class="flex items-center gap-3">
             <div class="bg-gradient-to-br from-emerald-700 to-green-600 rounded-2xl w-12 h-12 flex items-center justify-center shadow-md">
                 <i class="fas fa-graduation-cap text-white text-2xl"></i>
@@ -104,71 +180,93 @@
         </div>
     </div>
 
-    <!-- LAYOUT 2 colunas desktop-first -->
+    <!-- LAYOUT 2 COLUNAS COM ALTURA TOTAL -->
     <div class="gran-layout">
-        <!-- COLUNA ESQUERDA: ferramentas + estatísticas + analytics -->
-        <div class="space-y-6">
-            <!-- Card importação moderna -->
-            <div class="card-gran p-6 border border-gray-100">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-emerald-100 p-2.5 rounded-xl"><i class="fas fa-file-upload text-emerald-700 text-lg"></i></div>
-                    <div><h2 class="font-bold text-gray-800">Banco de questões</h2><p class="text-xs text-gray-500">Importe até 20 itens (formato padrão CESPE)</p></div>
+        <!-- COLUNA ESQUERDA (scroll) -->
+        <div class="left-col space-y-6">
+            <!-- Card importação -->
+            <div class="card-gran p-5 border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-emerald-100 p-2 rounded-xl"><i class="fas fa-file-upload text-emerald-700 text-lg"></i></div>
+                    <div><h2 class="font-bold text-gray-800">Banco de questões</h2><p class="text-xs text-gray-500">Importe até 20 itens (formato CESPE)</p></div>
                 </div>
                 <select id="disciplineSelect" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm bg-gray-50 mb-3 focus:ring-2 focus:ring-emerald-400">
-                    <option value="História do Rio Grande do Norte">📘 História do Rio Grande do Norte</option>
                     <option value="Língua Portuguesa">📖 Língua Portuguesa</option>
-                    <option value="Raciocínio Lógico-Matemático">🧠 Raciocínio Lógico-Matemático</option>
-                    <option value="Direito Constitucional">⚖️ Direito Constitucional</option>
-                    <option value="Administração Pública">🏛️ Administração Pública</option>
-                    <option value="Informática">💻 Informática</option>
+<option value="Raciocínio Lógico-Matemático">🧠 Raciocínio Lógico</option>
+<option value="Direito Constitucional">⚖️ Direito Constitucional</option>
+<option value="Direito Administrativo">📜 Direito Administrativo</option>
+<option value="Administração Pública">🏛️ Administração Pública</option>
+<option value="Administração Financeira e Orçamentária">💰 AFO</option>
+<option value="Contabilidade Geral">📊 Contabilidade Geral</option>
+<option value="Contabilidade Pública">🏦 Contabilidade Pública</option>
+<option value="Controle Externo">🔍 Controle Externo</option>
+<option value="Auditoria Governamental">🧾 Auditoria Governamental</option>
+<option value="Economia">📈 Economia</option>
+<option value="Finanças Públicas">💵 Finanças Públicas</option>
+<option value="Licitações e Contratos">📑 Licitações e Contratos</option>
+<option value="Lei de Responsabilidade Fiscal">⚠️ LRF</option>
+<option value="Políticas Públicas">📌 Políticas Públicas</option>
+<option value="Gestão de Materiais">📦 Gestão de Materiais</option>
+<option value="Informática">💻 Informática</option>
+<option value="Análise de Dados">📊 Análise de Dados</option>
+<option value="Estatística">📉 Estatística</option>
+<option value="Inglês">🌍 Inglês</option>
+<option value="Legislação Institucional">🏢 Legislação Institucional</option>
+<option value="História do Rio Grande do Norte">📘 História do RN</option>
+<option value="Geografia do Rio Grande do Norte">🌎 Geografia do RN</option>
+<option value="Jurisprudência">⚖️ Jurisprudência</option>
                 </select>
-                <textarea id="rawQuestionsInput" rows="4" class="w-full border border-gray-200 rounded-xl p-3 text-sm font-mono bg-gray-50 focus:ring-2 focus:ring-emerald-400" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."
+                <textarea id="rawQuestionsInput" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-sm font-mono bg-gray-50 focus:ring-2 focus:ring-emerald-400" placeholder="Questão 1: &quot;A Declaração Universal foi adotada em 1948.&quot;
 
-Comentário: "Adotada pela ONU em 10/12/1948."
+Comentário: &quot;Adotada pela ONU em 10/12/1948.&quot;
 
-Gabarito: Certo'></textarea>
-                <div class="flex flex-wrap gap-2 mt-4">
-                    <button id="importBtn" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
-                    <button id="loadExampleBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl transition"><i class="fas fa-code-branch"></i> Exemplo</button>
-                    <button id="importPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition flex items-center gap-2"><i class="fas fa-file-pdf"></i> PDF</button>
+Gabarito: Certo"></textarea>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <button id="importBtn" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2 rounded-xl transition flex items-center justify-center gap-1 text-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
+                    <button id="loadExampleBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl transition text-sm"><i class="fas fa-code-branch"></i> Exemplo</button>
+                    <button id="importPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl transition text-sm"><i class="fas fa-file-pdf"></i> PDF</button>
                     <input type="file" id="pdfUploadInput" accept=".pdf" class="hidden" />
                 </div>
-                <div id="importFeedback" class="text-xs mt-3 text-center hidden"></div>
-                <div class="flex justify-between text-xs text-gray-400 mt-3"><span>Máx 20 questões</span><span id="questionCounter">0/20</span></div>
+                <div id="importFeedback" class="text-xs mt-2 text-center hidden"></div>
+                <div class="flex justify-between text-xs text-gray-400 mt-2"><span>Máx 20 questões</span><span id="questionCounter">0/20</span></div>
             </div>
 
-            <!-- Dashboard de desempenho + gráficos avançados -->
-            <div class="card-gran p-6 border border-gray-100">
-                <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+            <!-- Dashboard desempenho -->
+            <div class="card-gran p-5 border border-gray-100">
+                <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
                     <div class="flex items-center gap-2"><i class="fas fa-chart-pie text-emerald-600 text-xl"></i><h2 class="font-bold text-gray-800">Meu desempenho</h2></div>
-                    <button id="generatePdfReportBtn" class="text-indigo-600 text-sm bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition"><i class="fas fa-download mr-1"></i> Relatório</button>
+                    <button id="generatePdfReportBtn" class="text-indigo-600 text-xs bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100"><i class="fas fa-download mr-1"></i> Relatório</button>
                 </div>
-                <div id="dashboardContainer" class="min-h-[240px]"></div>
-                <!-- Analytics extra: desempenho por disciplina -->
-                <div id="disciplineChartContainer" class="mt-5 pt-3 border-t border-gray-100">
-                    <p class="text-xs font-semibold text-gray-500 mb-2"><i class="fas fa-chart-simple"></i> Taxa de acerto por disciplina</p>
-                    <canvas id="disciplineBarChart" height="140" style="max-height:180px; width:100%"></canvas>
+                <div id="dashboardContainer" class="min-h-[200px]"></div>
+                <div id="disciplineChartContainer" class="mt-3 pt-2 border-t border-gray-100">
+                    <p class="text-xs font-semibold text-gray-500 mb-1"><i class="fas fa-chart-simple"></i> Acertos por disciplina</p>
+                    <canvas id="disciplineBarChart" height="130" style="max-height:130px; width:100%"></canvas>
                 </div>
             </div>
 
-            <!-- Cronômetro de estudo + ferramentas revisão -->
-            <div class="card-gran p-6 border border-gray-100">
-                <div class="flex items-center gap-2 mb-3"><i class="fas fa-hourglass-half text-amber-600 text-xl"></i><h2 class="font-bold text-gray-800">Cronômetro de estudo</h2></div>
-                <div class="text-center"><div id="timerDisplay" class="text-4xl font-mono font-bold bg-gray-100 inline-block px-6 py-2 rounded-2xl">00:00:00</div>
-                <div class="flex justify-center gap-3 mt-3"><button id="timerStartBtn" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl text-sm"><i class="fas fa-play"></i> Iniciar</button><button id="timerPauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-xl text-sm"><i class="fas fa-pause"></i> Pausar</button><button id="timerStopBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl text-sm"><i class="fas fa-stop"></i> Parar</button></div></div>
-                <div class="flex flex-col sm:flex-row gap-3 mt-5 pt-2">
-                    <button id="downloadWrongAnswersBtn" class="bg-rose-50 text-rose-700 border border-rose-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2"><i class="fas fa-book-open"></i> Caderno de erros (PDF)</button>
-                    <button id="downloadNotebookLMBtn" class="bg-sky-50 text-sky-700 border border-sky-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2"><i class="fas fa-download"></i> Prompt NotebookLM</button>
+            <!-- Cronômetro e ferramentas -->
+            <div class="card-gran p-5 border border-gray-100">
+                <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-amber-600 text-xl"></i><h2 class="font-bold text-gray-800">Cronômetro</h2></div>
+                <div class="text-center"><div id="timerDisplay" class="text-3xl font-mono font-bold bg-gray-100 inline-block px-4 py-1 rounded-2xl">00:00:00</div>
+                <div class="flex justify-center gap-2 mt-2"><button id="timerStartBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-play"></i> Iniciar</button><button id="timerPauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-pause"></i> Pausar</button><button id="timerStopBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-stop"></i> Parar</button></div></div>
+                <div class="flex flex-col gap-2 mt-4">
+                    <button id="downloadWrongAnswersBtn" class="bg-rose-50 text-rose-700 border border-rose-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-book-open"></i> Caderno de erros (PDF)</button>
+                    <button id="downloadNotebookLMBtn" class="bg-sky-50 text-sky-700 border border-sky-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-download"></i> Prompt NotebookLM</button>
                 </div>
-                <p class="text-[11px] text-gray-400 text-center mt-3">✔️ Caderno apenas com erros + comentários</p>
+                <div class="flex gap-2 mt-3">
+                    <button id="resetOnlyProgressBtn" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1.5 rounded-xl text-sm"><i class="fas fa-undo-alt"></i> Resetar progresso</button>
+                    <button id="clearAllDataBtn" class="flex-1 bg-red-50 border border-red-200 text-red-600 py-1.5 rounded-xl text-sm"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+                </div>
             </div>
         </div>
 
-        <!-- COLUNA DIREITA: QUESTÃO ATIVA (estilo plataforma) -->
-        <div class="card-gran p-6 md:p-8 border border-gray-100 min-h-[640px] transition-all" id="questionPanel">
-            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
-                <i class="fas fa-brain text-6xl mb-4 text-gray-300"></i>
-                <p class="text-center text-gray-500">Importe suas questões para começar<br />e treine no formato Certo/Errado</p>
+        <!-- COLUNA DIREITA (questão ampliada) -->
+        <div class="right-col">
+            <div id="questionPanel" class="question-card">
+                <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                    <i class="fas fa-brain text-6xl mb-4 text-gray-300"></i>
+                    <p class="text-center text-gray-500">Importe suas questões para começar<br />e treine no formato Certo/Errado</p>
+                </div>
             </div>
         </div>
     </div>
@@ -178,16 +276,16 @@ Gabarito: Certo'></textarea>
     // ------------------ CONSTANTES ------------------
     const MAX_QUESTIONS = 20;
     const DISCIPLINAS_LIST = ["História do Rio Grande do Norte","Língua Portuguesa","Raciocínio Lógico-Matemático","Direito Constitucional","Administração Pública","Informática"];
-    let questions = [];           // cada objeto: { id, number, text, comment, answer, discipline }
-    let answers = [];             // { questionId, isCorrect, userChoice, timestamp, timeSpentSeconds }
+    let questions = [];
+    let answers = [];
     let currentIndex = 0;
-    let commentVisibleMap = new Map(); // id da questão -> booleano
-    let questionStartTimes = new Map(); // id -> timestamp inicio visualização
+    let commentVisibleMap = new Map();
+    let questionStartTimes = new Map();
     
     // Timer estudo
     let timerInterval = null, timerSeconds = 0, timerRunning = false;
     
-    // Charts globais
+    // Charts
     let statsChart = null, disciplineChart = null;
     
     // Elementos DOM
@@ -196,8 +294,6 @@ Gabarito: Certo'></textarea>
     const rawInput = document.getElementById('rawQuestionsInput');
     const importBtn = document.getElementById('importBtn');
     const loadExampleBtn = document.getElementById('loadExampleBtn');
-    const resetProgressBtn = document.getElementById('resetOnlyProgressBtn'); // pode não existir, mas criaremos dinamicamente
-    const clearAllBtn = document.getElementById('clearAllDataBtn'); // criado depois? mas vamos manter referências
     const importFeedback = document.getElementById('importFeedback');
     const disciplineSelect = document.getElementById('disciplineSelect');
     const importPdfBtn = document.getElementById('importPdfBtn');
@@ -212,7 +308,9 @@ Gabarito: Certo'></textarea>
     const downloadNotebookLMBtn = document.getElementById('downloadNotebookLMBtn');
     const currentTimeSpan = document.getElementById('currentTime');
     const globalAccuracySpan = document.getElementById('globalAccuracy');
-    
+    const resetOnlyProgressBtn = document.getElementById('resetOnlyProgressBtn');
+    const clearAllDataBtn = document.getElementById('clearAllDataBtn');
+
     // Config pdf.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     
@@ -222,7 +320,7 @@ Gabarito: Certo'></textarea>
     function showToast(msg, type) {
         importFeedback.classList.remove('hidden');
         importFeedback.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'} mr-1"></i> ${msg}`;
-        importFeedback.className = `text-xs mt-3 text-center p-2 rounded-lg ${type==='success'?'bg-green-50 text-green-700':type==='error'?'bg-red-50 text-red-600':'bg-blue-50 text-blue-600'}`;
+        importFeedback.className = `text-xs mt-2 text-center p-2 rounded-lg ${type==='success'?'bg-green-50 text-green-700':type==='error'?'bg-red-50 text-red-600':'bg-blue-50 text-blue-600'}`;
         setTimeout(() => { importFeedback.classList.add('hidden'); }, 3200);
     }
     function updateGlobalAccuracy() {
@@ -267,7 +365,7 @@ Gabarito: Certo'></textarea>
     function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocalStorage(); showToast("Pausado","info");} }
     function resetTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocalStorage(); showToast("Cronômetro zerado","info");}
     
-    // parsing de questões - robusto e captura Gabarito com fidelidade
+    // parsing de questões
     function parseQuestionsFromText(text) {
         const questionsArray = [];
         const blockRegex = /Questão\s+(\d+):\s*([\s\S]*?)(?=Questão\s+\d+:|$)/gi;
@@ -291,7 +389,8 @@ Gabarito: Certo'></textarea>
                 questionsArray.push({ id: Date.now()+Math.random()*10000+number, number, text: questionText, comment, answer });
             }
         }
-        if(questionsArray.length===0 && text.includes('Questão')) { // fallback linha a linha
+        if(questionsArray.length===0 && text.includes('Questão')) {
+            // fallback linha a linha
             const lines = text.split(/\r?\n/);
             let current = null;
             for(let line of lines) {
@@ -371,21 +470,20 @@ Gabarito: Certo'></textarea>
         const stats = computeStats();
         const totalQ = questions.length;
         dashboardContainer.innerHTML = `
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="bg-gray-50 rounded-xl p-3 text-center"><i class="fas fa-check-circle text-green-500 text-xl"></i><div class="text-2xl font-bold">${stats.totalCorrect}</div><div class="text-xs text-gray-500">Acertos</div></div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${stats.totalWrong}</div><div class="text-xs text-gray-500">Erros</div></div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center"><i class="fas fa-list-check text-blue-500 text-xl"></i><div class="text-2xl font-bold">${stats.totalAnswered}</div><div class="text-xs text-gray-500">Respondidas</div></div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center"><i class="fas fa-percent text-purple-500 text-xl"></i><div class="text-2xl font-bold">${stats.percentage}%</div><div class="text-xs text-gray-500">Aproveitamento</div></div>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-gray-50 rounded-xl p-2 text-center"><i class="fas fa-check-circle text-green-500 text-lg"></i><div class="text-xl font-bold">${stats.totalCorrect}</div><div class="text-[11px] text-gray-500">Acertos</div></div>
+                <div class="bg-gray-50 rounded-xl p-2 text-center"><i class="fas fa-times-circle text-red-500 text-lg"></i><div class="text-xl font-bold">${stats.totalWrong}</div><div class="text-[11px] text-gray-500">Erros</div></div>
+                <div class="bg-gray-50 rounded-xl p-2 text-center"><i class="fas fa-list-check text-blue-500 text-lg"></i><div class="text-xl font-bold">${stats.totalAnswered}</div><div class="text-[11px] text-gray-500">Respondidas</div></div>
+                <div class="bg-gray-50 rounded-xl p-2 text-center"><i class="fas fa-percent text-purple-500 text-lg"></i><div class="text-xl font-bold">${stats.percentage}%</div><div class="text-[11px] text-gray-500">Aproveitamento</div></div>
             </div>
-            <canvas id="statsPieChart" height="150" style="max-height:160px; width:100%"></canvas>
+            <canvas id="statsPieChart" height="120" style="max-height:120px; width:100%"></canvas>
         `;
         if(statsChart) statsChart.destroy();
         const ctx = document.getElementById('statsPieChart')?.getContext('2d');
         if(ctx && (stats.totalCorrect+stats.totalWrong)>0){
-            statsChart = new Chart(ctx, { type:'doughnut', data:{ labels:['Acertos','Erros'], datasets:[{ data:[stats.totalCorrect, stats.totalWrong], backgroundColor:['#16a34a','#dc2626'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:10} } } } } });
+            statsChart = new Chart(ctx, { type:'doughnut', data:{ labels:['Acertos','Erros'], datasets:[{ data:[stats.totalCorrect,stats.totalWrong], backgroundColor:['#16a34a','#dc2626'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:9} } } } } });
         } else if(ctx) { statsChart = new Chart(ctx, { type:'doughnut', data:{ labels:['Sem dados'], datasets:[{ data:[1], backgroundColor:['#e2e8f0'] }] }, options:{ plugins:{ legend:{ display:false } } } }); }
         
-        // gráfico por disciplina
         const discMap = new Map();
         questions.forEach(q => { if(!discMap.has(q.discipline)) discMap.set(q.discipline, { total:0, correct:0 }); });
         answers.forEach(ans => {
@@ -400,14 +498,14 @@ Gabarito: Certo'></textarea>
         });
         const labels = [], dataCorrect = [], dataTotal = [];
         for(let [disc, stat] of discMap.entries()){
-            labels.push(disc.length>18?disc.substring(0,16)+'..':disc);
+            labels.push(disc.length>14?disc.substring(0,12)+'..':disc);
             dataCorrect.push(stat.correct);
             dataTotal.push(stat.total);
         }
         if(disciplineChart) disciplineChart.destroy();
         const barCtx = document.getElementById('disciplineBarChart')?.getContext('2d');
         if(barCtx && labels.length){
-            disciplineChart = new Chart(barCtx, { type:'bar', data:{ labels, datasets:[{ label:'Acertos', data:dataCorrect, backgroundColor:'#2e7d32', borderRadius:6 }, { label:'Total respondidas', data:dataTotal, backgroundColor:'#9ca3af', borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:true, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }, plugins:{ tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${ctx.raw}` } } } } });
+            disciplineChart = new Chart(barCtx, { type:'bar', data:{ labels, datasets:[{ label:'Acertos', data:dataCorrect, backgroundColor:'#2e7d32', borderRadius:4 }, { label:'Respondidas', data:dataTotal, backgroundColor:'#9ca3af', borderRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:true, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1, font:{size:9} } } }, plugins:{ tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${ctx.raw}` } }, legend:{ labels:{ font:{size:9} } } } } });
         } else if(barCtx) { disciplineChart = new Chart(barCtx, { type:'bar', data:{ labels:['Nenhuma'], datasets:[{ data:[0] }] }, options:{ plugins:{ legend:{ display:false } } } }); }
     }
     
@@ -437,7 +535,7 @@ Gabarito: Certo'></textarea>
                     <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="far fa-question-circle mr-1"></i> Questão ${q.number}</span>
                     <div class="flex gap-2 items-center"><label class="text-xs text-gray-500">Disciplina:</label><select id="discEditSelect" class="text-xs border rounded-lg p-1 bg-white">${disciplineOptions}</select><button id="saveDiscBtn" class="text-emerald-600 text-xs"><i class="fas fa-save"></i></button></div>
                 </div>
-                <div class="bg-gray-50/80 p-5 rounded-2xl mb-6"><p class="question-text text-gray-800 font-medium leading-relaxed">${formatBoldItalic(q.text)}</p></div>
+                <div class="bg-gray-50/80 p-6 rounded-2xl mb-6"><p class="question-text text-gray-800 font-medium leading-relaxed">${formatBoldItalic(q.text)}</p></div>
                 <div id="answerArea">
                     ${!hasAnswered ? `<div class="flex gap-4 mb-5"><button id="btnCertoQuest" class="flex-1 btn-certo text-white font-bold py-4 rounded-xl text-lg shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Certo</button><button id="btnErradoQuest" class="flex-1 btn-errado text-white font-bold py-4 rounded-xl text-lg shadow-md flex items-center justify-center gap-2"><i class="fas fa-times-circle"></i> Errado</button></div>` : feedbackHtml}
                     ${commentSection}
@@ -465,6 +563,7 @@ Gabarito: Certo'></textarea>
     function generateNotebookLMPrompt() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); let txt=`# GRANQUEST - PROMPT NOTEBOOKLM\nTotal respondidas: ${stats.totalAnswered} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong}\n\n`; questions.forEach(q=>{ const resp=answers.find(a=>a.questionId===q.id); const status=resp? (resp.isCorrect?"Acertou":"Errou") : "Não respondida"; txt+=`### Questão ${q.number} (${q.discipline})\nEnunciado: ${q.text}\nGabarito: ${q.answer}\nSua resposta: ${resp?resp.userChoice:"—"} (${status})\nComentário: ${q.comment}\n\n`; }); const blob=new Blob([txt],{type:"text/plain"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`prompt_notebooklm_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast("Prompt NotebookLM baixado","success"); }
     
     function renderAll() { renderDashboard(); renderQuestion(); saveToLocalStorage(); updateCounterDisplay(); }
+    
     function initEventListeners(){
         importBtn.onclick=()=>{ const raw=rawInput.value; if(importQuestions(raw)) rawInput.value=''; };
         loadExampleBtn.onclick=()=>{ rawInput.value=`Questão 1: "No movimento abolicionista de Mossoró, a atuação feminina limitou-se ao suporte doméstico e financeiro, não havendo registros de comissões formadas por mulheres para persuadir proprietários de escravizados."\nComentário: "A afirmação está incorreta, pois o movimento contou com a atuação direta de mulheres da elite, como Dona Amélia Dantas de Souza Melo, que constituíram uma Comissão Libertadora para visitar casas e persuadir proprietários a alforriar os cativos."\nGabarito: Errado\n\nQuestão 2: "O sistema de sesmarias previa que o sesmeiro teria a propriedade plena da terra desde que nela se fizesse produzir no prazo máximo de cinco anos."\nComentário: "Prazo de cinco anos sob pena de perda."\nGabarito: Certo`; importQuestions(rawInput.value, "História do Rio Grande do Norte"); };
@@ -476,27 +575,32 @@ Gabarito: Certo'></textarea>
         timerStartBtn.onclick=startTimer;
         timerPauseBtn.onclick=pauseTimer;
         timerStopBtn.onclick=resetTimer;
-        document.getElementById('resetOnlyProgressBtn')?.addEventListener('click',resetProgressOnly);
-        document.getElementById('clearAllDataBtn')?.addEventListener('click',clearAllData);
-        // botões extras adicionados dinamicamente, mas já no DOM via HTML? adicionamos
-    }
-    
-    // adicionar botões reset e clear no header via js (já estão no html original? precisamos garantir existência)
-    function ensureButtons() {
-        if(!document.getElementById('resetOnlyProgressBtn')) {
-            const btnDiv = document.querySelector('.flex.items-center.gap-4'); if(btnDiv){ const btn = document.createElement('button'); btn.id='resetOnlyProgressBtn'; btn.className='bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium'; btn.innerHTML='<i class="fas fa-undo-alt"></i> Resetar progresso'; btnDiv.appendChild(btn); btn.onclick=resetProgressOnly; }
-        }
-        if(!document.getElementById('clearAllDataBtn')) {
-            const btnDiv = document.querySelector('.flex.items-center.gap-4'); if(btnDiv){ const btn2 = document.createElement('button'); btn2.id='clearAllDataBtn'; btn2.className='bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-sm font-medium'; btn2.innerHTML='<i class="fas fa-trash-alt"></i> Limpar tudo'; btnDiv.appendChild(btn2); btn2.onclick=clearAllData; }
-        }
+        resetOnlyProgressBtn.onclick=resetProgressOnly;
+        clearAllDataBtn.onclick=clearAllData;
     }
     
     function updateCurrentTime() { const now=new Date(); currentTimeSpan.textContent=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`; }
     setInterval(updateCurrentTime,1000);
-    loadFromLocalStorage();
-    ensureButtons();
+    
+    // Tela de login
+    function doLogin() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        loadFromLocalStorage();
+        renderAll();
+    }
+    
+    function setGreeting() {
+        const hour = new Date().getHours();
+        let greeting = '';
+        if (hour < 12) greeting = 'Bom dia! ☀️';
+        else if (hour < 18) greeting = 'Boa tarde! 🌤️';
+        else greeting = 'Boa noite! 🌙';
+        document.getElementById('greetingMessage').innerText = greeting;
+    }
+    setGreeting();
+    
     initEventListeners();
-    renderAll();
 </script>
 </body>
 </html>
