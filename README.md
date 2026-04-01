@@ -12,47 +12,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        /* Reset completo para ocupar 100% da tela */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            height: 100%;
+            height: auto;
+            min-height: 100%;
             width: 100%;
-            overflow: hidden; /* evita rolagem dupla */
+            overflow-x: hidden;
+            overflow-y: auto;
             background: linear-gradient(145deg, #f0f4fa 0%, #e9eef5 100%);
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
-        /* Layout principal ocupa toda a altura */
         .main-app {
-            height: 100%;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
         }
-        /* Grid das colunas com altura flexível */
         .gran-layout {
-            flex: 1;
-            min-height: 0; /* importante para overflow funcionar */
             display: grid;
-            grid-template-columns: 380px 1fr;
+            grid-template-columns: 340px 1fr;
             gap: 28px;
             padding: 0 20px 20px 20px;
-            overflow: hidden;
+            width: 100%;
         }
-        /* Coluna esquerda com rolagem independente */
-        .left-col {
-            overflow-y: auto;
-            padding-right: 8px;
-            height: 100%;
+        .left-col, .right-col {
+            overflow-y: visible;
+            height: auto;
         }
-        /* Coluna direita com rolagem independente */
-        .right-col {
-            overflow-y: auto;
-            height: 100%;
-        }
-        /* Card da questão ocupa toda a largura da coluna */
         .question-card {
             background: rgba(255,255,255,0.98);
             border-radius: 2rem;
@@ -60,12 +46,14 @@
             padding: 2rem;
             width: 100%;
             transition: all 0.2s ease;
+            margin-bottom: 20px;
         }
         .card-gran {
             background: rgba(255,255,255,0.98);
             border-radius: 1.5rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             transition: all 0.2s ease;
+            margin-bottom: 24px;
         }
         .btn-primary {
             background: linear-gradient(105deg, #0f3b2c 0%, #1e5a3e 100%);
@@ -84,31 +72,11 @@
         .progress-bar-animated {
             transition: width 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 12px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #9ca3af;
-            border-radius: 12px;
-        }
-        .question-text {
-            font-size: 1.2rem;
-            line-height: 1.6;
-        }
-        .answer-feedback-correct {
-            background: #e8f5e9;
-            border-left: 6px solid #2e7d32;
-        }
-        .answer-feedback-wrong {
-            background: #ffebee;
-            border-left: 6px solid #c62828;
-        }
-        /* Tela de login */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 12px; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 12px; }
+        .answer-feedback-correct { background: #e8f5e9; border-left: 6px solid #2e7d32; }
+        .answer-feedback-wrong { background: #ffebee; border-left: 6px solid #c62828; }
         .login-overlay {
             position: fixed;
             top: 0;
@@ -130,29 +98,45 @@
             padding: 2rem;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-        /* Header fixo sem margens */
         .header-area {
             padding: 1rem 2rem;
             background: transparent;
             flex-shrink: 0;
         }
-        /* Responsividade: empilhar colunas em telas pequenas */
+        .font-control-group {
+            background: #f1f5f9;
+            border-radius: 2rem;
+            padding: 4px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .font-control-group button {
+            background: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .font-control-group button:hover { background: #e2e8f0; transform: scale(0.95); }
+        .font-control-group span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 2px;
+        }
         @media (max-width: 900px) {
-            .gran-layout {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                overflow-y: auto;
-            }
-            .left-col, .right-col {
-                overflow-y: visible;
-                height: auto;
-            }
-            .main-app {
-                overflow-y: auto;
-            }
-            .right-col {
-                margin-bottom: 20px;
-            }
+            .gran-layout { grid-template-columns: 1fr; gap: 20px; padding: 0 16px 20px 16px; }
+            .question-card { padding: 1.5rem; }
+            .header-area { padding: 0.75rem 1rem; }
+        }
+        @media (max-width: 640px) {
+            .question-text { font-size: 1rem; }
+            .btn-certo, .btn-errado { padding: 0.75rem; font-size: 1rem; }
         }
     </style>
 </head>
@@ -185,7 +169,7 @@
     </div>
 </div>
 
-<!-- CONTEÚDO PRINCIPAL (inicialmente oculto) -->
+<!-- CONTEÚDO PRINCIPAL -->
 <div id="mainApp" style="display: none;" class="main-app">
     <!-- HEADER -->
     <div class="header-area flex flex-wrap justify-between items-center gap-4 pb-2 border-b border-gray-200/80">
@@ -207,18 +191,38 @@
         </div>
     </div>
 
-    <!-- LAYOUT 2 COLUNAS COM ALTURA TOTAL -->
+    <!-- LAYOUT 2 COLUNAS (reorganizado: cards de import/desempenho movidos para direita) -->
     <div class="gran-layout">
-        <!-- COLUNA ESQUERDA (scroll) -->
+        <!-- COLUNA ESQUERDA: apenas cronômetro e ferramentas secundárias -->
         <div class="left-col space-y-6">
-            <!-- Card importação -->
+            <!-- Cronômetro -->
             <div class="card-gran p-5 border border-gray-100">
+                <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-amber-600 text-xl"></i><h2 class="font-bold text-gray-800">Cronômetro</h2></div>
+                <div class="text-center"><div id="timerDisplay" class="text-3xl font-mono font-bold bg-gray-100 inline-block px-4 py-1 rounded-2xl">00:00:00</div>
+                <div class="flex justify-center gap-2 mt-2"><button id="timerStartBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-play"></i> Iniciar</button><button id="timerPauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-pause"></i> Pausar</button><button id="timerStopBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-stop"></i> Parar</button></div></div>
+                <div class="flex flex-col gap-2 mt-4">
+                    <button id="downloadWrongAnswersBtn" class="bg-rose-50 text-rose-700 border border-rose-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-book-open"></i> Caderno de erros (PDF)</button>
+                    <button id="downloadNotebookLMBtn" class="bg-sky-50 text-sky-700 border border-sky-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-download"></i> Prompt NotebookLM</button>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button id="resetOnlyProgressBtn" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1.5 rounded-xl text-sm"><i class="fas fa-undo-alt"></i> Resetar progresso</button>
+                    <button id="clearAllDataBtn" class="flex-1 bg-red-50 border border-red-200 text-red-600 py-1.5 rounded-xl text-sm"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+                </div>
+            </div>
+            <!-- Espaço extra se quiser manter consistência -->
+            <div class="text-center text-xs text-gray-400 italic">Ferramentas de estudo</div>
+        </div>
+
+        <!-- COLUNA DIREITA: cards de importação + desempenho + questao principal -->
+        <div class="right-col space-y-6">
+            <!-- CARD BANCO DE QUESTÕES (movido para cima) -->
+            <div class="card-gran p-5 border border-gray-100" id="importCard">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="bg-emerald-100 p-2 rounded-xl"><i class="fas fa-file-upload text-emerald-700 text-lg"></i></div>
                     <div><h2 class="font-bold text-gray-800">Banco de questões</h2><p class="text-xs text-gray-500">Importe até 20 itens (formato CESPE)</p></div>
                 </div>
                 <select id="disciplineSelect" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm bg-gray-50 mb-3 focus:ring-2 focus:ring-emerald-400">
-                    <!-- Lista completa de disciplinas -->
+                    <!-- disciplinas via JS -->
                 </select>
                 <textarea id="rawQuestionsInput" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-sm font-mono bg-gray-50 focus:ring-2 focus:ring-emerald-400" placeholder="Questão 1: &quot;A Declaração Universal foi adotada em 1948.&quot;
 
@@ -235,8 +239,8 @@ Gabarito: Certo"></textarea>
                 <div class="flex justify-between text-xs text-gray-400 mt-2"><span>Máx 20 questões</span><span id="questionCounter">0/20</span></div>
             </div>
 
-            <!-- Dashboard desempenho -->
-            <div class="card-gran p-5 border border-gray-100">
+            <!-- CARD DESEMPENHO (movido para cima) -->
+            <div class="card-gran p-5 border border-gray-100" id="performanceCard">
                 <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
                     <div class="flex items-center gap-2"><i class="fas fa-chart-pie text-emerald-600 text-xl"></i><h2 class="font-bold text-gray-800">Meu desempenho</h2></div>
                     <button id="generatePdfReportBtn" class="text-indigo-600 text-xs bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100"><i class="fas fa-download mr-1"></i> Relatório</button>
@@ -248,24 +252,7 @@ Gabarito: Certo"></textarea>
                 </div>
             </div>
 
-            <!-- Cronômetro e ferramentas -->
-            <div class="card-gran p-5 border border-gray-100">
-                <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-amber-600 text-xl"></i><h2 class="font-bold text-gray-800">Cronômetro</h2></div>
-                <div class="text-center"><div id="timerDisplay" class="text-3xl font-mono font-bold bg-gray-100 inline-block px-4 py-1 rounded-2xl">00:00:00</div>
-                <div class="flex justify-center gap-2 mt-2"><button id="timerStartBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-play"></i> Iniciar</button><button id="timerPauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-pause"></i> Pausar</button><button id="timerStopBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-xl text-sm"><i class="fas fa-stop"></i> Parar</button></div></div>
-                <div class="flex flex-col gap-2 mt-4">
-                    <button id="downloadWrongAnswersBtn" class="bg-rose-50 text-rose-700 border border-rose-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-book-open"></i> Caderno de erros (PDF)</button>
-                    <button id="downloadNotebookLMBtn" class="bg-sky-50 text-sky-700 border border-sky-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-download"></i> Prompt NotebookLM</button>
-                </div>
-                <div class="flex gap-2 mt-3">
-                    <button id="resetOnlyProgressBtn" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1.5 rounded-xl text-sm"><i class="fas fa-undo-alt"></i> Resetar progresso</button>
-                    <button id="clearAllDataBtn" class="flex-1 bg-red-50 border border-red-200 text-red-600 py-1.5 rounded-xl text-sm"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- COLUNA DIREITA (questão ampliada) -->
-        <div class="right-col">
+            <!-- CARD QUESTÃO PRINCIPAL com controles de fonte separados -->
             <div id="questionPanel" class="question-card">
                 <div class="flex flex-col items-center justify-center py-16 text-gray-400">
                     <i class="fas fa-brain text-6xl mb-4 text-gray-300"></i>
@@ -277,9 +264,8 @@ Gabarito: Certo"></textarea>
 </div>
 
 <script>
-    // ------------------ CONSTANTES ------------------
+    // ------------------ CONSTANTES E ESTADO GLOBAL ------------------
     const MAX_QUESTIONS = 20;
-    // Lista completa de disciplinas (atualizada)
     const DISCIPLINAS_LIST = [
         "Língua Portuguesa", "Raciocínio Lógico-Matemático", "Direito Constitucional",
         "Direito Administrativo", "Administração Pública", "Administração Financeira e Orçamentária",
@@ -295,13 +281,13 @@ Gabarito: Certo"></textarea>
     let commentVisibleMap = new Map();
     let questionStartTimes = new Map();
     
-    // Timer estudo
     let timerInterval = null, timerSeconds = 0, timerRunning = false;
-    
-    // Charts
     let statsChart = null, disciplineChart = null;
     
-    // Elementos DOM
+    // Font size controls (separados)
+    let questionFontSize = 1.2;  // rem
+    let answerFontSize = 1.0;    // rem
+    
     const dashboardContainer = document.getElementById('dashboardContainer');
     const questionPanel = document.getElementById('questionPanel');
     const rawInput = document.getElementById('rawQuestionsInput');
@@ -332,10 +318,9 @@ Gabarito: Certo"></textarea>
         disciplineSelect.appendChild(option);
     });
 
-    // Config pdf.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     
-    // helpers
+    // Helpers
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     function formatBoldItalic(text) { if(!text) return ''; let escaped = escapeHtml(text); return escaped.replace(/\*\*([^*]+)\*\*/g, '<strong><em>$1</em></strong>'); }
     function showToast(msg, type) {
@@ -358,6 +343,8 @@ Gabarito: Certo"></textarea>
         localStorage.setItem('auditor_commentsVisible', JSON.stringify([...commentVisibleMap.entries()]));
         localStorage.setItem('auditor_timerSeconds', timerSeconds.toString());
         localStorage.setItem('auditor_timerRunning', timerRunning.toString());
+        localStorage.setItem('auditor_questionFontSize', questionFontSize.toString());
+        localStorage.setItem('auditor_answerFontSize', answerFontSize.toString());
         updateGlobalAccuracy();
     }
     function loadFromLocalStorage() {
@@ -376,6 +363,12 @@ Gabarito: Certo"></textarea>
         if(storedSec) timerSeconds = parseInt(storedSec,10);
         if(storedRun === 'true') { timerRunning=true; startTimerInterval(); }
         updateTimerDisplay();
+        // Carregar tamanhos de fonte salvos
+        const savedQFont = localStorage.getItem('auditor_questionFontSize');
+        const savedAFont = localStorage.getItem('auditor_answerFontSize');
+        if(savedQFont) questionFontSize = parseFloat(savedQFont);
+        if(savedAFont) answerFontSize = parseFloat(savedAFont);
+        applyFontSizes();
         questionStartTimes.clear();
         updateCounterDisplay();
         updateGlobalAccuracy();
@@ -386,7 +379,19 @@ Gabarito: Certo"></textarea>
     function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocalStorage(); showToast("Pausado","info");} }
     function resetTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocalStorage(); showToast("Cronômetro zerado","info");}
     
-    // parsing de questões
+    // Font size management
+    function applyFontSizes() {
+        const questionElem = document.querySelector('.question-text');
+        if(questionElem) questionElem.style.fontSize = `${questionFontSize}rem`;
+        const answerWrapper = document.getElementById('answerAreaWrapper');
+        if(answerWrapper) answerWrapper.style.fontSize = `${answerFontSize}rem`;
+    }
+    function increaseQuestionFont() { questionFontSize = Math.min(2.5, questionFontSize + 0.1); applyFontSizes(); saveToLocalStorage(); }
+    function decreaseQuestionFont() { questionFontSize = Math.max(0.8, questionFontSize - 0.1); applyFontSizes(); saveToLocalStorage(); }
+    function increaseAnswerFont() { answerFontSize = Math.min(2.2, answerFontSize + 0.1); applyFontSizes(); saveToLocalStorage(); }
+    function decreaseAnswerFont() { answerFontSize = Math.max(0.75, answerFontSize - 0.1); applyFontSizes(); saveToLocalStorage(); }
+    
+    // Parsing de questões
     function parseQuestionsFromText(text) {
         const questionsArray = [];
         const blockRegex = /Questão\s+(\d+):\s*([\s\S]*?)(?=Questão\s+\d+:|$)/gi;
@@ -546,26 +551,35 @@ Gabarito: Certo"></textarea>
         if(hasAnswered && !showComment) commentSection = `<button id="showCommentBtn" class="w-full mt-3 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition"><i class="far fa-comment-dots"></i> Ver comentário</button>`;
         else if(hasAnswered && showComment) commentSection = `<div class="mt-5 p-5 bg-gray-50 rounded-xl border border-gray-200"><i class="fas fa-quote-left text-gray-400 mr-2"></i><span class="font-semibold">Comentário do professor:</span><p class="text-gray-700 text-sm mt-2 leading-relaxed">${formatBoldItalic(q.comment)}</p></div>`;
         const disciplineOptions = DISCIPLINAS_LIST.map(d => `<option value="${d}" ${q.discipline===d?'selected':''}>${d}</option>`).join('');
-        
-        // Botão próxima questão (aparece apenas se respondida)
         const nextButtonHtml = hasAnswered ? `<div class="mb-5"><button id="nextBtnAction" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"><i class="fas fa-arrow-right"></i> ${currentIndex+1>=questions.length ? 'Finalizar simulado' : 'Próxima questão'}</button></div>` : '';
         
         const html = `
             <div>
-                <div class="mb-4"><div class="flex justify-between text-sm text-gray-500 mb-1"><span>Progresso ${currentIndex+ (hasAnswered?1:0)}/${questions.length}</span><span>${Math.round(progress)}%</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="progress-bar-animated h-full bg-emerald-500 rounded-full" style="width:${progress}%"></div></div></div>
-                <div class="flex flex-wrap justify-between items-start gap-3 mb-5 pb-2 border-b border-gray-200">
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="far fa-question-circle mr-1"></i> Questão ${q.number}</span>
-                    <div class="flex gap-2 items-center"><label class="text-xs text-gray-500">Disciplina:</label><select id="discEditSelect" class="text-xs border rounded-lg p-1 bg-white">${disciplineOptions}</select><button id="saveDiscBtn" class="text-emerald-600 text-xs"><i class="fas fa-save"></i></button></div>
+                <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="far fa-question-circle mr-1"></i> Questão ${q.number}</span>
+                        <div class="flex gap-2 items-center"><label class="text-xs text-gray-500">Disciplina:</label><select id="discEditSelect" class="text-xs border rounded-lg p-1 bg-white">${disciplineOptions}</select><button id="saveDiscBtn" class="text-emerald-600 text-xs"><i class="fas fa-save"></i></button></div>
+                    </div>
+                    <div class="flex gap-3 items-center">
+                        <div class="font-control-group"><span><i class="fas fa-text-height text-xs"></i> Q:</span><button id="decQuestionFontBtn" title="Diminuir fonte da questão">A-</button><button id="incQuestionFontBtn" title="Aumentar fonte da questão">A+</button></div>
+                        <div class="font-control-group"><span><i class="fas fa-comment-dots text-xs"></i> R:</span><button id="decAnswerFontBtn" title="Diminuir fonte da resposta">A-</button><button id="incAnswerFontBtn" title="Aumentar fonte da resposta">A+</button></div>
+                    </div>
                 </div>
-                ${nextButtonHtml}  <!-- Botão posicionado acima do enunciado -->
-                <div class="bg-gray-50/80 p-6 rounded-2xl mb-6"><p class="question-text text-gray-800 font-medium leading-relaxed">${formatBoldItalic(q.text)}</p></div>
-                <div id="answerArea">
+                <div class="mb-4"><div class="flex justify-between text-sm text-gray-500 mb-1"><span>Progresso ${currentIndex+ (hasAnswered?1:0)}/${questions.length}</span><span>${Math.round(progress)}%</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="progress-bar-animated h-full bg-emerald-500 rounded-full" style="width:${progress}%"></div></div></div>
+                ${nextButtonHtml}
+                <div class="bg-gray-50/80 p-6 rounded-2xl mb-6"><p class="question-text text-gray-800 font-medium leading-relaxed" style="font-size:${questionFontSize}rem">${formatBoldItalic(q.text)}</p></div>
+                <div id="answerAreaWrapper" style="font-size:${answerFontSize}rem">
                     ${!hasAnswered ? `<div class="flex gap-4 mb-5"><button id="btnCertoQuest" class="flex-1 btn-certo text-white font-bold py-4 rounded-xl text-lg shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Certo</button><button id="btnErradoQuest" class="flex-1 btn-errado text-white font-bold py-4 rounded-xl text-lg shadow-md flex items-center justify-center gap-2"><i class="fas fa-times-circle"></i> Errado</button></div>` : feedbackHtml}
                     ${commentSection}
                 </div>
             </div>
         `;
         questionPanel.innerHTML = html;
+        // Event listeners para fonte
+        document.getElementById('incQuestionFontBtn')?.addEventListener('click', increaseQuestionFont);
+        document.getElementById('decQuestionFontBtn')?.addEventListener('click', decreaseQuestionFont);
+        document.getElementById('incAnswerFontBtn')?.addEventListener('click', increaseAnswerFont);
+        document.getElementById('decAnswerFontBtn')?.addEventListener('click', decreaseAnswerFont);
         if(!hasAnswered){
             document.getElementById('btnCertoQuest')?.addEventListener('click',()=>answerCurrentQuestion('Certo'));
             document.getElementById('btnErradoQuest')?.addEventListener('click',()=>answerCurrentQuestion('Errado'));
@@ -575,13 +589,14 @@ Gabarito: Certo"></textarea>
             document.getElementById('nextBtnAction')?.addEventListener('click',()=>nextQuestion());
         }
         document.getElementById('saveDiscBtn')?.addEventListener('click',()=>{ const newDisc=document.getElementById('discEditSelect').value; updateDisciplineForCurrent(newDisc); });
+        applyFontSizes(); // reforço
     }
     
     function resetProgressOnly() { if(questions.length===0) return; answers = []; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); saveToLocalStorage(); renderAll(); showToast("Progresso reiniciado","success"); }
-    function clearAllData() { if(confirm("Apagar TODAS as questões, respostas e cronômetro?")){ localStorage.removeItem('auditor_questions'); localStorage.removeItem('auditor_answers'); localStorage.removeItem('auditor_currentIndex'); localStorage.removeItem('auditor_commentsVisible'); localStorage.removeItem('auditor_timerSeconds'); localStorage.removeItem('auditor_timerRunning'); questions=[]; answers=[]; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); resetTimer(); renderAll(); showToast("Todos os dados removidos","info"); } }
+    function clearAllData() { if(confirm("Apagar TODAS as questões, respostas e cronômetro?")){ localStorage.removeItem('auditor_questions'); localStorage.removeItem('auditor_answers'); localStorage.removeItem('auditor_currentIndex'); localStorage.removeItem('auditor_commentsVisible'); localStorage.removeItem('auditor_timerSeconds'); localStorage.removeItem('auditor_timerRunning'); localStorage.removeItem('auditor_questionFontSize'); localStorage.removeItem('auditor_answerFontSize'); questions=[]; answers=[]; currentIndex=0; commentVisibleMap.clear(); questionStartTimes.clear(); resetTimer(); renderAll(); showToast("Todos os dados removidos","info"); } }
     
-    async function generateWrongAnswersPDF() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const wrongs = answers.filter(a=>!a.isCorrect); if(wrongs.length===0){ showToast("Nenhum erro! 🎉","success"); return; } const doc = new jspdf.jsPDF(); doc.setFontSize(18); doc.text("Caderno de Erros - AuditorQuest",14,20); doc.setFontSize(10); doc.text(`Gerado: ${new Date().toLocaleString()}`,14,30); let y=40; for(let wa of wrongs){ const q=questions.find(qq=>qq.id===wa.questionId); if(!q) continue; if(y>260){ doc.addPage(); y=20; } doc.setFont(undefined,'bold'); doc.text(`Questão ${q.number} - ${q.discipline}`,14,y); y+=7; doc.setFont(undefined,'normal'); const txt=doc.splitTextToSize(`Enunciado: ${q.text}`,180); doc.text(txt,14,y); y+=txt.length*5; doc.text(`Sua resposta: ${wa.userChoice} | Gabarito: ${q.answer}`,14,y); y+=6; const com=doc.splitTextToSize(`Comentário: ${q.comment}`,180); doc.text(com,14,y); y+=com.length*5+6; doc.line(14,y-3,200,y-3); } doc.save(`caderno_erros_${Date.now()}.pdf`); showToast("Caderno de erros gerado","success"); }
-    async function generatePDFReport() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); const doc = new jspdf.jsPDF({orientation:'landscape'}); doc.setFontSize(16); doc.text("Relatório de Desempenho - AuditorQuest",14,18); doc.setFontSize(10); doc.text(`Data: ${new Date().toLocaleString()} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong} | Aproveitamento: ${stats.percentage}%`,14,28); const totalTime=answers.reduce((s,a)=>s+(a.timeSpentSeconds||0),0); doc.text(`Tempo total em respostas: ${Math.floor(totalTime/60)}min ${totalTime%60}s`,14,36); const tableData = answers.map(a=>{ const q=questions.find(qq=>qq.id===a.questionId); if(!q) return null; return [q.number, q.discipline, q.text.substring(0,70), a.userChoice, q.answer, a.isCorrect?"Acertou":"Errou", a.timeSpentSeconds?`${a.timeSpentSeconds}s`:"—", q.comment.substring(0,50)]; }).filter(v=>v); if(tableData.length) doc.autoTable({ head:[["#","Disciplina","Enunciado","Resp","Gabarito","Result","Tempo","Comentário"]], body:tableData, startY:45, styles:{fontSize:7}, columnStyles:{2:{cellWidth:45},7:{cellWidth:35}} }); doc.save(`relatorio_${Date.now()}.pdf`); showToast("Relatório completo gerado","success"); }
+    async function generateWrongAnswersPDF() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const wrongs = answers.filter(a=>!a.isCorrect); if(wrongs.length===0){ showToast("Nenhum erro! 🎉","success"); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text("Caderno de Erros - AuditorQuest",14,20); doc.setFontSize(10); doc.text(`Gerado: ${new Date().toLocaleString()}`,14,30); let y=40; for(let wa of wrongs){ const q=questions.find(qq=>qq.id===wa.questionId); if(!q) continue; if(y>260){ doc.addPage(); y=20; } doc.setFont(undefined,'bold'); doc.text(`Questão ${q.number} - ${q.discipline}`,14,y); y+=7; doc.setFont(undefined,'normal'); const txt=doc.splitTextToSize(`Enunciado: ${q.text}`,180); doc.text(txt,14,y); y+=txt.length*5; doc.text(`Sua resposta: ${wa.userChoice} | Gabarito: ${q.answer}`,14,y); y+=6; const com=doc.splitTextToSize(`Comentário: ${q.comment}`,180); doc.text(com,14,y); y+=com.length*5+6; doc.line(14,y-3,200,y-3); } doc.save(`caderno_erros_${Date.now()}.pdf`); showToast("Caderno de erros gerado","success"); }
+    async function generatePDFReport() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); const { jsPDF } = window.jspdf; const doc = new jsPDF({orientation:'landscape'}); doc.setFontSize(16); doc.text("Relatório de Desempenho - AuditorQuest",14,18); doc.setFontSize(10); doc.text(`Data: ${new Date().toLocaleString()} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong} | Aproveitamento: ${stats.percentage}%`,14,28); const totalTime=answers.reduce((s,a)=>s+(a.timeSpentSeconds||0),0); doc.text(`Tempo total em respostas: ${Math.floor(totalTime/60)}min ${totalTime%60}s`,14,36); const tableData = answers.map(a=>{ const q=questions.find(qq=>qq.id===a.questionId); if(!q) return null; return [q.number, q.discipline, q.text.substring(0,70), a.userChoice, q.answer, a.isCorrect?"Acertou":"Errou", a.timeSpentSeconds?`${a.timeSpentSeconds}s`:"—", q.comment.substring(0,50)]; }).filter(v=>v); if(tableData.length) doc.autoTable({ head:[["#","Disciplina","Enunciado","Resp","Gabarito","Result","Tempo","Comentário"]], body:tableData, startY:45, styles:{fontSize:7}, columnStyles:{2:{cellWidth:45},7:{cellWidth:35}} }); doc.save(`relatorio_${Date.now()}.pdf`); showToast("Relatório completo gerado","success"); }
     function generateNotebookLMPrompt() { if(questions.length===0){ showToast("Nenhuma questão","warning"); return; } const stats=computeStats(); let txt=`# AUDITORQUEST - PROMPT NOTEBOOKLM\nTotal respondidas: ${stats.totalAnswered} | Acertos: ${stats.totalCorrect} | Erros: ${stats.totalWrong}\n\n`; questions.forEach(q=>{ const resp=answers.find(a=>a.questionId===q.id); const status=resp? (resp.isCorrect?"Acertou":"Errou") : "Não respondida"; txt+=`### Questão ${q.number} (${q.discipline})\nEnunciado: ${q.text}\nGabarito: ${q.answer}\nSua resposta: ${resp?resp.userChoice:"—"} (${status})\nComentário: ${q.comment}\n\n`; }); const blob=new Blob([txt],{type:"text/plain"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`prompt_notebooklm_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast("Prompt NotebookLM baixado","success"); }
     
     function renderAll() { renderDashboard(); renderQuestion(); saveToLocalStorage(); updateCounterDisplay(); }
@@ -604,7 +619,6 @@ Gabarito: Certo"></textarea>
     function updateCurrentTime() { const now=new Date(); currentTimeSpan.textContent=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`; }
     setInterval(updateCurrentTime,1000);
     
-    // Tela de login
     function doLogin() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
@@ -614,14 +628,10 @@ Gabarito: Certo"></textarea>
     
     function setGreeting() {
         const hour = new Date().getHours();
-        let greeting = '';
-        if (hour < 12) greeting = 'Bom dia! ☀️';
-        else if (hour < 18) greeting = 'Boa tarde! 🌤️';
-        else greeting = 'Boa noite! 🌙';
+        let greeting = hour < 12 ? 'Bom dia! ☀️' : (hour < 18 ? 'Boa tarde! 🌤️' : 'Boa noite! 🌙');
         document.getElementById('greetingMessage').innerText = greeting;
     }
     setGreeting();
-    
     initEventListeners();
 </script>
 </body>
