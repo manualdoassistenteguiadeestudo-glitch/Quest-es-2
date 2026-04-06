@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AuditorQuest — Simulador CESPE/CEBRASPE</title>
+    <!-- Tailwind + Font Awesome + Chart.js + PDF.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        /* ----- PALETA PROFISSIONAL (SLATE + LARANJA) ----- */
+        :root {
+            --primary: #F97316;
+            --primary-dark: #EA580C;
+            --primary-light: #FFEDD5;
+            --secondary: #334155;
+            --background: #F8FAFC;
+            --card: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --success: #10B981;
+            --error: #EF4444;
+            --border: #E2E8F0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 15px -5px rgba(0,0,0,0.03);
+            --transition: all 0.2s ease;
+        }
+
+        body.dark {
+            --background: #0F172A;
+            --card: #1E293B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --border: #334155;
+            --primary-light: #2D1A0F;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--background);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            transition: var(--transition);
+            scroll-behavior: smooth;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #1E293B, #0F172A);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            transition: var(--transition);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .answer-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--card);
+            transition: var(--transition);
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .answer-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+        .answer-btn.correct-highlight { background: rgba(16,185,129,0.1); border-color: var(--success); color: var(--success); }
+        .answer-btn.wrong-highlight { background: rgba(239,68,68,0.1); border-color: var(--error); color: var(--error); }
+
+        .progress-top {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .gran-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        body.focus-mode .sidebar { display: none; }
+        body.focus-mode .gran-layout { grid-template-columns: 1fr; gap: 0; }
+        body.focus-mode .main-content { max-width: 900px; margin: 0 auto; width: 100%; }
+        .exit-focus-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: none;
+            transition: var(--transition);
+        }
+        body.focus-mode .exit-focus-btn { display: flex; align-items: center; gap: 0.5rem; }
+
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .question-card {
+            background: var(--card);
+            border-radius: 1.25rem;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+        .feedback-area {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: var(--background);
+        }
+        .comment-collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .comment-collapsible.show {
+            max-height: 300px;
+            transition: max-height 0.4s ease-in;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .page-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .page-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @media (max-width: 900px) {
+            .gran-layout { grid-template-columns: 1fr; padding: 1rem; gap: 1rem; }
+            .sidebar { order: 2; }
+            .main-content { order: 1; }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1E293B;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            z-index: 200;
+            animation: fadeOut 2s forwards;
+        }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+    </style>
+</head>
+<body>
+
+<div class="progress-top"><div id="topProgressFill" class="progress-fill"></div></div>
+
+<div class="app-header">
+    <div class="flex items-center gap-3">
+        <div class="bg-white/10 rounded-xl p-2"><i class="fas fa-gavel text-white text-xl"></i></div>
+        <div><h1 class="text-xl font-bold text-white">Auditor<span class="text-orange-400">Quest</span></h1><p class="text-xs text-white/70">Simulador CESPE / CEBRASPE</p></div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+        <button id="focusModeBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-expand-alt"></i> Modo Foco</button>
+        <button id="darkModeBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-moon"></i> Tema</button>
+        <button id="resetProgressBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-undo-alt"></i> Reset</button>
+        <div class="relative">
+            <button id="userMenuBtn" class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full text-white"><i class="fas fa-user-circle"></i><span id="userNameDisplay" class="text-sm">Usuário</span><i class="fas fa-chevron-down text-xs"></i></button>
+            <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg hidden z-50 border border-gray-200">
+                <button id="exportDataBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"><i class="fas fa-download"></i> Exportar JSON</button>
+                <button id="clearAllBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="gran-layout">
+    <div class="sidebar space-y-6">
+        <div class="card p-5">
+            <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-primary text-lg"></i><h2 class="font-semibold">Cronômetro</h2></div>
+            <div class="text-center"><div id="timerDisplay" class="text-2xl font-mono font-bold bg-gray-100 dark:bg-gray-700 inline-block px-4 py-1 rounded-xl">00:00:00</div>
+            <div class="flex justify-center gap-2 mt-2"><button id="timerStart" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-play"></i> Iniciar</button><button id="timerPause" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-pause"></i> Pausar</button><button id="timerStop" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-stop"></i> Parar</button></div></div>
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="downloadErrorsBtn" class="bg-rose-50 dark:bg-rose-900/30 text-rose-600 border border-rose-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-book-open"></i> Caderno de erros</button>
+                <button id="downloadNotebookBtn" class="bg-sky-50 dark:bg-sky-900/30 text-sky-600 border border-sky-200 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm"><i class="fas fa-robot"></i> Prompt NotebookLM</button>
+            </div>
+        </div>
+
+        <div class="card p-5">
+            <div class="flex items-center gap-2 mb-3"><i class="fas fa-filter text-primary"></i><h2 class="font-semibold">Filtro de estudo</h2></div>
+            <select id="filterSelect" class="w-full border border-border rounded-xl p-2 bg-background text-sm">
+                <option value="all">Todas as questões</option>
+                <option value="unanswered">Não respondidas</option>
+                <option value="wrong">Apenas erradas</option>
+                <option value="starred">⭐ Marcadas</option>
+            </select>
+            <button id="applyFilterBtn" class="w-full mt-3 btn-primary py-2 rounded-xl text-sm">Aplicar filtro</button>
+        </div>
+
+        <div class="card p-5 text-center">
+            <div class="flex justify-between items-center"><div><i class="fas fa-star text-yellow-500"></i> <span id="starredCount">0</span></div><div><i class="fas fa-fire text-orange-500"></i> <span id="streakCount">0</span> streak</div><div><i class="fas fa-trophy text-primary"></i> <span id="levelBadge">Iniciante</span></div></div>
+            <div class="mt-2 text-xs text-textSecondary">+10 acerto | -5 erro</div>
+        </div>
+    </div>
+
+    <div class="main-content space-y-6">
+        <div class="card p-5">
+            <div class="flex items-center gap-3 mb-3"><div class="bg-primary/10 p-2 rounded-xl"><i class="fas fa-file-upload text-primary text-lg"></i></div><div><h2 class="font-semibold">Banco de questões</h2><p class="text-xs text-textSecondary">Importe até 20 itens (C/E)</p></div></div>
+            <select id="disciplineSelect" class="w-full border border-border rounded-xl p-2.5 text-sm bg-background mb-3"></select>
+            <textarea id="questionsRaw" rows="3" class="w-full border border-border rounded-xl p-3 text-sm font-mono bg-background" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."
+
+Comentário: "Adotada pela ONU em 10/12/1948."
+
+Gabarito: Certo'></textarea>
+            <div class="flex flex-wrap gap-2 mt-3">
+                <button id="previewImportBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-eye"></i> Visualizar</button>
+                <button id="importBtn" class="flex-1 btn-primary py-2 rounded-xl text-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
+                <button id="exampleBtn" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-2 rounded-xl text-sm"><i class="fas fa-code-branch"></i> Exemplo</button>
+                <button id="importPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-file-pdf"></i> PDF</button>
+                <input type="file" id="pdfUpload" accept=".pdf" class="hidden">
+            </div>
+            <div class="flex justify-between text-xs text-textSecondary mt-2"><span>Máx 20</span><span id="questionCounter">0/20</span></div>
+        </div>
+
+        <div class="card p-5">
+            <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-2"><i class="fas fa-chart-pie text-primary text-lg"></i><h2 class="font-semibold">Desempenho</h2></div><button id="reportBtn" class="text-primary text-xs bg-primary/10 px-3 py-1.5 rounded-full"><i class="fas fa-chart-line"></i> Relatório</button></div>
+            <div id="dashboardArea" class="min-h-[100px]"></div>
+            <div id="insightMsg" class="mt-2 text-sm font-medium"></div>
+            <div class="mt-3 pt-2 border-t border-border"><canvas id="disciplineChart" height="120"></canvas></div>
+        </div>
+
+        <div id="questionsGridContainer" class="questions-grid"></div>
+
+        <div class="pagination">
+            <button id="prevPageBtn" class="page-btn"><i class="fas fa-chevron-left"></i> Anterior</button>
+            <span id="pageIndicator" class="text-sm font-medium">Página 1</span>
+            <button id="nextPageBtn" class="page-btn">Próxima <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<button id="exitFocusBtn" class="exit-focus-btn"><i class="fas fa-times-circle"></i> Sair do modo foco</button>
+
+<div id="previewModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"><div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6"><h3 class="text-xl font-bold mb-3">Pré-visualização</h3><div id="previewList" class="space-y-2 text-sm"></div><div class="flex justify-end gap-3 mt-4"><button id="cancelPreview" class="px-4 py-2 bg-gray-300 rounded-xl">Cancelar</button><button id="confirmPreview" class="px-4 py-2 bg-primary text-white rounded-xl">Confirmar</button></div></div></div>
+
+<script>
+    const MAX_QUESTIONS = 20;
+    const PAGE_SIZE = 10;
+    const DISCIPLINAS = ["Língua Portuguesa","Raciocínio Lógico","Direito Constitucional","Direito Administrativo","Auditoria","Contabilidade"];
+    let questions = [];
+    let answers = [];
+    let starred = new Set();
+    let currentFilter = "all";
+    let filteredList = [];
+    let currentPage = 0;
+    let points = 0, streak = 0;
+    let timerSeconds = 0, timerInterval = null, timerRunning = false;
+
+    // Elementos DOM
+    const disciplineSelect = document.getElementById("disciplineSelect");
+    const rawInput = document.getElementById("questionsRaw");
+    const importBtn = document.getElementById("importBtn");
+    const previewBtn = document.getElementById("previewImportBtn");
+    const exampleBtn = document.getElementById("exampleBtn");
+    const importPdfBtn = document.getElementById("importPdfBtn");
+    const pdfUpload = document.getElementById("pdfUpload");
+    const filterSelect = document.getElementById("filterSelect");
+    const applyFilterBtn = document.getElementById("applyFilterBtn");
+    const prevPageBtn = document.getElementById("prevPageBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
+    const pageIndicator = document.getElementById("pageIndicator");
+    const questionsGrid = document.getElementById("questionsGridContainer");
+    const dashboardArea = document.getElementById("dashboardArea");
+    const disciplineChartCanvas = document.getElementById("disciplineChart");
+    const starredCountSpan = document.getElementById("starredCount");
+    const streakCountSpan = document.getElementById("streakCount");
+    const levelBadge = document.getElementById("levelBadge");
+    const questionCounterSpan = document.getElementById("questionCounter");
+    const topProgressFill = document.getElementById("topProgressFill");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const timerStart = document.getElementById("timerStart");
+    const timerPause = document.getElementById("timerPause");
+    const timerStop = document.getElementById("timerStop");
+
+    DISCIPLINAS.forEach(d => { let opt = document.createElement("option"); opt.value = d; opt.textContent = d; disciplineSelect.appendChild(opt); });
+
+    function showToast(msg) {
+        let toast = document.createElement("div"); toast.className = "toast"; toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
+    function saveToLocal() {
+        localStorage.setItem("auditor_questions", JSON.stringify(questions));
+        localStorage.setItem("auditor_answers", JSON.stringify(answers));
+        localStorage.setItem("auditor_starred", JSON.stringify([...starred]));
+        localStorage.setItem("auditor_points", points);
+        localStorage.setItem("auditor_streak", streak);
+        localStorage.setItem("auditor_timer", timerSeconds);
+        localStorage.setItem("auditor_timerRunning", timerRunning);
+        localStorage.setItem("auditor_filter", currentFilter);
+    }
+
+    function loadFromLocal() {
+        let q = localStorage.getItem("auditor_questions");
+        if(q) questions = JSON.parse(q);
+        let a = localStorage.getItem("auditor_answers");
+        if(a) answers = JSON.parse(a);
+        let star = localStorage.getItem("auditor_starred");
+        if(star) starred = new Set(JSON.parse(star));
+        let pts = localStorage.getItem("auditor_points");
+        if(pts) points = parseInt(pts);
+        let strk = localStorage.getItem("auditor_streak");
+        if(strk) streak = parseInt(strk);
+        let sec = localStorage.getItem("auditor_timer");
+        if(sec) timerSeconds = parseInt(sec);
+        let run = localStorage.getItem("auditor_timerRunning");
+        if(run === "true") { timerRunning = true; startTimerInterval(); }
+        updateTimerDisplay();
+        let filt = localStorage.getItem("auditor_filter");
+        if(filt) currentFilter = filt;
+        filterSelect.value = currentFilter;
+        updatePointsAndStreak();
+        applyFilter();
+    }
+
+    function startTimerInterval() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if(timerRunning) { timerSeconds++; updateTimerDisplay(); saveToLocal(); } }, 1000); }
+    function updateTimerDisplay() { let h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; timerDisplay.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
+    function startTimer() { if(!timerRunning){ timerRunning=true; if(!timerInterval) startTimerInterval(); saveToLocal(); showToast("Cronômetro iniciado"); } }
+    function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocal(); showToast("Pausado"); } }
+    function stopTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocal(); showToast("Zerado"); }
+
+    function updatePointsAndStreak() {
+        let totalPoints = 0, currentStreak = 0;
+        for(let ans of answers) {
+            if(ans.isCorrect) { totalPoints += 10; currentStreak++; }
+            else { totalPoints = Math.max(0, totalPoints-5); currentStreak = 0; }
+        }
+        points = totalPoints; streak = currentStreak;
+        let level = points < 100 ? "Iniciante" : (points < 300 ? "Intermediário" : "Avançado");
+        levelBadge.innerText = level;
+        streakCountSpan.innerText = streak;
+        saveToLocal();
+    }
+
+    function parseQuestions(text) {
+        let result = [];
+        let regex = /Questão\s+(\d+):\s*([\s\S]*?)(?=Questão\s+\d+:|$)/gi;
+        let match;
+        while((match = regex.exec(text)) !== null) {
+            let num = parseInt(match[1]);
+            let block = match[2].trim();
+            let answer = "Certo";
+            let comment = "";
+            let gabMatch = block.match(/Gabarito:\s*(Certo|Errado|C|c|E|e)/i);
+            if(gabMatch) { let g = gabMatch[1]; answer = (g.toLowerCase()==='c')?'Certo':((g.toLowerCase()==='e')?'Errado':g); block = block.replace(gabMatch[0],''); }
+            let comMatch = block.match(/Comentário:\s*([\s\S]*?)(?=(?:Gabarito:|$))/i);
+            if(comMatch) { comment = comMatch[1].trim(); block = block.replace(comMatch[0],''); }
+            else comment = "Sem comentário adicional.";
+            let questionText = block.trim().replace(/^["']|["']$/g,'');
+            if(questionText) result.push({ id: Date.now()+Math.random()*10000+num, number: num, text: questionText, comment, answer });
+        }
+        return result;
+    }
+
+    function importQuestions(raw, discOverride=null) {
+        let parsed = parseQuestions(raw);
+        if(parsed.length===0) { showToast("Nenhuma questão válida encontrada"); return false; }
+        if(parsed.length > MAX_QUESTIONS) { showToast(`Limite de ${MAX_QUESTIONS} questões`); return false; }
+        let disc = discOverride || disciplineSelect.value;
+        questions = parsed.map(q => ({ ...q, discipline: disc }));
+        answers = [];
+        starred.clear();
+        points = 0; streak = 0;
+        // Limpar estados de comentários antigos
+        for(let key in localStorage) {
+            if(key.startsWith("comment_")) localStorage.removeItem(key);
+        }
+        saveToLocal();
+        applyFilter();
+        showToast(`${parsed.length} questões importadas com sucesso`);
+        return true;
+    }
+
+    function applyFilter() {
+        if(!questions.length) { filteredList = []; currentPage = 0; renderAll(); return; }
+        let filter = filterSelect.value;
+        currentFilter = filter;
+        let filtered = [...questions];
+        if(filter === "unanswered") filtered = filtered.filter(q => !answers.some(a=>a.questionId===q.id));
+        else if(filter === "wrong") filtered = filtered.filter(q => answers.some(a=>a.questionId===q.id && !a.isCorrect));
+        else if(filter === "starred") filtered = filtered.filter(q => starred.has(q.id));
+        filteredList = filtered;
+        currentPage = 0;
+        renderAll();
+    }
+
+    function answerQuestion(questionId, choice) {
+        let q = questions.find(qq => qq.id === questionId);
+        if(!q) return;
+        if(answers.some(a => a.questionId === q.id)) { showToast("Essa questão já foi respondida"); return; }
+        let isCorrect = (choice === q.answer);
+        answers.push({ questionId: q.id, isCorrect, userChoice: choice, timestamp: Date.now() });
+        updatePointsAndStreak();
+        saveToLocal();
+        renderAll();
+        let cardElement = document.getElementById(`question-card-${q.id}`);
+        if(cardElement) cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function toggleComment(questionId) {
+        let current = localStorage.getItem(`comment_${questionId}`);
+        let newState = current === 'true' ? 'false' : 'true';
+        localStorage.setItem(`comment_${questionId}`, newState);
+        // Atualizar apenas o card específico para não recarregar tudo (melhor performance)
+        const commentDiv = document.getElementById(`comment-${questionId}`);
+        if(commentDiv) {
+            if(newState === 'true') commentDiv.classList.add('show');
+            else commentDiv.classList.remove('show');
+            const btn = document.querySelector(`.toggle-comment-btn[data-id="${questionId}"]`);
+            if(btn) btn.innerHTML = `<i class="far fa-comment-dots mr-1"></i> ${newState === 'true' ? 'Esconder comentário' : 'Ver comentário'}`;
+        } else {
+            renderAll(); // fallback
+        }
+    }
+
+    function isCommentVisible(questionId) {
+        return localStorage.getItem(`comment_${questionId}`) === 'true';
+    }
+
+    function toggleStar(questionId) {
+        if(starred.has(questionId)) starred.delete(questionId);
+        else starred.add(questionId);
+        saveToLocal();
+        renderAll();
+    }
+
+    function renderDashboard() {
+        let total = answers.length, correct = answers.filter(a=>a.isCorrect).length;
+        dashboardArea.innerHTML = `<div class="grid grid-cols-2 gap-3"><div class="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-xl text-center"><i class="fas fa-check-circle text-emerald-500 text-xl"></i><div class="text-2xl font-bold">${correct}</div><div class="text-xs">Acertos</div></div><div class="bg-red-50 dark:bg-red-900/30 p-3 rounded-xl text-center"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${total-correct}</div><div class="text-xs">Erros</div></div></div>`;
+        if(window.disChart) window.disChart.destroy();
+        let ctx = disciplineChartCanvas.getContext("2d");
+        window.disChart = new Chart(ctx, { type:"bar", data:{ labels:["Acertos", "Erros"], datasets:[{ label:"Quantidade", data:[correct, total-correct], backgroundColor: ["#F97316", "#EF4444"], borderRadius: 8 }] }, options:{ responsive: true, maintainAspectRatio: true } });
+        let insight = "";
+        let last5 = answers.slice(-5);
+        let lastCorrect = last5.filter(a=>a.isCorrect).length;
+        if(last5.length>=3 && lastCorrect/last5.length>0.6) insight = "🔥 Bom rendimento! Continue revisando.";
+        else if(last5.length>=3 && lastCorrect/last5.length<0.4) insight = "⚠️ Atenção! Revise os conceitos.";
+        document.getElementById("insightMsg").innerHTML = insight ? `<div class="p-2 rounded-lg bg-primary/10">${insight}</div>` : "";
+    }
+
+    function renderQuestionsPage() {
+        if(!filteredList.length) {
+            questionsGrid.innerHTML = `<div class="card p-8 text-center text-textSecondary"><i class="fas fa-inbox text-4xl mb-2"></i><p>Nenhuma questão para exibir.</p><p class="text-sm">Importe questões ou ajuste os filtros.</p></div>`;
+            return;
+        }
+        const start = currentPage * PAGE_SIZE;
+        const end = Math.min(start + PAGE_SIZE, filteredList.length);
+        const pageQuestions = filteredList.slice(start, end);
+        let html = '';
+        for(let q of pageQuestions) {
+            const answered = answers.find(a => a.questionId === q.id);
+            const isStarred = starred.has(q.id);
+            const showComment = isCommentVisible(q.id);
+            const starIcon = isStarred ? "fas fa-star text-yellow-500" : "far fa-star";
+            let feedbackHtml = '';
+            if(answered) {
+                feedbackHtml = `<div class="feedback-area mt-3">
+                    <div class="flex items-center gap-2 mb-2"><i class="fas ${answered.isCorrect ? 'fa-check-circle text-emerald-500' : 'fa-times-circle text-red-500'}"></i><span class="font-semibold">${answered.isCorrect ? 'Correto!' : 'Errado!'}</span></div>
+                    <p class="text-sm mb-2">Sua resposta: ${answered.userChoice} | Gabarito: ${q.answer}</p>
+                    <button class="toggle-comment-btn text-xs bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-full" data-id="${q.id}"><i class="far fa-comment-dots mr-1"></i> ${showComment ? 'Esconder comentário' : 'Ver comentário'}</button>
+                    <div id="comment-${q.id}" class="comment-collapsible ${showComment ? 'show' : ''} mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg"><p class="text-sm">${q.comment}</p></div>
+                </div>`;
+            } else {
+                feedbackHtml = `<div class="flex gap-3 mt-4"><button class="answer-certo btn-primary px-5 py-2 rounded-xl text-sm" data-id="${q.id}"><i class="fas fa-check-circle"></i> Certo</button><button class="answer-errado btn-primary px-5 py-2 rounded-xl text-sm" data-id="${q.id}"><i class="fas fa-times-circle"></i> Errado</button></div>`;
+            }
+            html += `
+                <div class="question-card p-5" id="question-card-${q.id}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-primary/10 text-primary-dark text-xs font-bold px-3 py-1 rounded-full">Q${q.number}</span>
+                            <span class="text-xs text-textSecondary bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">${q.discipline}</span>
+                            <button class="star-btn text-lg" data-id="${q.id}"><i class="${starIcon}"></i></button>
+                        </div>
+                    </div>
+                    <div class="question-text">${q.text}</div>
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+        questionsGrid.innerHTML = html;
+        // Eventos
+        document.querySelectorAll('.answer-certo').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); answerQuestion(parseInt(btn.dataset.id), "Certo"); }));
+        document.querySelectorAll('.answer-errado').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); answerQuestion(parseInt(btn.dataset.id), "Errado"); }));
+        document.querySelectorAll('.toggle-comment-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); toggleComment(parseInt(btn.dataset.id)); }));
+        document.querySelectorAll('.star-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); toggleStar(parseInt(btn.dataset.id)); }));
+        updatePaginationControls();
+        updateCounterAndProgress();
+    }
+
+    function updatePaginationControls() {
+        const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
+        pageIndicator.innerText = `Página ${currentPage+1} de ${totalPages || 1}`;
+        prevPageBtn.disabled = currentPage === 0;
+        nextPageBtn.disabled = currentPage >= totalPages-1;
+    }
+
+    function updateCounterAndProgress() {
+        let total = filteredList.length;
+        questionCounterSpan.innerText = `${total}/${MAX_QUESTIONS}`;
+        starredCountSpan.innerText = starred.size;
+        let totalQuestions = questions.length;
+        let answeredCount = answers.length;
+        let progressPercent = totalQuestions ? (answeredCount / totalQuestions) * 100 : 0;
+        topProgressFill.style.width = `${progressPercent}%`;
+    }
+
+    function renderAll() {
+        renderDashboard();
+        renderQuestionsPage();
+        saveToLocal();
+    }
+
+    function nextPage() { if(currentPage < Math.ceil(filteredList.length / PAGE_SIZE)-1) { currentPage++; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+    function prevPage() { if(currentPage > 0) { currentPage--; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+
+    function resetProgress() { if(questions.length) { answers=[]; starred.clear(); points=0; streak=0; for(let key in localStorage) if(key.startsWith("comment_")) localStorage.removeItem(key); saveToLocal(); applyFilter(); showToast("Progresso resetado"); } }
+    function clearAllData() { if(confirm("Apagar todos os dados?")) { localStorage.clear(); location.reload(); } }
+    function exportJSON() { let data = { questions, answers, starred:[...starred] }; let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"})); a.download="auditorquest_backup.json"; a.click(); showToast("Backup exportado"); }
+    function toggleFocusMode() { document.body.classList.toggle("focus-mode"); localStorage.setItem("focusMode", document.body.classList.contains("focus-mode")); }
+    function toggleDarkMode() { document.body.classList.toggle("dark"); localStorage.setItem("darkMode", document.body.classList.contains("dark")); }
+    function generateErrorNotebook() { let wrongs = answers.filter(a=>!a.isCorrect).map(a=>questions.find(q=>q.id===a.questionId)).filter(Boolean); if(wrongs.length===0) { showToast("Nenhum erro registrado"); return; } let content = "CADERNO DE ERROS - AuditorQuest\n\n"; wrongs.forEach(q=>{ content += `Questão ${q.number}: ${q.text}\nGabarito: ${q.answer}\nComentário: ${q.comment}\n\n---\n\n`; }); let blob = new Blob([content], {type:"text/plain"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="caderno_erros.txt"; a.click(); showToast("Caderno de erros gerado"); }
+    function generateNotebookLMPrompt() { let prompt = `# Prompt para NotebookLM - Estudo de questões CESPE/CEBRASPE\n\n## Instruções:\nAnalise as seguintes questões e forneça resumos, estatísticas e sugestões de revisão com base nos meus erros.\n\n## Questões:\n`; questions.forEach((q,idx)=>{ let resp = answers.find(a=>a.questionId===q.id); prompt += `\n${idx+1}. ${q.text}\n   - Gabarito: ${q.answer}\n   - Minha resposta: ${resp ? resp.userChoice : "Não respondida"}\n   - Comentário: ${q.comment}\n`; }); let blob = new Blob([prompt], {type:"text/markdown"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="prompt_notebooklm.md"; a.click(); showToast("Prompt para NotebookLM baixado"); }
+    function generateReport() { let total=answers.length, correct=answers.filter(a=>a.isCorrect).length; let percent = total ? ((correct/total)*100).toFixed(1) : 0; alert(`RELATÓRIO DE DESEMPENHO\nAcertos: ${correct}\nErros: ${total-correct}\nAproveitamento: ${percent}%\nStreak atual: ${streak}\nPontuação: ${points}`); }
+
+    timerStart.onclick = startTimer; timerPause.onclick = pauseTimer; timerStop.onclick = stopTimer;
+    document.getElementById("resetProgressBtn").onclick = resetProgress;
+    document.getElementById("clearAllBtn").onclick = clearAllData;
+    document.getElementById("exportDataBtn").onclick = exportJSON;
+    document.getElementById("focusModeBtn").onclick = toggleFocusMode;
+    document.getElementById("darkModeBtn").onclick = toggleDarkMode;
+    document.getElementById("exitFocusBtn").onclick = toggleFocusMode;
+    prevPageBtn.onclick = prevPage;
+    nextPageBtn.onclick = nextPage;
+    applyFilterBtn.onclick = applyFilter;
+    importBtn.onclick = () => { if(rawInput.value.trim()) importQuestions(rawInput.value); };
+    previewBtn.onclick = () => { let parsed = parseQuestions(rawInput.value); if(parsed.length) { document.getElementById("previewList").innerHTML = parsed.map(q=>`<div><strong>Q${q.number}:</strong> ${q.text.substring(0,80)}... <span class="text-xs font-mono">${q.answer}</span></div>`).join(""); document.getElementById("previewModal").style.display = "flex"; } else showToast("Nada detectado"); };
+    document.getElementById("cancelPreview").onclick = () => document.getElementById("previewModal").style.display = "none";
+    document.getElementById("confirmPreview").onclick = () => { importQuestions(rawInput.value); document.getElementById("previewModal").style.display = "none"; };
+    exampleBtn.onclick = () => { rawInput.value = `Questão 1: "A Declaração Universal dos Direitos Humanos foi adotada em 1948."\nComentário: "Adotada pela ONU em 10/12/1948."\nGabarito: Certo\n\nQuestão 2: "O Brasil foi descoberto em 1500 por Pedro Álvares Cabral."\nComentário: "Fato histórico consolidado."\nGabarito: Certo\n\nQuestão 3: "A auditoria interna é facultativa para empresas de capital aberto."\nComentário: "É obrigatória por lei."\nGabarito: Errado`; importQuestions(rawInput.value); };
+    importPdfBtn.onclick = () => pdfUpload.click();
+    pdfUpload.onchange = async(e) => { if(e.target.files[0]) { showToast("Extraindo texto do PDF..."); let file = e.target.files[0]; let reader = new FileReader(); reader.onload = async(ev) => { let typedarray = new Uint8Array(ev.target.result); let pdf = await pdfjsLib.getDocument(typedarray).promise; let text=""; for(let i=1;i<=pdf.numPages;i++) { let page=await pdf.getPage(i); let content=await page.getTextContent(); text+=content.items.map(t=>t.str).join(" "); } rawInput.value = text; importQuestions(text); }; reader.readAsArrayBuffer(file); } };
+    document.getElementById("userMenuBtn").onclick = () => document.getElementById("userDropdown").classList.toggle("hidden");
+    document.addEventListener("click", (e) => { if(!document.getElementById("userMenuBtn").contains(e.target)) document.getElementById("userDropdown").classList.add("hidden"); });
+    document.getElementById("reportBtn").onclick = generateReport;
+    document.getElementById("downloadErrorsBtn").onclick = generateErrorNotebook;
+    document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt;
+    window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
+
+    if(localStorage.getItem("darkMode")==="true") document.body.classList.add("dark");
+    if(localStorage.getItem("focusMode")==="true") document.body.classList.add("focus-mode");
+    loadFromLocal();
+    if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para começar.");
+</script>
+
+<div id="loginScreen" class="fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-96 shadow-xl"><h2 class="text-2xl font-bold text-center mb-4">AuditorQuest</h2><form id="loginForm" onsubmit="event.preventDefault(); doLogin();"><input type="email" placeholder="Email" value="aluno@exemplo.com" class="w-full border p-2 rounded mb-2"><input type="password" placeholder="Senha" value="123" class="w-full border p-2 rounded mb-4"><button type="submit" class="w-full btn-primary py-2 rounded">Entrar</button></form></div>
+</div>
+<div id="mainApp" style="display: none;"></div>
+<script>
+    function doLogin() { document.getElementById("loginScreen").style.display="none"; document.getElementById("mainApp").style.display="block"; loadFromLocal(); renderAll(); }
+    if(localStorage.getItem("auditor_questions")) { doLogin(); } else { document.getElementById("mainApp").style.display="block"; document.getElementById("loginScreen").style.display="none"; loadFromLocal(); }
+</script>
+</body>
+</html>
