@@ -406,12 +406,76 @@
             color: var(--text-primary);
         }
 
-        @media (max-width: 900px) {
-            .gran-layout { grid-template-columns: 1fr; padding: 1rem; gap: 1.2rem; }
-            .question-card { padding: 1.2rem; }
-            .questao-texto { font-size: 1rem; }
-            .flex.gap-3 { flex-direction: column; }
-            .btn-resposta { width: 100%; }
+        /* ========== NOVOS ESTILOS POWER BI DASHBOARD ========== */
+        .powerbi-dashboard {
+            background: #0f172a; /* fundo fixo estilo Power BI */
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.2s;
+        }
+        [data-theme="light"] .powerbi-dashboard {
+            background: #f1f5f9;
+            border-color: rgba(0,0,0,0.1);
+        }
+        .kpi-grid-v2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .kpi-card-v2 {
+            background: #111827;
+            border-radius: 1.25rem;
+            padding: 1rem 1rem;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        [data-theme="light"] .kpi-card-v2 {
+            background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .kpi-card-v2:hover { transform: translateY(-3px); }
+        .kpi-title-v2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 0.5rem; }
+        .kpi-value-v2 { font-size: 2rem; font-weight: 700; color: #f1f5f9; line-height: 1.2; }
+        [data-theme="light"] .kpi-value-v2 { color: #0f172a; }
+        .kpi-unit-v2 { font-size: 0.85rem; color: #64748b; margin-left: 4px; }
+        .kpi-trend-v2 { font-size: 0.7rem; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: #22c55e; }
+        .trend-down { color: #ef4444; }
+        .charts-row-v2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
+        }
+        .chart-card-v2 {
+            background: #111827;
+            border-radius: 1.25rem;
+            padding: 1rem;
+            border: 1px solid #1e293b;
+        }
+        [data-theme="light"] .chart-card-v2 {
+            background: white;
+            border-color: #e2e8f0;
+        }
+        .insight-card-v2 {
+            background: #111827;
+            border-radius: 1.25rem;
+            padding: 1.2rem;
+            margin-top: 0.5rem;
+            border-left: 4px solid #f97316;
+        }
+        [data-theme="light"] .insight-card-v2 {
+            background: white;
+        }
+        .diagnosis-text { font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
+        [data-theme="light"] .diagnosis-text { color: #334155; }
+        @media (max-width: 768px) {
+            .kpi-value-v2 { font-size: 1.5rem; }
+            .powerbi-dashboard { padding: 1rem; }
         }
     </style>
 </head>
@@ -425,9 +489,7 @@
         <div><h1 class="text-xl font-bold">Auditor<span class="text-orange-400">Quest</span></h1><p class="text-xs text-textSecondary">CESPE / CEBRASPE</p></div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
-        <!-- NOVO BOTÃO: Estratégia de Prova (Configuração de Treino) -->
         <button id="configTreinoBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-sliders-h"></i> Estratégia</button>
-        <!-- Botão de tamanho de fonte (engrenagem) -->
         <div class="relative">
             <button id="fontSettingsBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-font"></i> Ajuste</button>
             <div id="fontPanel" class="font-control-panel hidden">
@@ -499,11 +561,24 @@ Gabarito: Certo'></textarea>
             <div class="flex justify-between text-xs text-textSecondary mt-2"><span>Máx 20</span><span id="questionCounter">0/20</span></div>
         </div>
 
+        <!-- ÁREA DO DASHBOARD ORIGINAL (preservada) -->
         <div class="card p-5">
             <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-2"><i class="fas fa-chart-pie text-orange-400 text-lg"></i><h2 class="font-semibold">Desempenho</h2></div><button id="reportBtn" class="text-orange-400 text-xs bg-orange-500/10 px-3 py-1.5 rounded-full"><i class="fas fa-chart-line"></i> Relatório</button></div>
             <div id="dashboardArea" class="min-h-[100px]"></div>
             <div id="insightMsg" class="mt-2 text-sm font-medium"></div>
             <div class="mt-3 pt-2 border-t border-borderLight"><canvas id="disciplineChart" height="120"></canvas></div>
+        </div>
+
+        <!-- ========== NOVO DASHBOARD POWER BI (adicionado sem interferir) ========== -->
+        <div id="powerbiContainerV2" class="powerbi-dashboard">
+            <div class="flex items-center gap-2 mb-4"><i class="fas fa-chalkboard-user text-blue-400 text-xl"></i><h3 class="font-bold text-white/90">📊 Power BI - Rodada Atual (últimas 15 questões)</h3></div>
+            <div class="kpi-grid-v2" id="kpiGridV2"></div>
+            <div class="charts-row-v2">
+                <div class="chart-card-v2"><canvas id="doughnutRodadaV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos × Erros</p></div>
+                <div class="chart-card-v2"><canvas id="barDisciplinasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos por disciplina</p></div>
+                <div class="chart-card-v2"><canvas id="lineRodadasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Evolução % acerto (últimas 5 rodadas)</p></div>
+            </div>
+            <div class="insight-card-v2" id="insightV2"></div>
         </div>
 
         <div id="questionsGridContainer" class="questions-grid"></div>
@@ -518,7 +593,7 @@ Gabarito: Certo'></textarea>
 
 <div id="previewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4"><div class="bg-card rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6 border border-borderLight"><h3 class="text-xl font-bold mb-3">Pré-visualização</h3><div id="previewList" class="space-y-2 text-sm"></div><div class="flex justify-end gap-3 mt-4"><button id="cancelPreview" class="px-4 py-2 bg-gray-700 rounded-xl">Cancelar</button><button id="confirmPreview" class="px-4 py-2 bg-orange-600 text-white rounded-xl">Confirmar</button></div></div></div>
 
-<!-- MODAL CONFIGURAÇÃO DE TREINO (nova funcionalidade) -->
+<!-- MODAL CONFIGURAÇÃO DE TREINO -->
 <div id="configModal" class="modal-config hidden">
     <div class="modal-config-content">
         <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-chess-board"></i> Estratégia de Prova</h3><button id="closeConfigModal" class="text-2xl leading-5">&times;</button></div>
@@ -560,16 +635,14 @@ Gabarito: Certo'></textarea>
     // timer
     let timerSeconds = 0, timerInterval = null, timerRunning = false;
 
-    // NOVAS VARIÁVEIS: Configuração de Treino (não interfere nas existentes)
     let trainingConfig = {
         difficulty: "balanced",
         type: "cebraspe",
         depth: "standard",
-        extras: [] // array de strings
+        extras: []
     };
 
-    // Controle de fonte
-    let fontSizeQuestion = 1.125; // em rem
+    let fontSizeQuestion = 1.125;
     let fontSizeComment = 0.9;
     const FONT_STORAGE_KEY = "auditor_font_sizes";
 
@@ -600,7 +673,6 @@ Gabarito: Certo'></textarea>
 
     function showToast(msg) { let toast = document.createElement("div"); toast.className = "toast"; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
 
-    // ----- PARSER INTELIGENTE (obrigatório) -----
     function parseQuestoes(texto) {
         const blocos = texto.split(/Questão\s+\d+:/g).filter(Boolean);
         const questoes = [];
@@ -626,7 +698,8 @@ Gabarito: Certo'></textarea>
                     responded: false,
                     userChoice: null,
                     showComment: false,
-                    isStarred: false
+                    isStarred: false,
+                    responseTimestamp: null
                 });
             }
         }
@@ -643,6 +716,7 @@ Gabarito: Certo'></textarea>
         saveToLocal();
         applyFilter();
         showToast(`${parsed.length} questões importadas`);
+        atualizarDashboardPowerBI(); // força atualização do novo dashboard
         return true;
     }
 
@@ -663,7 +737,7 @@ Gabarito: Certo'></textarea>
         const savedQ = localStorage.getItem("auditor_questions_v2");
         if(savedQ) {
             questions = JSON.parse(savedQ);
-            questions.forEach(q => { if(q.responded === undefined) q.responded = false; if(q.showComment === undefined) q.showComment = false; if(q.userChoice === undefined) q.userChoice = null; if(q.isStarred === undefined) q.isStarred = false; });
+            questions.forEach(q => { if(q.responded === undefined) q.responded = false; if(q.showComment === undefined) q.showComment = false; if(q.userChoice === undefined) q.userChoice = null; if(q.isStarred === undefined) q.isStarred = false; if(q.responseTimestamp === undefined) q.responseTimestamp = null; });
         }
         const star = localStorage.getItem("auditor_starred");
         if(star) starredSet = new Set(JSON.parse(star));
@@ -679,7 +753,6 @@ Gabarito: Certo'></textarea>
         let filt = localStorage.getItem("auditor_filter");
         if(filt) currentFilter = filt;
         filterSelect.value = currentFilter;
-        // Carregar config de treino
         let savedConfig = localStorage.getItem("auditor_training_config");
         if(savedConfig) {
             try {
@@ -687,7 +760,6 @@ Gabarito: Certo'></textarea>
                 if(!trainingConfig.extras) trainingConfig.extras = [];
             } catch(e) {}
         }
-        // Carregar tamanhos de fonte
         let fontSizes = localStorage.getItem(FONT_STORAGE_KEY);
         if(fontSizes) {
             let sizes = JSON.parse(fontSizes);
@@ -697,6 +769,7 @@ Gabarito: Certo'></textarea>
         applyFontSizesToCSS();
         updatePointsAndStreak();
         applyFilter();
+        atualizarDashboardPowerBI();
     }
 
     function updatePointsAndStreak() {
@@ -720,10 +793,14 @@ Gabarito: Certo'></textarea>
         q.responded = true;
         q.userChoice = resposta;
         q.showComment = false;
+        // Adiciona timestamp para controle de rodada (sem afetar outras lógicas)
+        if(!q.responseTimestamp) q.responseTimestamp = Date.now();
         updatePointsAndStreak();
         saveToLocal();
         renderAll();
         document.getElementById(`question-card-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Atualiza dashboard Power BI
+        atualizarDashboardPowerBI();
     }
 
     function toggleComentario(id) {
@@ -741,50 +818,34 @@ Gabarito: Certo'></textarea>
         renderAll();
     }
 
-    // ---------------------- FUNÇÃO DE APLICAÇÃO DA ESTRATÉGIA (NOVA) ----------------------
-    // Esta função atua sobre a lista filtrada (filteredList) para reordenar/selecionar conforme as opções
-    // Não altera o array original 'questions' nem dados de resposta.
     function applyTrainingStrategy() {
         if(!filteredList.length) return;
         let workingList = [...filteredList];
-        // 1. Aplicar distribuição de dificuldade (simulação com base em ordem atual - como não temos campo dificuldade, usamos heurística: questões respondidas erradas são "difíceis", não respondidas "médias", acertadas "fáceis")
         if(trainingConfig.difficulty === "errorFocus") {
-            // foco em erros: prioriza questões respondidas com erro
             workingList.sort((a,b) => {
                 let aErr = a.responded && a.userChoice !== a.answer ? 1 : 0;
                 let bErr = b.responded && b.userChoice !== b.answer ? 1 : 0;
                 return bErr - aErr;
             });
         } else if(trainingConfig.difficulty === "progressive") {
-            // progressivo: primeiro não respondidas, depois erradas, depois certas
             workingList.sort((a,b) => {
                 let aWeight = a.responded ? (a.userChoice === a.answer ? 2 : 1) : 0;
                 let bWeight = b.responded ? (b.userChoice === b.answer ? 2 : 1) : 0;
                 return aWeight - bWeight;
             });
         } else if(trainingConfig.difficulty === "advanced") {
-            // embaralha e prioriza as mais recentes (id maior)
             workingList.sort((a,b) => b.id - a.id);
         } else if(trainingConfig.difficulty === "simulated") {
-            // ordem aleatória
             workingList.sort(() => Math.random() - 0.5);
         }
-        // Tipo de cobrança misto: se misto, mantém como está; se apenas C/E, nenhuma ação extra (já é padrão)
-        // Extras: "Modo pegadinhas" -> destacar visualmente? Apenas adicionamos um ícone ou mensagem sem quebrar.
-        if(trainingConfig.extras.includes("trick")) {
-            showToast("Modo pegadinhas ativado: atenção às sutilezas!");
-        }
-        if(trainingConfig.extras.includes("interpret")) {
-            showToast("Foco em interpretação: leia com atenção cada detalhe.");
-        }
-        // Atualiza filteredList com a nova ordem (mas preserva a paginação)
+        if(trainingConfig.extras.includes("trick")) showToast("Modo pegadinhas ativado: atenção às sutilezas!");
+        if(trainingConfig.extras.includes("interpret")) showToast("Foco em interpretação: leia com atenção cada detalhe.");
         filteredList = workingList;
         currentPage = 0;
         renderAll();
         saveToLocal();
     }
 
-    // Aplica font sizes no CSS
     function applyFontSizesToCSS() {
         document.documentElement.style.setProperty('--font-size-question', `${fontSizeQuestion}rem`);
         document.documentElement.style.setProperty('--font-size-comment', `${fontSizeComment}rem`);
@@ -792,11 +853,8 @@ Gabarito: Certo'></textarea>
     }
 
     function changeFontSize(type, delta) {
-        if(type === 'question') {
-            fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta));
-        } else if(type === 'comment') {
-            fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta));
-        }
+        if(type === 'question') fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta));
+        else if(type === 'comment') fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta));
         applyFontSizesToCSS();
     }
 
@@ -809,9 +867,7 @@ Gabarito: Certo'></textarea>
         else if(filter === "wrong") filtered = filtered.filter(q => q.responded && q.userChoice !== q.answer);
         else if(filter === "starred") filtered = filtered.filter(q => starredSet.has(q.id));
         filteredList = filtered;
-        // Aplica estratégia de treino APÓS o filtro (se alguma config estiver ativa)
         if(trainingConfig.difficulty !== "balanced" || trainingConfig.extras.length) {
-            // reaplica estratégia sem salvar recursivamente
             let working = [...filteredList];
             if(trainingConfig.difficulty === "errorFocus") working.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0));
             else if(trainingConfig.difficulty === "progressive") working.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0));
@@ -878,7 +934,7 @@ Gabarito: Certo'></textarea>
     function renderAll() { renderDashboard(); renderQuestionsPage(); saveToLocal(); }
     function nextPage() { if(currentPage < Math.ceil(filteredList.length / PAGE_SIZE)-1) { currentPage++; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
     function prevPage() { if(currentPage > 0) { currentPage--; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
-    function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); } }
+    function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; q.responseTimestamp = null; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); atualizarDashboardPowerBI(); } }
     function clearAllData() { if(confirm("Apagar todos os dados?")) { localStorage.clear(); location.reload(); } }
     function exportJSON() { let data = { questions, starred: [...starredSet] }; let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"})); a.download="auditorquest_backup.json"; a.click(); showToast("Backup exportado"); }
     function generateErrorNotebook() { let wrongs = questions.filter(q => q.responded && q.userChoice !== q.answer); if(wrongs.length===0) { showToast("Nenhum erro"); return; } let content = "CADERNO DE ERROS\n\n"; wrongs.forEach(q=>{ content += `Questão ${q.number}: ${q.text}\nGabarito: ${q.answer}\nComentário: ${q.comment}\n\n---\n\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:"text/plain"})); a.download="caderno_erros.txt"; a.click(); showToast("Caderno de erros gerado"); }
@@ -892,7 +948,133 @@ Gabarito: Certo'></textarea>
     function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocal(); showToast("Pausado"); } }
     function stopTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocal(); showToast("Zerado"); }
 
-    // ---------------------- NOVOS EVENTOS E CONFIGURAÇÃO DO MODAL ----------------------
+    // ================== DASHBOARD POWER BI (NOVO) ==================
+    let doughnutChartV2 = null, barChartV2 = null, lineChartV2 = null;
+
+    function obterRodadaAtual() {
+        // Últimas 15 questões respondidas ordenadas por timestamp
+        const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
+        return respondidas.slice(-15);
+    }
+
+    function obterHistoricoRodadas() {
+        const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
+        const rodadas = [];
+        for(let i=0; i<respondidas.length; i+=15) {
+            const bloco = respondidas.slice(i, i+15);
+            const acertos = bloco.filter(q => q.userChoice === q.answer).length;
+            const taxa = (acertos / bloco.length) * 100;
+            rodadas.push({ acertos, total: bloco.length, taxa });
+        }
+        return rodadas.slice(-5);
+    }
+
+    function calcularTempoMedioRodada(rodada) {
+        // Simulação: usa timestamp médio entre primeira e última resposta (em segundos)
+        if(rodada.length < 2) return 0;
+        const tempos = rodada.map(q => q.responseTimestamp);
+        const minTime = Math.min(...tempos);
+        const maxTime = Math.max(...tempos);
+        const diffSeg = (maxTime - minTime) / 1000;
+        return Math.round(diffSeg / rodada.length);
+    }
+
+    function atualizarDashboardPowerBI() {
+        const rodada = obterRodadaAtual();
+        const totalRodada = rodada.length;
+        const acertosRodada = rodada.filter(q => q.userChoice === q.answer).length;
+        const taxaAcerto = totalRodada ? (acertosRodada / totalRodada * 100).toFixed(1) : 0;
+        const tempoMedio = calcularTempoMedioRodada(rodada);
+        const streakAtual = streak;
+
+        // KPIs
+        const kpiHtml = `
+            <div class="kpi-card-v2"><div class="kpi-title-v2">🎯 ACERTOS</div><div class="kpi-value-v2">${acertosRodada}<span class="kpi-unit-v2">/${totalRodada}</span></div><div class="kpi-trend-v2">${taxaAcerto}% de aproveitamento</div></div>
+            <div class="kpi-card-v2"><div class="kpi-title-v2">⏱️ TEMPO MÉDIO</div><div class="kpi-value-v2">${tempoMedio}<span class="kpi-unit-v2">s</span></div><div class="kpi-trend-v2">por questão</div></div>
+            <div class="kpi-card-v2"><div class="kpi-title-v2">🔥 SEQUÊNCIA</div><div class="kpi-value-v2">${streakAtual}<span class="kpi-unit-v2"> acertos</span></div><div class="kpi-trend-v2">streak atual</div></div>
+            <div class="kpi-card-v2"><div class="kpi-title-v2">📊 TAXA GERAL</div><div class="kpi-value-v2">${taxaAcerto}<span class="kpi-unit-v2">%</span></div><div class="kpi-trend-v2">rodada atual</div></div>
+        `;
+        document.getElementById("kpiGridV2").innerHTML = kpiHtml;
+
+        // Gráfico Doughnut
+        if(doughnutChartV2) doughnutChartV2.destroy();
+        const ctxDoughnut = document.getElementById("doughnutRodadaV2").getContext("2d");
+        doughnutChartV2 = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: { labels: ['Acertos', 'Erros'], datasets: [{ data: [acertosRodada, totalRodada - acertosRodada], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } }
+        });
+
+        // Gráfico de barras por disciplina (apenas acertos na rodada)
+        const disciplinasMap = new Map();
+        rodada.forEach(q => {
+            const disc = q.discipline;
+            if(!disciplinasMap.has(disc)) disciplinasMap.set(disc, { acertos:0, total:0 });
+            const val = disciplinasMap.get(disc);
+            val.total++;
+            if(q.userChoice === q.answer) val.acertos++;
+            disciplinasMap.set(disc, val);
+        });
+        const labelsDisciplinas = Array.from(disciplinasMap.keys());
+        const acertosPorDisciplina = labelsDisciplinas.map(d => disciplinasMap.get(d).acertos);
+        if(barChartV2) barChartV2.destroy();
+        const ctxBar = document.getElementById("barDisciplinasV2").getContext("2d");
+        barChartV2 = new Chart(ctxBar, {
+            type: 'bar',
+            data: { labels: labelsDisciplinas, datasets: [{ label: 'Acertos na rodada', data: acertosPorDisciplina, backgroundColor: '#3b82f6', borderRadius: 8 }] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1', maxRotation: 30 } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+        });
+
+        // Gráfico de linha - últimas 5 rodadas
+        const historico = obterHistoricoRodadas();
+        const taxas = historico.map(r => r.taxa);
+        const rodadasLabels = historico.map((_, idx) => `Rodada ${idx+1}`);
+        if(lineChartV2) lineChartV2.destroy();
+        const ctxLine = document.getElementById("lineRodadasV2").getContext("2d");
+        lineChartV2 = new Chart(ctxLine, {
+            type: 'line',
+            data: { labels: rodadasLabels, datasets: [{ label: '% Acertos', data: taxas, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { min: 0, max: 100, ticks: { callback: (val) => val+'%', color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1' } } }, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } } } }
+        });
+
+        // Diagnóstico automático
+        const errosPorDisciplina = new Map();
+        rodada.forEach(q => {
+            if(q.userChoice !== q.answer) {
+                errosPorDisciplina.set(q.discipline, (errosPorDisciplina.get(q.discipline)||0) + 1);
+            }
+        });
+        let piorDisciplina = "nenhuma";
+        let maxErros = 0;
+        for(let [disc, err] of errosPorDisciplina.entries()) {
+            if(err > maxErros) { maxErros = err; piorDisciplina = disc; }
+        }
+        let tendenciaMsg = "";
+        if(historico.length >= 2) {
+            const ultima = historico[historico.length-1].taxa;
+            const penultima = historico[historico.length-2].taxa;
+            if(ultima > penultima) tendenciaMsg = "📈 Tendência de melhora na última rodada!";
+            else if(ultima < penultima) tendenciaMsg = "📉 Atenção: desempenho caiu na última rodada.";
+            else tendenciaMsg = "➡️ Desempenho estável nas últimas rodadas.";
+        }
+        const tempoMsg = tempoMedio > 90 ? "⏳ Tempo médio elevado. Tente ganhar agilidade." : (tempoMedio > 45 ? "⏱️ Tempo médio moderado, pode melhorar." : "⚡ Bom ritmo de resolução.");
+        const insightHTML = `<div class="diagnosis-text"><i class="fas fa-microphone-alt text-orange-400 mr-2"></i> <strong>Diagnóstico automático</strong><br>🔴 Disciplina com mais erros: <strong>${piorDisciplina}</strong> (${maxErros} erro(s)).<br>${tendenciaMsg}<br>${tempoMsg}</div>`;
+        document.getElementById("insightV2").innerHTML = insightHTML;
+    }
+
+    // Eventos que disparam atualização do dashboard avançado
+    function initPowerBIWatcher() {
+        // Observa mudanças via clique em respostas (já chamamos em responderQuestao)
+        // Também em importação, reset, etc.
+        const originalApplyFilter = applyFilter;
+        window.applyFilter = applyFilter;
+        const events = [resetProgress, importQuestions];
+        // Garantir que sempre que o filtro for aplicado, atualiza o dashboard
+        const oldApplyFilter = applyFilter;
+        window.applyFilter = function() { oldApplyFilter(); atualizarDashboardPowerBI(); };
+        applyFilter = window.applyFilter;
+    }
+
     function initTrainingModal() {
         const modal = document.getElementById("configModal");
         const openBtn = document.getElementById("configTreinoBtn");
@@ -902,7 +1084,6 @@ Gabarito: Certo'></textarea>
         if(openBtn) openBtn.onclick = () => { modal.classList.remove("hidden"); };
         if(closeBtn) closeBtn.onclick = () => { modal.classList.add("hidden"); };
         if(applyBtn) applyBtn.onclick = () => {
-            // Coleta valores selecionados
             const diffSelected = document.querySelector("#difficultyOptions .config-option.selected")?.dataset.val || "balanced";
             const typeSelected = document.querySelector("#typeOptions .config-option.selected")?.dataset.val || "cebraspe";
             const depthSelected = document.querySelector("#depthOptions .config-option.selected")?.dataset.val || "standard";
@@ -911,13 +1092,12 @@ Gabarito: Certo'></textarea>
             trainingConfig = { difficulty: diffSelected, type: typeSelected, depth: depthSelected, extras: extrasSelected };
             saveToLocal();
             modal.classList.add("hidden");
-            applyTrainingStrategy(); // reordena as questões
+            applyTrainingStrategy();
             showToast("Estratégia aplicada com sucesso!");
         };
         if(resetConfigBtn) resetConfigBtn.onclick = () => {
             trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] };
             saveToLocal();
-            // Resetar UI dos seletores
             document.querySelectorAll("#difficultyOptions .config-option").forEach(opt => opt.classList.remove("selected"));
             document.querySelector("#difficultyOptions .config-option[data-val='balanced']").classList.add("selected");
             document.querySelectorAll("#typeOptions .config-option").forEach(opt => opt.classList.remove("selected"));
@@ -928,16 +1108,11 @@ Gabarito: Certo'></textarea>
             showToast("Configurações resetadas");
             if(questions.length) applyFilter();
         };
-        // Seleção interativa nos grupos
         document.querySelectorAll(".config-option").forEach(opt => {
             opt.addEventListener("click", (e) => {
                 const parent = opt.parentNode;
-                if(parent.id === "extrasOptions") {
-                    opt.classList.toggle("selected");
-                } else {
-                    parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected"));
-                    opt.classList.add("selected");
-                }
+                if(parent.id === "extrasOptions") opt.classList.toggle("selected");
+                else { parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); }
             });
         });
     }
@@ -979,10 +1154,10 @@ Gabarito: Certo'></textarea>
     document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt;
     window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
 
-    // Inicialização e chamada das novas funções
     loadFromLocal();
     initTrainingModal();
     initFontControls();
+    initPowerBIWatcher();
     if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para importar questões.");
 </script>
 </body>
