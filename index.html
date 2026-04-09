@@ -26,12 +26,10 @@
             --shadow-card: 0 6px 25px rgba(0, 0, 0, 0.45);
             --shadow-hover: 0 10px 35px rgba(0, 0, 0, 0.6);
             --transition: all 0.25s ease;
-            /* Controles de fonte (valores padrão) */
             --font-size-question: 1.125rem;
             --font-size-comment: 0.9rem;
         }
 
-        /* Tema Claro - REFATORADO com conforto visual */
         [data-theme="light"] {
             --bg-primary: #F5F7FA;
             --bg-secondary: #FFFFFF;
@@ -60,7 +58,6 @@
             scroll-behavior: smooth;
         }
 
-        /* Cards e superfícies */
         .card {
             background: var(--card-bg);
             border-radius: 1.25rem;
@@ -74,7 +71,6 @@
             box-shadow: var(--shadow-hover);
         }
 
-        /* Header com blur */
         .app-header {
             background: rgba(var(--bg-primary-rgb, 11, 11, 12), 0.92);
             backdrop-filter: blur(12px);
@@ -107,7 +103,6 @@
             box-shadow: 0 6px 14px rgba(249,115,22,0.2);
         }
 
-        /* Progress bar */
         .progress-top {
             position: sticky;
             top: 0;
@@ -131,7 +126,6 @@
             margin: 0 auto;
         }
 
-        /* ----- QUESTÃO CARD PREMIUM ----- */
         .question-card {
             background: var(--card-bg);
             border-radius: 20px;
@@ -167,10 +161,8 @@
             color: var(--text-primary);
             margin: 0.75rem 0 1rem 0;
             font-weight: 450;
-            transition: font-size 0.1s ease;
         }
 
-        /* Comentário profissional */
         .comentario-content {
             background: var(--bg-secondary);
             padding: 1rem;
@@ -180,11 +172,9 @@
             color: var(--text-secondary);
             line-height: 1.55;
             font-size: var(--font-size-comment);
-            transition: font-size 0.1s ease;
             animation: fadeSlide 0.25s ease;
         }
 
-        /* Botões de resposta (preservados) */
         .btn-resposta {
             flex: 1;
             padding: 0.75rem;
@@ -242,7 +232,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Paginação */
         .pagination {
             display: flex;
             justify-content: center;
@@ -267,7 +256,6 @@
             cursor: not-allowed;
         }
 
-        /* Formulários */
         select, textarea, input {
             background: var(--bg-secondary);
             border: 1px solid var(--border-subtle);
@@ -298,7 +286,6 @@
             font-weight: 500;
         }
 
-        /* Modo Foco */
         body.focus-mode .sidebar { display: none; }
         body.focus-mode .gran-layout { grid-template-columns: 1fr; }
         body.focus-mode .main-content { max-width: 780px; margin: 0 auto; }
@@ -319,8 +306,6 @@
         }
         body.focus-mode .exit-focus-btn { display: flex; align-items: center; gap: 0.5rem; }
 
-        /* ----- NOVOS ESTILOS: CONFIGURAÇÃO DE TREINO E FONT SIZE ----- */
-        /* Modal Configuração de Treino */
         .modal-config {
             position: fixed;
             inset: 0;
@@ -379,7 +364,6 @@
             border-color: var(--accent-orange);
             color: white;
         }
-        /* Controle de fonte */
         .font-control-panel {
             position: absolute;
             right: 0;
@@ -406,9 +390,8 @@
             color: var(--text-primary);
         }
 
-        /* ========== NOVOS ESTILOS POWER BI DASHBOARD ========== */
         .powerbi-dashboard {
-            background: #0f172a; /* fundo fixo estilo Power BI */
+            background: #0f172a;
             border-radius: 1.5rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -443,8 +426,6 @@
         [data-theme="light"] .kpi-value-v2 { color: #0f172a; }
         .kpi-unit-v2 { font-size: 0.85rem; color: #64748b; margin-left: 4px; }
         .kpi-trend-v2 { font-size: 0.7rem; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        .trend-up { color: #22c55e; }
-        .trend-down { color: #ef4444; }
         .charts-row-v2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -473,9 +454,110 @@
         }
         .diagnosis-text { font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         [data-theme="light"] .diagnosis-text { color: #334155; }
+
+        /* ========== ESTILOS GAMIFICAÇÃO CONCURSOCOIN ========== */
+        .coin-notification {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1e293b;
+            font-weight: bold;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,215,0,0.5);
+            z-index: 1000;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: coinPop 0.8s ease-out forwards;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        @keyframes coinPop {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            20% { opacity: 1; transform: translate(-50%, -10px); }
+            80% { opacity: 1; transform: translate(-50%, -20px); }
+            100% { opacity: 0; transform: translate(-50%, -50px); visibility: hidden; }
+        }
+        .jackpot-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        .jackpot-content {
+            background: linear-gradient(145deg, #1e1b2e, #0f0c1a);
+            border-radius: 3rem;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 40px rgba(251,191,36,0.6);
+            animation: pulseGold 1s infinite alternate;
+            max-width: 500px;
+            width: 90%;
+        }
+        @keyframes pulseGold {
+            from { box-shadow: 0 0 10px #fbbf24; border-color: #fbbf24; }
+            to { box-shadow: 0 0 40px #f59e0b; border-color: #f59e0b; }
+        }
+        .jackpot-content h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 1rem 0;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 20px;
+            background: gold;
+            position: absolute;
+            animation: fall linear forwards;
+            z-index: 1999;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .coin-counter {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 40px;
+            padding: 0.3rem 0.9rem;
+            font-weight: bold;
+            color: #1e293b;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .streak-badge {
+            background: #f97316;
+            border-radius: 40px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+        @keyframes countUp {
+            from { opacity: 0.7; transform: scale(0.9);}
+            to { opacity: 1; transform: scale(1);}
+        }
+        .coin-value-update {
+            animation: countUp 0.3s ease-out;
+        }
         @media (max-width: 768px) {
-            .kpi-value-v2 { font-size: 1.5rem; }
-            .powerbi-dashboard { padding: 1rem; }
+            .coin-notification { font-size: 0.9rem; padding: 0.5rem 1rem; white-space: nowrap; }
         }
     </style>
 </head>
@@ -489,6 +571,9 @@
         <div><h1 class="text-xl font-bold">Auditor<span class="text-orange-400">Quest</span></h1><p class="text-xs text-textSecondary">CESPE / CEBRASPE</p></div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
+        <!-- Gamificação: Contador de moedas e streak -->
+        <div class="coin-counter" id="coinCounterDisplay">💰 0</div>
+        <div class="streak-badge" id="streakCounterDisplay">🔥 0</div>
         <button id="configTreinoBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-sliders-h"></i> Estratégia</button>
         <div class="relative">
             <button id="fontSettingsBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-font"></i> Ajuste</button>
@@ -546,11 +631,7 @@
         <div class="card p-5">
             <div class="flex items-center gap-3 mb-3"><div class="bg-orange-500/10 p-2 rounded-xl"><i class="fas fa-file-upload text-orange-400 text-lg"></i></div><div><h2 class="font-semibold">Banco de questões</h2><p class="text-xs text-textSecondary">Importe até 20 itens (formato: Questão X: ... Comentário: ... Gabarito: Certo/Errado)</p></div></div>
             <select id="disciplineSelect" class="w-full rounded-xl p-2.5 text-sm mb-3"></select>
-            <textarea id="questionsRaw" rows="3" class="w-full rounded-xl p-3 text-sm font-mono" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."
-
-Comentário: "Adotada pela ONU em 10/12/1948."
-
-Gabarito: Certo'></textarea>
+            <textarea id="questionsRaw" rows="3" class="w-full rounded-xl p-3 text-sm font-mono" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."\n\nComentário: "Adotada pela ONU em 10/12/1948."\n\nGabarito: Certo'></textarea>
             <div class="flex flex-wrap gap-2 mt-3">
                 <button id="previewImportBtn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-eye"></i> Visualizar</button>
                 <button id="importBtn" class="flex-1 btn-primary py-2 rounded-xl text-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
@@ -561,7 +642,6 @@ Gabarito: Certo'></textarea>
             <div class="flex justify-between text-xs text-textSecondary mt-2"><span>Máx 20</span><span id="questionCounter">0/20</span></div>
         </div>
 
-        <!-- ÁREA DO DASHBOARD ORIGINAL (preservada) -->
         <div class="card p-5">
             <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-2"><i class="fas fa-chart-pie text-orange-400 text-lg"></i><h2 class="font-semibold">Desempenho</h2></div><button id="reportBtn" class="text-orange-400 text-xs bg-orange-500/10 px-3 py-1.5 rounded-full"><i class="fas fa-chart-line"></i> Relatório</button></div>
             <div id="dashboardArea" class="min-h-[100px]"></div>
@@ -569,7 +649,6 @@ Gabarito: Certo'></textarea>
             <div class="mt-3 pt-2 border-t border-borderLight"><canvas id="disciplineChart" height="120"></canvas></div>
         </div>
 
-        <!-- ========== NOVO DASHBOARD POWER BI (adicionado sem interferir) ========== -->
         <div id="powerbiContainerV2" class="powerbi-dashboard">
             <div class="flex items-center gap-2 mb-4"><i class="fas fa-chalkboard-user text-blue-400 text-xl"></i><h3 class="font-bold text-white/90">📊 Power BI - Rodada Atual (últimas 15 questões)</h3></div>
             <div class="kpi-grid-v2" id="kpiGridV2"></div>
@@ -593,7 +672,6 @@ Gabarito: Certo'></textarea>
 
 <div id="previewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4"><div class="bg-card rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6 border border-borderLight"><h3 class="text-xl font-bold mb-3">Pré-visualização</h3><div id="previewList" class="space-y-2 text-sm"></div><div class="flex justify-end gap-3 mt-4"><button id="cancelPreview" class="px-4 py-2 bg-gray-700 rounded-xl">Cancelar</button><button id="confirmPreview" class="px-4 py-2 bg-orange-600 text-white rounded-xl">Confirmar</button></div></div></div>
 
-<!-- MODAL CONFIGURAÇÃO DE TREINO -->
 <div id="configModal" class="modal-config hidden">
     <div class="modal-config-content">
         <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-chess-board"></i> Estratégia de Prova</h3><button id="closeConfigModal" class="text-2xl leading-5">&times;</button></div>
@@ -606,559 +684,752 @@ Gabarito: Certo'></textarea>
 </div>
 
 <script>
-    // ----------------------------- TEMA (data-theme) -----------------------------
+    // ----------------------------- CÓDIGO ORIGINAL COMPLETO (PRESERVADO) -----------------------------
     (function() {
-        const saved = localStorage.getItem("theme") || "dark";
-        document.documentElement.setAttribute("data-theme", saved);
-    })();
-    function toggleTheme() {
-        const html = document.documentElement;
-        const current = html.getAttribute("data-theme");
-        const next = current === "dark" ? "light" : "dark";
-        html.setAttribute("data-theme", next);
-        localStorage.setItem("theme", next);
-        const btn = document.getElementById("themeToggleBtn");
-        if(btn) btn.innerHTML = next === "dark" ? '<i class="fas fa-moon"></i> Tema' : '<i class="fas fa-sun"></i> Tema';
-    }
-
-    // ----------------------------- ESTRUTURA DE DADOS -----------------------------
-    let questions = [];        // array de objetos { id, number, text, comment, answer, discipline, responded, userChoice, showComment, starred? }
-    let starredSet = new Set(); // ids
-    let points = 0, streak = 0;
-    let currentFilter = "all";
-    let filteredList = [];
-    let currentPage = 0;
-    const PAGE_SIZE = 10;
-    const MAX_QUESTIONS = 20;
-    const DISCIPLINAS = ["Língua Portuguesa","Raciocínio Lógico","Direito Constitucional","Direito Administrativo","Auditoria","Contabilidade"];
-
-    // timer
-    let timerSeconds = 0, timerInterval = null, timerRunning = false;
-
-    let trainingConfig = {
-        difficulty: "balanced",
-        type: "cebraspe",
-        depth: "standard",
-        extras: []
-    };
-
-    let fontSizeQuestion = 1.125;
-    let fontSizeComment = 0.9;
-    const FONT_STORAGE_KEY = "auditor_font_sizes";
-
-    // DOM
-    const disciplineSelect = document.getElementById("disciplineSelect");
-    const rawInput = document.getElementById("questionsRaw");
-    const importBtn = document.getElementById("importBtn");
-    const previewBtn = document.getElementById("previewImportBtn");
-    const exampleBtn = document.getElementById("exampleBtn");
-    const importPdfBtn = document.getElementById("importPdfBtn");
-    const pdfUpload = document.getElementById("pdfUpload");
-    const filterSelect = document.getElementById("filterSelect");
-    const applyFilterBtn = document.getElementById("applyFilterBtn");
-    const prevPageBtn = document.getElementById("prevPageBtn");
-    const nextPageBtn = document.getElementById("nextPageBtn");
-    const pageIndicator = document.getElementById("pageIndicator");
-    const questionsGrid = document.getElementById("questionsGridContainer");
-    const dashboardArea = document.getElementById("dashboardArea");
-    const disciplineChartCanvas = document.getElementById("disciplineChart");
-    const starredCountSpan = document.getElementById("starredCount");
-    const streakCountSpan = document.getElementById("streakCount");
-    const levelBadge = document.getElementById("levelBadge");
-    const questionCounterSpan = document.getElementById("questionCounter");
-    const topProgressFill = document.getElementById("topProgressFill");
-    const timerDisplay = document.getElementById("timerDisplay");
-
-    DISCIPLINAS.forEach(d => { let opt = document.createElement("option"); opt.value = d; opt.textContent = d; disciplineSelect.appendChild(opt); });
-
-    function showToast(msg) { let toast = document.createElement("div"); toast.className = "toast"; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
-
-    function parseQuestoes(texto) {
-        const blocos = texto.split(/Questão\s+\d+:/g).filter(Boolean);
-        const questoes = [];
-        let idCounter = Date.now();
-        for(let bloco of blocos) {
-            const comentarioMatch = bloco.match(/Comentário:\s*(.*?)(?=Gabarito:|$)/is);
-            const gabaritoMatch = bloco.match(/Gabarito:\s*(Certo|Errado)/i);
-            let pergunta = bloco
-                .replace(/Comentário:.*$/is, "")
-                .replace(/Gabarito:.*$/is, "")
-                .trim();
-            if(pergunta.startsWith('"') && pergunta.endsWith('"')) pergunta = pergunta.slice(1,-1);
-            const comentario = comentarioMatch ? comentarioMatch[1].trim() : "Sem comentário adicional.";
-            const respostaCorreta = gabaritoMatch ? (gabaritoMatch[1].toUpperCase().startsWith("C") ? "Certo" : "Errado") : null;
-            if(pergunta && respostaCorreta) {
-                questoes.push({
-                    id: idCounter++,
-                    number: questoes.length+1,
-                    text: pergunta,
-                    comment: comentario,
-                    answer: respostaCorreta,
-                    discipline: disciplineSelect.value,
-                    responded: false,
-                    userChoice: null,
-                    showComment: false,
-                    isStarred: false,
-                    responseTimestamp: null
-                });
+        // TEMA
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            const current = html.getAttribute("data-theme");
+            const next = current === "dark" ? "light" : "dark";
+            html.setAttribute("data-theme", next);
+            localStorage.setItem("theme", next);
+            const btn = document.getElementById("themeToggleBtn");
+            if(btn) btn.innerHTML = next === "dark" ? '<i class="fas fa-moon"></i> Tema' : '<i class="fas fa-sun"></i> Tema';
+        };
+        
+        // DADOS GLOBAIS
+        let questions = [];
+        let starredSet = new Set();
+        let points = 0, streak = 0;
+        let currentFilter = "all";
+        let filteredList = [];
+        let currentPage = 0;
+        const PAGE_SIZE = 10;
+        const MAX_QUESTIONS = 20;
+        const DISCIPLINAS = ["Língua Portuguesa","Raciocínio Lógico","Direito Constitucional","Direito Administrativo","Auditoria","Contabilidade"];
+        
+        let timerSeconds = 0, timerInterval = null, timerRunning = false;
+        
+        let trainingConfig = {
+            difficulty: "balanced",
+            type: "cebraspe",
+            depth: "standard",
+            extras: []
+        };
+        
+        let fontSizeQuestion = 1.125;
+        let fontSizeComment = 0.9;
+        const FONT_STORAGE_KEY = "auditor_font_sizes";
+        
+        // DOM
+        const disciplineSelect = document.getElementById("disciplineSelect");
+        const rawInput = document.getElementById("questionsRaw");
+        const importBtn = document.getElementById("importBtn");
+        const previewBtn = document.getElementById("previewImportBtn");
+        const exampleBtn = document.getElementById("exampleBtn");
+        const importPdfBtn = document.getElementById("importPdfBtn");
+        const pdfUpload = document.getElementById("pdfUpload");
+        const filterSelect = document.getElementById("filterSelect");
+        const applyFilterBtn = document.getElementById("applyFilterBtn");
+        const prevPageBtn = document.getElementById("prevPageBtn");
+        const nextPageBtn = document.getElementById("nextPageBtn");
+        const pageIndicator = document.getElementById("pageIndicator");
+        const questionsGrid = document.getElementById("questionsGridContainer");
+        const dashboardArea = document.getElementById("dashboardArea");
+        const disciplineChartCanvas = document.getElementById("disciplineChart");
+        const starredCountSpan = document.getElementById("starredCount");
+        const streakCountSpan = document.getElementById("streakCount");
+        const levelBadge = document.getElementById("levelBadge");
+        const questionCounterSpan = document.getElementById("questionCounter");
+        const topProgressFill = document.getElementById("topProgressFill");
+        const timerDisplay = document.getElementById("timerDisplay");
+        
+        DISCIPLINAS.forEach(d => { let opt = document.createElement("option"); opt.value = d; opt.textContent = d; disciplineSelect.appendChild(opt); });
+        
+        function showToast(msg) { let toast = document.createElement("div"); toast.className = "toast"; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
+        
+        function parseQuestoes(texto) {
+            const blocos = texto.split(/Questão\s+\d+:/g).filter(Boolean);
+            const questoes = [];
+            let idCounter = Date.now();
+            for(let bloco of blocos) {
+                const comentarioMatch = bloco.match(/Comentário:\s*(.*?)(?=Gabarito:|$)/is);
+                const gabaritoMatch = bloco.match(/Gabarito:\s*(Certo|Errado)/i);
+                let pergunta = bloco
+                    .replace(/Comentário:.*$/is, "")
+                    .replace(/Gabarito:.*$/is, "")
+                    .trim();
+                if(pergunta.startsWith('"') && pergunta.endsWith('"')) pergunta = pergunta.slice(1,-1);
+                const comentario = comentarioMatch ? comentarioMatch[1].trim() : "Sem comentário adicional.";
+                const respostaCorreta = gabaritoMatch ? (gabaritoMatch[1].toUpperCase().startsWith("C") ? "Certo" : "Errado") : null;
+                if(pergunta && respostaCorreta) {
+                    questoes.push({
+                        id: idCounter++,
+                        number: questoes.length+1,
+                        text: pergunta,
+                        comment: comentario,
+                        answer: respostaCorreta,
+                        discipline: disciplineSelect.value,
+                        responded: false,
+                        userChoice: null,
+                        showComment: false,
+                        isStarred: false,
+                        responseTimestamp: null
+                    });
+                }
+            }
+            return questoes;
+        }
+        
+        function importQuestions(rawText) {
+            let parsed = parseQuestoes(rawText);
+            if(parsed.length === 0) { showToast("Nenhuma questão válida encontrada"); return false; }
+            if(parsed.length > MAX_QUESTIONS) { showToast(`Limite de ${MAX_QUESTIONS} questões`); return false; }
+            questions = parsed;
+            starredSet.clear();
+            points = 0; streak = 0;
+            saveToLocal();
+            applyFilter();
+            showToast(`${parsed.length} questões importadas`);
+            if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
+            // Reset gamification streak (chama o callback exposto pela gamificação)
+            if(window.resetGamificationOnImport) window.resetGamificationOnImport();
+            return true;
+        }
+        
+        function saveToLocal() {
+            const toSave = questions.map(q => ({ ...q }));
+            localStorage.setItem("auditor_questions_v2", JSON.stringify(toSave));
+            localStorage.setItem("auditor_starred", JSON.stringify([...starredSet]));
+            localStorage.setItem("auditor_points", points);
+            localStorage.setItem("auditor_streak", streak);
+            localStorage.setItem("auditor_timer", timerSeconds);
+            localStorage.setItem("auditor_timerRunning", timerRunning);
+            localStorage.setItem("auditor_filter", currentFilter);
+            localStorage.setItem("auditor_training_config", JSON.stringify(trainingConfig));
+            localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
+        }
+        
+        function loadFromLocal() {
+            const savedQ = localStorage.getItem("auditor_questions_v2");
+            if(savedQ) {
+                questions = JSON.parse(savedQ);
+                questions.forEach(q => { if(q.responded === undefined) q.responded = false; if(q.showComment === undefined) q.showComment = false; if(q.userChoice === undefined) q.userChoice = null; if(q.isStarred === undefined) q.isStarred = false; if(q.responseTimestamp === undefined) q.responseTimestamp = null; });
+            }
+            const star = localStorage.getItem("auditor_starred");
+            if(star) starredSet = new Set(JSON.parse(star));
+            let pts = localStorage.getItem("auditor_points");
+            if(pts) points = parseInt(pts);
+            let strk = localStorage.getItem("auditor_streak");
+            if(strk) streak = parseInt(strk);
+            let sec = localStorage.getItem("auditor_timer");
+            if(sec) timerSeconds = parseInt(sec);
+            let run = localStorage.getItem("auditor_timerRunning");
+            if(run === "true") { timerRunning = true; startTimerInterval(); }
+            updateTimerDisplay();
+            let filt = localStorage.getItem("auditor_filter");
+            if(filt) currentFilter = filt;
+            filterSelect.value = currentFilter;
+            let savedConfig = localStorage.getItem("auditor_training_config");
+            if(savedConfig) {
+                try {
+                    trainingConfig = JSON.parse(savedConfig);
+                    if(!trainingConfig.extras) trainingConfig.extras = [];
+                } catch(e) {}
+            }
+            let fontSizes = localStorage.getItem(FONT_STORAGE_KEY);
+            if(fontSizes) {
+                let sizes = JSON.parse(fontSizes);
+                fontSizeQuestion = sizes.question || 1.125;
+                fontSizeComment = sizes.comment || 0.9;
+            }
+            applyFontSizesToCSS();
+            updatePointsAndStreak();
+            applyFilter();
+            if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
+        }
+        
+        function updatePointsAndStreak() {
+            let totalPoints = 0, currentStreak = 0;
+            for(let q of questions) {
+                if(q.responded) {
+                    if(q.userChoice === q.answer) { totalPoints += 10; currentStreak++; }
+                    else { totalPoints = Math.max(0, totalPoints-5); currentStreak = 0; }
+                }
+            }
+            points = totalPoints; streak = currentStreak;
+            let level = points < 100 ? "Iniciante" : (points < 300 ? "Intermediário" : "Avançado");
+            levelBadge.innerText = level;
+            streakCountSpan.innerText = streak;
+            saveToLocal();
+        }
+        
+        // FUNÇÃO ORIGINAL DE RESPOSTA (agora com callback para gamificação)
+        window.responderQuestao = function(id, resposta) {
+            const q = questions.find(qq => qq.id === id);
+            if(!q || q.responded) return;
+            const wasCorrect = (resposta === q.answer);
+            q.responded = true;
+            q.userChoice = resposta;
+            q.showComment = false;
+            if(!q.responseTimestamp) q.responseTimestamp = Date.now();
+            updatePointsAndStreak();
+            saveToLocal();
+            renderAll();
+            document.getElementById(`question-card-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+            if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
+            // CHAMADA PARA O SISTEMA DE GAMIFICAÇÃO (ConcursoCoin)
+            if(window.onQuestionAnswered) window.onQuestionAnswered(q.number, wasCorrect);
+        };
+        
+        function toggleComentario(id) {
+            const q = questions.find(qq => qq.id === id);
+            if(q && q.responded) {
+                q.showComment = !q.showComment;
+                renderAll();
             }
         }
-        return questoes;
-    }
-
-    function importQuestions(rawText) {
-        let parsed = parseQuestoes(rawText);
-        if(parsed.length === 0) { showToast("Nenhuma questão válida encontrada"); return false; }
-        if(parsed.length > MAX_QUESTIONS) { showToast(`Limite de ${MAX_QUESTIONS} questões`); return false; }
-        questions = parsed;
-        starredSet.clear();
-        points = 0; streak = 0;
-        saveToLocal();
-        applyFilter();
-        showToast(`${parsed.length} questões importadas`);
-        atualizarDashboardPowerBI(); // força atualização do novo dashboard
-        return true;
-    }
-
-    function saveToLocal() {
-        const toSave = questions.map(q => ({ ...q }));
-        localStorage.setItem("auditor_questions_v2", JSON.stringify(toSave));
-        localStorage.setItem("auditor_starred", JSON.stringify([...starredSet]));
-        localStorage.setItem("auditor_points", points);
-        localStorage.setItem("auditor_streak", streak);
-        localStorage.setItem("auditor_timer", timerSeconds);
-        localStorage.setItem("auditor_timerRunning", timerRunning);
-        localStorage.setItem("auditor_filter", currentFilter);
-        localStorage.setItem("auditor_training_config", JSON.stringify(trainingConfig));
-        localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
-    }
-
-    function loadFromLocal() {
-        const savedQ = localStorage.getItem("auditor_questions_v2");
-        if(savedQ) {
-            questions = JSON.parse(savedQ);
-            questions.forEach(q => { if(q.responded === undefined) q.responded = false; if(q.showComment === undefined) q.showComment = false; if(q.userChoice === undefined) q.userChoice = null; if(q.isStarred === undefined) q.isStarred = false; if(q.responseTimestamp === undefined) q.responseTimestamp = null; });
-        }
-        const star = localStorage.getItem("auditor_starred");
-        if(star) starredSet = new Set(JSON.parse(star));
-        let pts = localStorage.getItem("auditor_points");
-        if(pts) points = parseInt(pts);
-        let strk = localStorage.getItem("auditor_streak");
-        if(strk) streak = parseInt(strk);
-        let sec = localStorage.getItem("auditor_timer");
-        if(sec) timerSeconds = parseInt(sec);
-        let run = localStorage.getItem("auditor_timerRunning");
-        if(run === "true") { timerRunning = true; startTimerInterval(); }
-        updateTimerDisplay();
-        let filt = localStorage.getItem("auditor_filter");
-        if(filt) currentFilter = filt;
-        filterSelect.value = currentFilter;
-        let savedConfig = localStorage.getItem("auditor_training_config");
-        if(savedConfig) {
-            try {
-                trainingConfig = JSON.parse(savedConfig);
-                if(!trainingConfig.extras) trainingConfig.extras = [];
-            } catch(e) {}
-        }
-        let fontSizes = localStorage.getItem(FONT_STORAGE_KEY);
-        if(fontSizes) {
-            let sizes = JSON.parse(fontSizes);
-            fontSizeQuestion = sizes.question || 1.125;
-            fontSizeComment = sizes.comment || 0.9;
-        }
-        applyFontSizesToCSS();
-        updatePointsAndStreak();
-        applyFilter();
-        atualizarDashboardPowerBI();
-    }
-
-    function updatePointsAndStreak() {
-        let totalPoints = 0, currentStreak = 0;
-        for(let q of questions) {
-            if(q.responded) {
-                if(q.userChoice === q.answer) { totalPoints += 10; currentStreak++; }
-                else { totalPoints = Math.max(0, totalPoints-5); currentStreak = 0; }
-            }
-        }
-        points = totalPoints; streak = currentStreak;
-        let level = points < 100 ? "Iniciante" : (points < 300 ? "Intermediário" : "Avançado");
-        levelBadge.innerText = level;
-        streakCountSpan.innerText = streak;
-        saveToLocal();
-    }
-
-    function responderQuestao(id, resposta) {
-        const q = questions.find(qq => qq.id === id);
-        if(!q || q.responded) return;
-        q.responded = true;
-        q.userChoice = resposta;
-        q.showComment = false;
-        // Adiciona timestamp para controle de rodada (sem afetar outras lógicas)
-        if(!q.responseTimestamp) q.responseTimestamp = Date.now();
-        updatePointsAndStreak();
-        saveToLocal();
-        renderAll();
-        document.getElementById(`question-card-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-        // Atualiza dashboard Power BI
-        atualizarDashboardPowerBI();
-    }
-
-    function toggleComentario(id) {
-        const q = questions.find(qq => qq.id === id);
-        if(q && q.responded) {
-            q.showComment = !q.showComment;
+        
+        function toggleStar(id) {
+            if(starredSet.has(id)) starredSet.delete(id);
+            else starredSet.add(id);
+            saveToLocal();
             renderAll();
         }
-    }
-
-    function toggleStar(id) {
-        if(starredSet.has(id)) starredSet.delete(id);
-        else starredSet.add(id);
-        saveToLocal();
-        renderAll();
-    }
-
-    function applyTrainingStrategy() {
-        if(!filteredList.length) return;
-        let workingList = [...filteredList];
-        if(trainingConfig.difficulty === "errorFocus") {
-            workingList.sort((a,b) => {
-                let aErr = a.responded && a.userChoice !== a.answer ? 1 : 0;
-                let bErr = b.responded && b.userChoice !== b.answer ? 1 : 0;
-                return bErr - aErr;
-            });
-        } else if(trainingConfig.difficulty === "progressive") {
-            workingList.sort((a,b) => {
-                let aWeight = a.responded ? (a.userChoice === a.answer ? 2 : 1) : 0;
-                let bWeight = b.responded ? (b.userChoice === b.answer ? 2 : 1) : 0;
-                return aWeight - bWeight;
-            });
-        } else if(trainingConfig.difficulty === "advanced") {
-            workingList.sort((a,b) => b.id - a.id);
-        } else if(trainingConfig.difficulty === "simulated") {
-            workingList.sort(() => Math.random() - 0.5);
+        
+        function applyTrainingStrategy() {
+            if(!filteredList.length) return;
+            let workingList = [...filteredList];
+            if(trainingConfig.difficulty === "errorFocus") {
+                workingList.sort((a,b) => {
+                    let aErr = a.responded && a.userChoice !== a.answer ? 1 : 0;
+                    let bErr = b.responded && b.userChoice !== b.answer ? 1 : 0;
+                    return bErr - aErr;
+                });
+            } else if(trainingConfig.difficulty === "progressive") {
+                workingList.sort((a,b) => {
+                    let aWeight = a.responded ? (a.userChoice === a.answer ? 2 : 1) : 0;
+                    let bWeight = b.responded ? (b.userChoice === b.answer ? 2 : 1) : 0;
+                    return aWeight - bWeight;
+                });
+            } else if(trainingConfig.difficulty === "advanced") {
+                workingList.sort((a,b) => b.id - a.id);
+            } else if(trainingConfig.difficulty === "simulated") {
+                workingList.sort(() => Math.random() - 0.5);
+            }
+            if(trainingConfig.extras.includes("trick")) showToast("Modo pegadinhas ativado: atenção às sutilezas!");
+            if(trainingConfig.extras.includes("interpret")) showToast("Foco em interpretação: leia com atenção cada detalhe.");
+            filteredList = workingList;
+            currentPage = 0;
+            renderAll();
+            saveToLocal();
         }
-        if(trainingConfig.extras.includes("trick")) showToast("Modo pegadinhas ativado: atenção às sutilezas!");
-        if(trainingConfig.extras.includes("interpret")) showToast("Foco em interpretação: leia com atenção cada detalhe.");
-        filteredList = workingList;
-        currentPage = 0;
-        renderAll();
-        saveToLocal();
-    }
-
-    function applyFontSizesToCSS() {
-        document.documentElement.style.setProperty('--font-size-question', `${fontSizeQuestion}rem`);
-        document.documentElement.style.setProperty('--font-size-comment', `${fontSizeComment}rem`);
-        localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
-    }
-
-    function changeFontSize(type, delta) {
-        if(type === 'question') fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta));
-        else if(type === 'comment') fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta));
-        applyFontSizesToCSS();
-    }
-
-    function applyFilter() {
-        if(!questions.length) { filteredList = []; currentPage = 0; renderAll(); return; }
-        let filter = filterSelect.value;
-        currentFilter = filter;
-        let filtered = [...questions];
-        if(filter === "unanswered") filtered = filtered.filter(q => !q.responded);
-        else if(filter === "wrong") filtered = filtered.filter(q => q.responded && q.userChoice !== q.answer);
-        else if(filter === "starred") filtered = filtered.filter(q => starredSet.has(q.id));
-        filteredList = filtered;
-        if(trainingConfig.difficulty !== "balanced" || trainingConfig.extras.length) {
-            let working = [...filteredList];
-            if(trainingConfig.difficulty === "errorFocus") working.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0));
-            else if(trainingConfig.difficulty === "progressive") working.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0));
-            else if(trainingConfig.difficulty === "advanced") working.sort((a,b) => b.id - a.id);
-            else if(trainingConfig.difficulty === "simulated") working.sort(() => Math.random() - 0.5);
-            filteredList = working;
+        
+        function applyFontSizesToCSS() {
+            document.documentElement.style.setProperty('--font-size-question', `${fontSizeQuestion}rem`);
+            document.documentElement.style.setProperty('--font-size-comment', `${fontSizeComment}rem`);
+            localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
         }
-        currentPage = 0;
-        renderAll();
-    }
-
-    function renderDashboard() {
-        let total = questions.filter(q => q.responded).length;
-        let correct = questions.filter(q => q.responded && q.userChoice === q.answer).length;
-        dashboardArea.innerHTML = `<div class="grid grid-cols-2 gap-3"><div class="bg-emerald-950/40 p-3 rounded-xl text-center border border-emerald-800/30"><i class="fas fa-check-circle text-emerald-500 text-xl"></i><div class="text-2xl font-bold">${correct}</div><div class="text-xs">Acertos</div></div><div class="bg-red-950/40 p-3 rounded-xl text-center border border-red-800/30"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${total-correct}</div><div class="text-xs">Erros</div></div></div>`;
-        if(window.disChart) window.disChart.destroy();
-        let ctx = disciplineChartCanvas.getContext("2d");
-        window.disChart = new Chart(ctx, { type:"bar", data:{ labels:["Acertos","Erros"], datasets:[{ label:"", data:[correct, total-correct], backgroundColor: ["#F97316","#EF4444"], borderRadius: 8 }] }, options:{ responsive: true, maintainAspectRatio: true, scales: { y: { grid: { color: "rgba(255,255,255,0.05)" } }, x: { ticks: { color: "var(--text-secondary)" } } } } });
-        let insight = "";
-        let last5 = questions.filter(q => q.responded).slice(-5);
-        let lastCorrect = last5.filter(q => q.userChoice === q.answer).length;
-        if(last5.length>=3 && lastCorrect/last5.length>0.6) insight = "🔥 Bom rendimento! Continue assim.";
-        else if(last5.length>=3 && lastCorrect/last5.length<0.4) insight = "⚠️ Atenção! Revise os conceitos.";
-        document.getElementById("insightMsg").innerHTML = insight ? `<div class="p-2 rounded-lg bg-orange-500/10 text-orange-300">${insight}</div>` : "";
-    }
-
-    function renderQuestionsPage() {
-        if(!filteredList.length) { questionsGrid.innerHTML = `<div class="card p-8 text-center text-textSecondary"><i class="fas fa-inbox text-4xl mb-2"></i><p>Nenhuma questão para exibir.</p></div>`; return; }
-        const start = currentPage * PAGE_SIZE;
-        const end = Math.min(start + PAGE_SIZE, filteredList.length);
-        const pageQuestions = filteredList.slice(start, end);
-        let html = '';
-        for(let q of pageQuestions) {
-            const isStarred = starredSet.has(q.id);
-            const starIcon = isStarred ? "fas fa-star text-yellow-500" : "far fa-star";
-            let cardClass = '';
-            if(q.responded) cardClass = q.userChoice === q.answer ? 'correta' : 'errada';
-            let botoesResposta = '';
-            if(!q.responded) {
-                botoesResposta = `<div class="flex gap-3 mt-4"><button class="btn-resposta btn-certo" data-id="${q.id}" data-resp="Certo"><i class="fas fa-check-circle"></i> Certo</button><button class="btn-resposta btn-errado" data-id="${q.id}" data-resp="Errado"><i class="fas fa-times-circle"></i> Errado</button></div>`;
+        
+        function changeFontSize(type, delta) {
+            if(type === 'question') fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta));
+            else if(type === 'comment') fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta));
+            applyFontSizesToCSS();
+        }
+        
+        function applyFilter() {
+            if(!questions.length) { filteredList = []; currentPage = 0; renderAll(); return; }
+            let filter = filterSelect.value;
+            currentFilter = filter;
+            let filtered = [...questions];
+            if(filter === "unanswered") filtered = filtered.filter(q => !q.responded);
+            else if(filter === "wrong") filtered = filtered.filter(q => q.responded && q.userChoice !== q.answer);
+            else if(filter === "starred") filtered = filtered.filter(q => starredSet.has(q.id));
+            filteredList = filtered;
+            if(trainingConfig.difficulty !== "balanced" || trainingConfig.extras.length) {
+                let working = [...filteredList];
+                if(trainingConfig.difficulty === "errorFocus") working.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0));
+                else if(trainingConfig.difficulty === "progressive") working.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0));
+                else if(trainingConfig.difficulty === "advanced") working.sort((a,b) => b.id - a.id);
+                else if(trainingConfig.difficulty === "simulated") working.sort(() => Math.random() - 0.5);
+                filteredList = working;
+            }
+            currentPage = 0;
+            renderAll();
+        }
+        
+        function renderDashboard() {
+            let total = questions.filter(q => q.responded).length;
+            let correct = questions.filter(q => q.responded && q.userChoice === q.answer).length;
+            dashboardArea.innerHTML = `<div class="grid grid-cols-2 gap-3"><div class="bg-emerald-950/40 p-3 rounded-xl text-center border border-emerald-800/30"><i class="fas fa-check-circle text-emerald-500 text-xl"></i><div class="text-2xl font-bold">${correct}</div><div class="text-xs">Acertos</div></div><div class="bg-red-950/40 p-3 rounded-xl text-center border border-red-800/30"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${total-correct}</div><div class="text-xs">Erros</div></div></div>`;
+            if(window.disChart) window.disChart.destroy();
+            let ctx = disciplineChartCanvas.getContext("2d");
+            window.disChart = new Chart(ctx, { type:"bar", data:{ labels:["Acertos","Erros"], datasets:[{ label:"", data:[correct, total-correct], backgroundColor: ["#F97316","#EF4444"], borderRadius: 8 }] }, options:{ responsive: true, maintainAspectRatio: true, scales: { y: { grid: { color: "rgba(255,255,255,0.05)" } }, x: { ticks: { color: "var(--text-secondary)" } } } } });
+            let insight = "";
+            let last5 = questions.filter(q => q.responded).slice(-5);
+            let lastCorrect = last5.filter(q => q.userChoice === q.answer).length;
+            if(last5.length>=3 && lastCorrect/last5.length>0.6) insight = "🔥 Bom rendimento! Continue assim.";
+            else if(last5.length>=3 && lastCorrect/last5.length<0.4) insight = "⚠️ Atenção! Revise os conceitos.";
+            document.getElementById("insightMsg").innerHTML = insight ? `<div class="p-2 rounded-lg bg-orange-500/10 text-orange-300">${insight}</div>` : "";
+        }
+        
+        function renderQuestionsPage() {
+            if(!filteredList.length) { questionsGrid.innerHTML = `<div class="card p-8 text-center text-textSecondary"><i class="fas fa-inbox text-4xl mb-2"></i><p>Nenhuma questão para exibir.</p></div>`; return; }
+            const start = currentPage * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, filteredList.length);
+            const pageQuestions = filteredList.slice(start, end);
+            let html = '';
+            for(let q of pageQuestions) {
+                const isStarred = starredSet.has(q.id);
+                const starIcon = isStarred ? "fas fa-star text-yellow-500" : "far fa-star";
+                let cardClass = '';
+                if(q.responded) cardClass = q.userChoice === q.answer ? 'correta' : 'errada';
+                let botoesResposta = '';
+                if(!q.responded) {
+                    botoesResposta = `<div class="flex gap-3 mt-4"><button class="btn-resposta btn-certo" data-id="${q.id}" data-resp="Certo"><i class="fas fa-check-circle"></i> Certo</button><button class="btn-resposta btn-errado" data-id="${q.id}" data-resp="Errado"><i class="fas fa-times-circle"></i> Errado</button></div>`;
+                } else {
+                    const resultado = q.userChoice === q.answer ? "Correto!" : "Errado!";
+                    const resultClass = q.userChoice === q.answer ? "bg-emerald-900/40 text-emerald-300" : "bg-red-900/40 text-red-300";
+                    botoesResposta = `<div class="mt-3 p-3 rounded-xl bg-gray-800/30"><div class="flex items-center gap-2"><span class="result-badge ${resultClass}"><i class="fas ${q.userChoice === q.answer ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> Gabarito: ${q.userChoice}</span></div><button class="btn-comentario" data-id="${q.id}"><i class="far fa-comment-dots mr-1"></i> ${q.showComment ? 'Esconder Comentário' : 'Mostrar Comentário'}</button>${q.showComment ? `<div class="comentario-content"><strong>Comentário:</strong> ${q.comment}<br><span class="text-xs mt-1 block">Gabarito oficial: ${q.answer}</span></div>` : ''}</div>`;
+                }
+                html += `<div class="question-card ${cardClass}" id="question-card-${q.id}"><div class="questao-numero"><span class="bg-orange-500/15 text-orange-300 text-xs px-2 py-0.5 rounded-full">Questão ${q.number}</span><span class="text-xs text-textSecondary">${q.discipline}</span><button class="star-btn ml-auto text-lg" data-id="${q.id}"><i class="${starIcon}"></i></button></div><div class="questao-texto">${q.text}</div>${botoesResposta}</div>`;
+            }
+            questionsGrid.innerHTML = html;
+            document.querySelectorAll('.btn-resposta').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const resp = btn.dataset.resp; window.responderQuestao(id, resp); });
+            });
+            document.querySelectorAll('.btn-comentario').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleComentario(id); });
+            });
+            document.querySelectorAll('.star-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleStar(id); });
+            });
+            updatePaginationControls();
+            updateCounterAndProgress();
+        }
+        
+        function updatePaginationControls() { const totalPages = Math.ceil(filteredList.length / PAGE_SIZE); pageIndicator.innerText = `Página ${currentPage+1} de ${totalPages || 1}`; prevPageBtn.disabled = currentPage === 0; nextPageBtn.disabled = currentPage >= totalPages-1; }
+        function updateCounterAndProgress() { questionCounterSpan.innerText = `${filteredList.length}/${MAX_QUESTIONS}`; starredCountSpan.innerText = starredSet.size; let answeredCount = questions.filter(q => q.responded).length; let progressPercent = questions.length ? (answeredCount / questions.length) * 100 : 0; topProgressFill.style.width = `${progressPercent}%`; }
+        function renderAll() { renderDashboard(); renderQuestionsPage(); saveToLocal(); }
+        function nextPage() { if(currentPage < Math.ceil(filteredList.length / PAGE_SIZE)-1) { currentPage++; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+        function prevPage() { if(currentPage > 0) { currentPage--; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+        function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; q.responseTimestamp = null; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI(); if(window.resetGamificationOnReset) window.resetGamificationOnReset(); } }
+        function clearAllData() { if(confirm("Apagar todos os dados?")) { localStorage.clear(); location.reload(); } }
+        function exportJSON() { let data = { questions, starred: [...starredSet] }; let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"})); a.download="auditorquest_backup.json"; a.click(); showToast("Backup exportado"); }
+        function generateErrorNotebook() { let wrongs = questions.filter(q => q.responded && q.userChoice !== q.answer); if(wrongs.length===0) { showToast("Nenhum erro"); return; } let content = "CADERNO DE ERROS\n\n"; wrongs.forEach(q=>{ content += `Questão ${q.number}: ${q.text}\nGabarito: ${q.answer}\nComentário: ${q.comment}\n\n---\n\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:"text/plain"})); a.download="caderno_erros.txt"; a.click(); showToast("Caderno de erros gerado"); }
+        function generateNotebookLMPrompt() { let prompt = `# Prompt para NotebookLM - Estudo CESPE\n\n## Questões:\n`; questions.forEach((q,idx)=>{ prompt += `\n${idx+1}. ${q.text}\n   Gabarito: ${q.answer}\n   Minha resposta: ${q.responded ? q.userChoice : "Não respondida"}\n   Comentário: ${q.comment}\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([prompt],{type:"text/markdown"})); a.download="prompt_notebooklm.md"; a.click(); showToast("Prompt baixado"); }
+        function generateReport() { let total=questions.filter(q=>q.responded).length, correct=questions.filter(q=>q.responded && q.userChoice===q.answer).length; let pct=total?((correct/total)*100).toFixed(1):0; alert(`RELATÓRIO\nAcertos: ${correct}\nErros: ${total-correct}\nAproveitamento: ${pct}%\nStreak: ${streak}\nPontos: ${points}`); }
+        
+        function startTimerInterval() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if(timerRunning) { timerSeconds++; updateTimerDisplay(); saveToLocal(); } }, 1000); }
+        function updateTimerDisplay() { let h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; timerDisplay.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
+        function startTimer() { if(!timerRunning){ timerRunning=true; if(!timerInterval) startTimerInterval(); saveToLocal(); showToast("Cronômetro iniciado"); } }
+        function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocal(); showToast("Pausado"); } }
+        function stopTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocal(); showToast("Zerado"); }
+        
+        // DASHBOARD POWER BI (original)
+        let doughnutChartV2 = null, barChartV2 = null, lineChartV2 = null;
+        function obterRodadaAtual() {
+            const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
+            return respondidas.slice(-15);
+        }
+        function obterHistoricoRodadas() {
+            const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
+            const rodadas = [];
+            for(let i=0; i<respondidas.length; i+=15) {
+                const bloco = respondidas.slice(i, i+15);
+                const acertos = bloco.filter(q => q.userChoice === q.answer).length;
+                const taxa = (acertos / bloco.length) * 100;
+                rodadas.push({ acertos, total: bloco.length, taxa });
+            }
+            return rodadas.slice(-5);
+        }
+        function calcularTempoMedioRodada(rodada) {
+            if(rodada.length < 2) return 0;
+            const tempos = rodada.map(q => q.responseTimestamp);
+            const minTime = Math.min(...tempos);
+            const maxTime = Math.max(...tempos);
+            const diffSeg = (maxTime - minTime) / 1000;
+            return Math.round(diffSeg / rodada.length);
+        }
+        window.atualizarDashboardPowerBI = function() {
+            const rodada = obterRodadaAtual();
+            const totalRodada = rodada.length;
+            const acertosRodada = rodada.filter(q => q.userChoice === q.answer).length;
+            const taxaAcerto = totalRodada ? (acertosRodada / totalRodada * 100).toFixed(1) : 0;
+            const tempoMedio = calcularTempoMedioRodada(rodada);
+            const streakAtual = streak;
+            const kpiHtml = `
+                <div class="kpi-card-v2"><div class="kpi-title-v2">🎯 ACERTOS</div><div class="kpi-value-v2">${acertosRodada}<span class="kpi-unit-v2">/${totalRodada}</span></div><div class="kpi-trend-v2">${taxaAcerto}% de aproveitamento</div></div>
+                <div class="kpi-card-v2"><div class="kpi-title-v2">⏱️ TEMPO MÉDIO</div><div class="kpi-value-v2">${tempoMedio}<span class="kpi-unit-v2">s</span></div><div class="kpi-trend-v2">por questão</div></div>
+                <div class="kpi-card-v2"><div class="kpi-title-v2">🔥 SEQUÊNCIA</div><div class="kpi-value-v2">${streakAtual}<span class="kpi-unit-v2"> acertos</span></div><div class="kpi-trend-v2">streak atual</div></div>
+                <div class="kpi-card-v2"><div class="kpi-title-v2">📊 TAXA GERAL</div><div class="kpi-value-v2">${taxaAcerto}<span class="kpi-unit-v2">%</span></div><div class="kpi-trend-v2">rodada atual</div></div>
+            `;
+            document.getElementById("kpiGridV2").innerHTML = kpiHtml;
+            if(doughnutChartV2) doughnutChartV2.destroy();
+            const ctxDoughnut = document.getElementById("doughnutRodadaV2").getContext("2d");
+            doughnutChartV2 = new Chart(ctxDoughnut, { type: 'doughnut', data: { labels: ['Acertos', 'Erros'], datasets: [{ data: [acertosRodada, totalRodada - acertosRodada], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } } });
+            const disciplinasMap = new Map();
+            rodada.forEach(q => {
+                const disc = q.discipline;
+                if(!disciplinasMap.has(disc)) disciplinasMap.set(disc, { acertos:0, total:0 });
+                const val = disciplinasMap.get(disc);
+                val.total++;
+                if(q.userChoice === q.answer) val.acertos++;
+                disciplinasMap.set(disc, val);
+            });
+            const labelsDisciplinas = Array.from(disciplinasMap.keys());
+            const acertosPorDisciplina = labelsDisciplinas.map(d => disciplinasMap.get(d).acertos);
+            if(barChartV2) barChartV2.destroy();
+            const ctxBar = document.getElementById("barDisciplinasV2").getContext("2d");
+            barChartV2 = new Chart(ctxBar, { type: 'bar', data: { labels: labelsDisciplinas, datasets: [{ label: 'Acertos na rodada', data: acertosPorDisciplina, backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1', maxRotation: 30 } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } } });
+            const historico = obterHistoricoRodadas();
+            const taxas = historico.map(r => r.taxa);
+            const rodadasLabels = historico.map((_, idx) => `Rodada ${idx+1}`);
+            if(lineChartV2) lineChartV2.destroy();
+            const ctxLine = document.getElementById("lineRodadasV2").getContext("2d");
+            lineChartV2 = new Chart(ctxLine, { type: 'line', data: { labels: rodadasLabels, datasets: [{ label: '% Acertos', data: taxas, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { min: 0, max: 100, ticks: { callback: (val) => val+'%', color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1' } } }, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } } } } });
+            const errosPorDisciplina = new Map();
+            rodada.forEach(q => { if(q.userChoice !== q.answer) errosPorDisciplina.set(q.discipline, (errosPorDisciplina.get(q.discipline)||0) + 1); });
+            let piorDisciplina = "nenhuma", maxErros = 0;
+            for(let [disc, err] of errosPorDisciplina.entries()) { if(err > maxErros) { maxErros = err; piorDisciplina = disc; } }
+            let tendenciaMsg = "";
+            if(historico.length >= 2) {
+                const ultima = historico[historico.length-1].taxa;
+                const penultima = historico[historico.length-2].taxa;
+                if(ultima > penultima) tendenciaMsg = "📈 Tendência de melhora na última rodada!";
+                else if(ultima < penultima) tendenciaMsg = "📉 Atenção: desempenho caiu na última rodada.";
+                else tendenciaMsg = "➡️ Desempenho estável nas últimas rodadas.";
+            }
+            const tempoMsg = tempoMedio > 90 ? "⏳ Tempo médio elevado. Tente ganhar agilidade." : (tempoMedio > 45 ? "⏱️ Tempo médio moderado, pode melhorar." : "⚡ Bom ritmo de resolução.");
+            const insightHTML = `<div class="diagnosis-text"><i class="fas fa-microphone-alt text-orange-400 mr-2"></i> <strong>Diagnóstico automático</strong><br>🔴 Disciplina com mais erros: <strong>${piorDisciplina}</strong> (${maxErros} erro(s)).<br>${tendenciaMsg}<br>${tempoMsg}</div>`;
+            document.getElementById("insightV2").innerHTML = insightHTML;
+        };
+        
+        function initTrainingModal() {
+            const modal = document.getElementById("configModal");
+            const openBtn = document.getElementById("configTreinoBtn");
+            const closeBtn = document.getElementById("closeConfigModal");
+            const applyBtn = document.getElementById("applyConfigBtn");
+            const resetConfigBtn = document.getElementById("resetConfigBtn");
+            if(openBtn) openBtn.onclick = () => { modal.classList.remove("hidden"); };
+            if(closeBtn) closeBtn.onclick = () => { modal.classList.add("hidden"); };
+            if(applyBtn) applyBtn.onclick = () => {
+                const diffSelected = document.querySelector("#difficultyOptions .config-option.selected")?.dataset.val || "balanced";
+                const typeSelected = document.querySelector("#typeOptions .config-option.selected")?.dataset.val || "cebraspe";
+                const depthSelected = document.querySelector("#depthOptions .config-option.selected")?.dataset.val || "standard";
+                let extrasSelected = [];
+                document.querySelectorAll("#extrasOptions .config-option.selected").forEach(el => extrasSelected.push(el.dataset.val));
+                trainingConfig = { difficulty: diffSelected, type: typeSelected, depth: depthSelected, extras: extrasSelected };
+                saveToLocal();
+                modal.classList.add("hidden");
+                applyTrainingStrategy();
+                showToast("Estratégia aplicada com sucesso!");
+            };
+            if(resetConfigBtn) resetConfigBtn.onclick = () => {
+                trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] };
+                saveToLocal();
+                document.querySelectorAll("#difficultyOptions .config-option").forEach(opt => opt.classList.remove("selected"));
+                document.querySelector("#difficultyOptions .config-option[data-val='balanced']").classList.add("selected");
+                document.querySelectorAll("#typeOptions .config-option").forEach(opt => opt.classList.remove("selected"));
+                document.querySelector("#typeOptions .config-option[data-val='cebraspe']").classList.add("selected");
+                document.querySelectorAll("#depthOptions .config-option").forEach(opt => opt.classList.remove("selected"));
+                document.querySelector("#depthOptions .config-option[data-val='standard']").classList.add("selected");
+                document.querySelectorAll("#extrasOptions .config-option").forEach(opt => opt.classList.remove("selected"));
+                showToast("Configurações resetadas");
+                if(questions.length) applyFilter();
+            };
+            document.querySelectorAll(".config-option").forEach(opt => {
+                opt.addEventListener("click", (e) => {
+                    const parent = opt.parentNode;
+                    if(parent.id === "extrasOptions") opt.classList.toggle("selected");
+                    else { parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); }
+                });
+            });
+        }
+        
+        function initFontControls() {
+            const fontBtn = document.getElementById("fontSettingsBtn");
+            const panel = document.getElementById("fontPanel");
+            fontBtn.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("hidden"); };
+            document.getElementById("fontDecreaseQuestion").onclick = () => changeFontSize('question', -0.05);
+            document.getElementById("fontIncreaseQuestion").onclick = () => changeFontSize('question', 0.05);
+            document.getElementById("fontDecreaseComment").onclick = () => changeFontSize('comment', -0.05);
+            document.getElementById("fontIncreaseComment").onclick = () => changeFontSize('comment', 0.05);
+            document.addEventListener("click", (e) => { if(!fontBtn.contains(e.target) && !panel.contains(e.target)) panel.classList.add("hidden"); });
+        }
+        
+        // Event listeners
+        document.getElementById("timerStart").onclick = startTimer;
+        document.getElementById("timerPause").onclick = pauseTimer;
+        document.getElementById("timerStop").onclick = stopTimer;
+        document.getElementById("resetProgressBtn").onclick = resetProgress;
+        document.getElementById("clearAllBtn").onclick = clearAllData;
+        document.getElementById("exportDataBtn").onclick = exportJSON;
+        document.getElementById("focusModeBtn").onclick = () => document.body.classList.toggle("focus-mode");
+        document.getElementById("exitFocusBtn").onclick = () => document.body.classList.remove("focus-mode");
+        document.getElementById("themeToggleBtn").onclick = toggleTheme;
+        prevPageBtn.onclick = prevPage; nextPageBtn.onclick = nextPage;
+        applyFilterBtn.onclick = applyFilter;
+        importBtn.onclick = () => { if(rawInput.value.trim()) importQuestions(rawInput.value); };
+        previewBtn.onclick = () => { let parsed = parseQuestoes(rawInput.value); if(parsed.length) { document.getElementById("previewList").innerHTML = parsed.map(q=>`<div><strong>Q${q.number}:</strong> ${q.text.substring(0,80)}... <span class="text-xs">${q.answer}</span></div>`).join(""); document.getElementById("previewModal").style.display = "flex"; } else showToast("Nada detectado"); };
+        document.getElementById("cancelPreview").onclick = () => document.getElementById("previewModal").style.display = "none";
+        document.getElementById("confirmPreview").onclick = () => { importQuestions(rawInput.value); document.getElementById("previewModal").style.display = "none"; };
+        exampleBtn.onclick = () => { rawInput.value = `Questão 1: "A Declaração Universal dos Direitos Humanos foi adotada em 1948."\nComentário: "Adotada pela ONU em 10/12/1948."\nGabarito: Certo\n\nQuestão 2: "O Brasil foi descoberto em 1500 por Pedro Álvares Cabral."\nComentário: "Fato histórico consolidado."\nGabarito: Certo\n\nQuestão 3: "A auditoria interna é facultativa para empresas de capital aberto."\nComentário: "É obrigatória por lei."\nGabarito: Errado`; importQuestions(rawInput.value); };
+        importPdfBtn.onclick = () => pdfUpload.click();
+        pdfUpload.onchange = async(e) => { if(e.target.files[0]) { showToast("Extraindo PDF..."); let file = e.target.files[0]; let reader = new FileReader(); reader.onload = async(ev) => { let typedarray = new Uint8Array(ev.target.result); let pdf = await pdfjsLib.getDocument(typedarray).promise; let text=""; for(let i=1;i<=pdf.numPages;i++) { let page=await pdf.getPage(i); let content=await page.getTextContent(); text+=content.items.map(t=>t.str).join(" "); } rawInput.value = text; importQuestions(text); }; reader.readAsArrayBuffer(file); } };
+        document.getElementById("userMenuBtn").onclick = () => document.getElementById("userDropdown").classList.toggle("hidden");
+        document.addEventListener("click", (e) => { if(!document.getElementById("userMenuBtn").contains(e.target)) document.getElementById("userDropdown").classList.add("hidden"); });
+        document.getElementById("reportBtn").onclick = generateReport;
+        document.getElementById("downloadErrorsBtn").onclick = generateErrorNotebook;
+        document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt;
+        window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
+        
+        loadFromLocal();
+        initTrainingModal();
+        initFontControls();
+        if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para importar questões.");
+    })();
+    
+    // ================== SISTEMA CONCURSOCOIN (GAMIFICAÇÃO ISOLADA) ==================
+    (function() {
+        // Variáveis do sistema de gamificação
+        let totalCoins = 0;
+        let currentStreak = 0;        // streak específico da gamificação
+        let bestStreak = 0;
+        let jackpotCount = 0;
+        let lastBonus5 = false;
+        let lastBonus10 = false;
+        let jackpotTriggeredThisStreak = false;
+        let rodadaID = 0;
+        
+        // Arrays de mensagens dinâmicas
+        const mensagensAcerto = [
+            "+{valor} ConcursoCoins 💰",
+            "Boa! +{valor} moedas!",
+            "Acertou! Ganho de {valor} 💰",
+            "Mandou bem! +{valor}",
+            "💰 +{valor} coins! Continue!",
+            "Show! +{valor} moedas!"
+        ];
+        const mensagensBonus = [
+            "🔥 Sequência ativada! +100 moedas!",
+            "💥 Combo! Você ganhou +100!",
+            "⚡ Incrível! +100 moedas!",
+            "🎯 Bônus de sequência! +100",
+            "🚀 +100 por 5 acertos seguidos!"
+        ];
+        const mensagensBonus10 = [
+            "🏆 MEGA COMBO! +300 moedas!",
+            "💎 Sequência de 10! +300 coins!",
+            "⚡ LENDÁRIO! +300 moedas!",
+            "🔥 10 ACERTOS SEGUIDOS! +300"
+        ];
+        
+        // Elementos da interface
+        let coinDisplay, streakDisplay;
+        
+        function updateUI() {
+            if (!coinDisplay) coinDisplay = document.getElementById("coinCounterDisplay");
+            if (!streakDisplay) streakDisplay = document.getElementById("streakCounterDisplay");
+            if (coinDisplay) {
+                coinDisplay.classList.add("coin-value-update");
+                setTimeout(() => coinDisplay.classList.remove("coin-value-update"), 300);
+                coinDisplay.innerHTML = `💰 ${totalCoins.toLocaleString()}`;
+            }
+            if (streakDisplay) {
+                streakDisplay.innerHTML = `🔥 ${currentStreak}`;
+                streakDisplay.style.background = currentStreak >= 5 ? "#f59e0b" : "#f97316";
+            }
+        }
+        
+        function addCoins(valor) {
+            totalCoins += valor;
+            updateUI();
+            saveData();
+            return totalCoins;
+        }
+        
+        function getRandomMessage(lista) {
+            return lista[Math.floor(Math.random() * lista.length)];
+        }
+        
+        function showCoinNotification(valor) {
+            let template = getRandomMessage(mensagensAcerto);
+            let mensagem = template.replace("{valor}", valor);
+            const notif = document.createElement("div");
+            notif.className = "coin-notification";
+            notif.innerHTML = `<i class="fas fa-coins"></i> ${mensagem}`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 800);
+        }
+        
+        function showBonusNotification(valor) {
+            let msgList = valor === 100 ? mensagensBonus : mensagensBonus10;
+            const msg = getRandomMessage(msgList);
+            const notif = document.createElement("div");
+            notif.className = "coin-notification";
+            notif.style.background = "linear-gradient(135deg, #f97316, #ea580c)";
+            notif.style.color = "white";
+            notif.innerHTML = `<i class="fas fa-trophy"></i> ${msg}`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 1000);
+            addCoins(valor);
+        }
+        
+        function createConfetti() {
+            for (let i = 0; i < 120; i++) {
+                const conf = document.createElement("div");
+                conf.classList.add("confetti");
+                conf.style.left = Math.random() * 100 + "%";
+                conf.style.width = Math.random() * 8 + 4 + "px";
+                conf.style.height = Math.random() * 12 + 6 + "px";
+                conf.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                conf.style.position = "fixed";
+                conf.style.top = "-20px";
+                conf.style.borderRadius = "2px";
+                conf.style.animationDuration = Math.random() * 2 + 1.5 + "s";
+                conf.style.animationDelay = Math.random() * 0.5 + "s";
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 4000);
+            }
+        }
+        
+        function showJackpot() {
+            addCoins(10000);
+            jackpotCount++;
+            saveData();
+            const modal = document.createElement("div");
+            modal.className = "jackpot-modal";
+            modal.innerHTML = `
+                <div class="jackpot-content">
+                    <i class="fas fa-crown" style="font-size: 4rem; color: #fbbf24;"></i>
+                    <h2>🎰 JACKPOT ATIVADO 🎰</h2>
+                    <h3>🔥 SEQUÊNCIA PERFEITA 🔥</h3>
+                    <h3>🏆 15/15 QUESTÕES 🏆</h3>
+                    <div style="font-size: 2rem; margin: 1rem;">+10.000 ConcursoCoins 💰</div>
+                    <button id="closeJackpotBtn" class="btn-primary px-6 py-2 rounded-full">FECHAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            createConfetti();
+            const closeBtn = modal.querySelector("#closeJackpotBtn");
+            closeBtn.onclick = () => modal.remove();
+            setTimeout(() => { if(modal) modal.remove(); }, 6000);
+        }
+        
+        function checkStreakBonus(streak) {
+            if (streak === 5 && !lastBonus5) {
+                showBonusNotification(100);
+                lastBonus5 = true;
+                saveData();
+            } else if (streak === 10 && !lastBonus10) {
+                showBonusNotification(300);
+                lastBonus10 = true;
+                saveData();
+            }
+        }
+        
+        function checkJackpot(streak) {
+            if (streak === 15 && !jackpotTriggeredThisStreak) {
+                jackpotTriggeredThisStreak = true;
+                showJackpot();
+                saveData();
+            }
+        }
+        
+        function showNearJackpotAlert(streak) {
+            if (streak === 13 || streak === 14) {
+                const alertDiv = document.createElement("div");
+                alertDiv.className = "coin-notification";
+                alertDiv.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
+                alertDiv.style.color = "white";
+                alertDiv.style.fontSize = "1rem";
+                alertDiv.innerHTML = "🚨 ATENÇÃO: VOCÊ ESTÁ PERTO DO JACKPOT 🚨";
+                document.body.appendChild(alertDiv);
+                setTimeout(() => alertDiv.remove(), 2000);
+            }
+        }
+        
+        // Função chamada sempre que uma questão é respondida (via callback do app original)
+        window.onQuestionAnswered = function(questionNumber, wasCorrect) {
+            if (wasCorrect) {
+                const ganho = questionNumber;  // moedas = número da questão
+                addCoins(ganho);
+                showCoinNotification(ganho);   // NOTIFICAÇÃO OBRIGATÓRIA A CADA ACERTO
+                currentStreak++;
+                if (currentStreak > bestStreak) bestStreak = currentStreak;
+                updateUI();
+                checkStreakBonus(currentStreak);
+                checkJackpot(currentStreak);
+                showNearJackpotAlert(currentStreak);
+                saveData();
+                rodadaID++;
             } else {
-                const resultado = q.userChoice === q.answer ? "Correto!" : "Errado!";
-                const resultClass = q.userChoice === q.answer ? "bg-emerald-900/40 text-emerald-300" : "bg-red-900/40 text-red-300";
-                botoesResposta = `<div class="mt-3 p-3 rounded-xl bg-gray-800/30"><div class="flex items-center gap-2"><span class="result-badge ${resultClass}"><i class="fas ${q.userChoice === q.answer ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> Gabarito: ${q.userChoice}</span></div><button class="btn-comentario" data-id="${q.id}"><i class="far fa-comment-dots mr-1"></i> ${q.showComment ? 'Esconder Comentário' : 'Mostrar Comentário'}</button>${q.showComment ? `<div class="comentario-content"><strong>Comentário:</strong> ${q.comment}<br><span class="text-xs mt-1 block">Gabarito oficial: ${q.answer}</span></div>` : ''}</div>`;
+                if (currentStreak > 0) {
+                    const notif = document.createElement("div");
+                    notif.className = "coin-notification";
+                    notif.style.background = "linear-gradient(135deg, #6b7280, #4b5563)";
+                    notif.innerHTML = "💔 Streak quebrado! Recomece.";
+                    document.body.appendChild(notif);
+                    setTimeout(() => notif.remove(), 1000);
+                }
+                currentStreak = 0;
+                lastBonus5 = false;
+                lastBonus10 = false;
+                jackpotTriggeredThisStreak = false;
+                updateUI();
+                saveData();
+                rodadaID++;
             }
-            html += `<div class="question-card ${cardClass}" id="question-card-${q.id}"><div class="questao-numero"><span class="bg-orange-500/15 text-orange-300 text-xs px-2 py-0.5 rounded-full">Questão ${q.number}</span><span class="text-xs text-textSecondary">${q.discipline}</span><button class="star-btn ml-auto text-lg" data-id="${q.id}"><i class="${starIcon}"></i></button></div><div class="questao-texto">${q.text}</div>${botoesResposta}</div>`;
-        }
-        questionsGrid.innerHTML = html;
-        document.querySelectorAll('.btn-resposta').forEach(btn => {
-            btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const resp = btn.dataset.resp; responderQuestao(id, resp); });
-        });
-        document.querySelectorAll('.btn-comentario').forEach(btn => {
-            btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleComentario(id); });
-        });
-        document.querySelectorAll('.star-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleStar(id); });
-        });
-        updatePaginationControls();
-        updateCounterAndProgress();
-    }
-
-    function updatePaginationControls() { const totalPages = Math.ceil(filteredList.length / PAGE_SIZE); pageIndicator.innerText = `Página ${currentPage+1} de ${totalPages || 1}`; prevPageBtn.disabled = currentPage === 0; nextPageBtn.disabled = currentPage >= totalPages-1; }
-    function updateCounterAndProgress() { questionCounterSpan.innerText = `${filteredList.length}/${MAX_QUESTIONS}`; starredCountSpan.innerText = starredSet.size; let answeredCount = questions.filter(q => q.responded).length; let progressPercent = questions.length ? (answeredCount / questions.length) * 100 : 0; topProgressFill.style.width = `${progressPercent}%`; }
-    function renderAll() { renderDashboard(); renderQuestionsPage(); saveToLocal(); }
-    function nextPage() { if(currentPage < Math.ceil(filteredList.length / PAGE_SIZE)-1) { currentPage++; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
-    function prevPage() { if(currentPage > 0) { currentPage--; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
-    function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; q.responseTimestamp = null; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); atualizarDashboardPowerBI(); } }
-    function clearAllData() { if(confirm("Apagar todos os dados?")) { localStorage.clear(); location.reload(); } }
-    function exportJSON() { let data = { questions, starred: [...starredSet] }; let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"})); a.download="auditorquest_backup.json"; a.click(); showToast("Backup exportado"); }
-    function generateErrorNotebook() { let wrongs = questions.filter(q => q.responded && q.userChoice !== q.answer); if(wrongs.length===0) { showToast("Nenhum erro"); return; } let content = "CADERNO DE ERROS\n\n"; wrongs.forEach(q=>{ content += `Questão ${q.number}: ${q.text}\nGabarito: ${q.answer}\nComentário: ${q.comment}\n\n---\n\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:"text/plain"})); a.download="caderno_erros.txt"; a.click(); showToast("Caderno de erros gerado"); }
-    function generateNotebookLMPrompt() { let prompt = `# Prompt para NotebookLM - Estudo CESPE\n\n## Questões:\n`; questions.forEach((q,idx)=>{ prompt += `\n${idx+1}. ${q.text}\n   Gabarito: ${q.answer}\n   Minha resposta: ${q.responded ? q.userChoice : "Não respondida"}\n   Comentário: ${q.comment}\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([prompt],{type:"text/markdown"})); a.download="prompt_notebooklm.md"; a.click(); showToast("Prompt baixado"); }
-    function generateReport() { let total=questions.filter(q=>q.responded).length, correct=questions.filter(q=>q.responded && q.userChoice===q.answer).length; let pct=total?((correct/total)*100).toFixed(1):0; alert(`RELATÓRIO\nAcertos: ${correct}\nErros: ${total-correct}\nAproveitamento: ${pct}%\nStreak: ${streak}\nPontos: ${points}`); }
-
-    // Timer
-    function startTimerInterval() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if(timerRunning) { timerSeconds++; updateTimerDisplay(); saveToLocal(); } }, 1000); }
-    function updateTimerDisplay() { let h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; timerDisplay.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
-    function startTimer() { if(!timerRunning){ timerRunning=true; if(!timerInterval) startTimerInterval(); saveToLocal(); showToast("Cronômetro iniciado"); } }
-    function pauseTimer() { if(timerRunning){ timerRunning=false; saveToLocal(); showToast("Pausado"); } }
-    function stopTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocal(); showToast("Zerado"); }
-
-    // ================== DASHBOARD POWER BI (NOVO) ==================
-    let doughnutChartV2 = null, barChartV2 = null, lineChartV2 = null;
-
-    function obterRodadaAtual() {
-        // Últimas 15 questões respondidas ordenadas por timestamp
-        const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
-        return respondidas.slice(-15);
-    }
-
-    function obterHistoricoRodadas() {
-        const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
-        const rodadas = [];
-        for(let i=0; i<respondidas.length; i+=15) {
-            const bloco = respondidas.slice(i, i+15);
-            const acertos = bloco.filter(q => q.userChoice === q.answer).length;
-            const taxa = (acertos / bloco.length) * 100;
-            rodadas.push({ acertos, total: bloco.length, taxa });
-        }
-        return rodadas.slice(-5);
-    }
-
-    function calcularTempoMedioRodada(rodada) {
-        // Simulação: usa timestamp médio entre primeira e última resposta (em segundos)
-        if(rodada.length < 2) return 0;
-        const tempos = rodada.map(q => q.responseTimestamp);
-        const minTime = Math.min(...tempos);
-        const maxTime = Math.max(...tempos);
-        const diffSeg = (maxTime - minTime) / 1000;
-        return Math.round(diffSeg / rodada.length);
-    }
-
-    function atualizarDashboardPowerBI() {
-        const rodada = obterRodadaAtual();
-        const totalRodada = rodada.length;
-        const acertosRodada = rodada.filter(q => q.userChoice === q.answer).length;
-        const taxaAcerto = totalRodada ? (acertosRodada / totalRodada * 100).toFixed(1) : 0;
-        const tempoMedio = calcularTempoMedioRodada(rodada);
-        const streakAtual = streak;
-
-        // KPIs
-        const kpiHtml = `
-            <div class="kpi-card-v2"><div class="kpi-title-v2">🎯 ACERTOS</div><div class="kpi-value-v2">${acertosRodada}<span class="kpi-unit-v2">/${totalRodada}</span></div><div class="kpi-trend-v2">${taxaAcerto}% de aproveitamento</div></div>
-            <div class="kpi-card-v2"><div class="kpi-title-v2">⏱️ TEMPO MÉDIO</div><div class="kpi-value-v2">${tempoMedio}<span class="kpi-unit-v2">s</span></div><div class="kpi-trend-v2">por questão</div></div>
-            <div class="kpi-card-v2"><div class="kpi-title-v2">🔥 SEQUÊNCIA</div><div class="kpi-value-v2">${streakAtual}<span class="kpi-unit-v2"> acertos</span></div><div class="kpi-trend-v2">streak atual</div></div>
-            <div class="kpi-card-v2"><div class="kpi-title-v2">📊 TAXA GERAL</div><div class="kpi-value-v2">${taxaAcerto}<span class="kpi-unit-v2">%</span></div><div class="kpi-trend-v2">rodada atual</div></div>
-        `;
-        document.getElementById("kpiGridV2").innerHTML = kpiHtml;
-
-        // Gráfico Doughnut
-        if(doughnutChartV2) doughnutChartV2.destroy();
-        const ctxDoughnut = document.getElementById("doughnutRodadaV2").getContext("2d");
-        doughnutChartV2 = new Chart(ctxDoughnut, {
-            type: 'doughnut',
-            data: { labels: ['Acertos', 'Erros'], datasets: [{ data: [acertosRodada, totalRodada - acertosRodada], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } }
-        });
-
-        // Gráfico de barras por disciplina (apenas acertos na rodada)
-        const disciplinasMap = new Map();
-        rodada.forEach(q => {
-            const disc = q.discipline;
-            if(!disciplinasMap.has(disc)) disciplinasMap.set(disc, { acertos:0, total:0 });
-            const val = disciplinasMap.get(disc);
-            val.total++;
-            if(q.userChoice === q.answer) val.acertos++;
-            disciplinasMap.set(disc, val);
-        });
-        const labelsDisciplinas = Array.from(disciplinasMap.keys());
-        const acertosPorDisciplina = labelsDisciplinas.map(d => disciplinasMap.get(d).acertos);
-        if(barChartV2) barChartV2.destroy();
-        const ctxBar = document.getElementById("barDisciplinasV2").getContext("2d");
-        barChartV2 = new Chart(ctxBar, {
-            type: 'bar',
-            data: { labels: labelsDisciplinas, datasets: [{ label: 'Acertos na rodada', data: acertosPorDisciplina, backgroundColor: '#3b82f6', borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1', maxRotation: 30 } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
-        });
-
-        // Gráfico de linha - últimas 5 rodadas
-        const historico = obterHistoricoRodadas();
-        const taxas = historico.map(r => r.taxa);
-        const rodadasLabels = historico.map((_, idx) => `Rodada ${idx+1}`);
-        if(lineChartV2) lineChartV2.destroy();
-        const ctxLine = document.getElementById("lineRodadasV2").getContext("2d");
-        lineChartV2 = new Chart(ctxLine, {
-            type: 'line',
-            data: { labels: rodadasLabels, datasets: [{ label: '% Acertos', data: taxas, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, scales: { y: { min: 0, max: 100, ticks: { callback: (val) => val+'%', color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1' } } }, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } } } }
-        });
-
-        // Diagnóstico automático
-        const errosPorDisciplina = new Map();
-        rodada.forEach(q => {
-            if(q.userChoice !== q.answer) {
-                errosPorDisciplina.set(q.discipline, (errosPorDisciplina.get(q.discipline)||0) + 1);
-            }
-        });
-        let piorDisciplina = "nenhuma";
-        let maxErros = 0;
-        for(let [disc, err] of errosPorDisciplina.entries()) {
-            if(err > maxErros) { maxErros = err; piorDisciplina = disc; }
-        }
-        let tendenciaMsg = "";
-        if(historico.length >= 2) {
-            const ultima = historico[historico.length-1].taxa;
-            const penultima = historico[historico.length-2].taxa;
-            if(ultima > penultima) tendenciaMsg = "📈 Tendência de melhora na última rodada!";
-            else if(ultima < penultima) tendenciaMsg = "📉 Atenção: desempenho caiu na última rodada.";
-            else tendenciaMsg = "➡️ Desempenho estável nas últimas rodadas.";
-        }
-        const tempoMsg = tempoMedio > 90 ? "⏳ Tempo médio elevado. Tente ganhar agilidade." : (tempoMedio > 45 ? "⏱️ Tempo médio moderado, pode melhorar." : "⚡ Bom ritmo de resolução.");
-        const insightHTML = `<div class="diagnosis-text"><i class="fas fa-microphone-alt text-orange-400 mr-2"></i> <strong>Diagnóstico automático</strong><br>🔴 Disciplina com mais erros: <strong>${piorDisciplina}</strong> (${maxErros} erro(s)).<br>${tendenciaMsg}<br>${tempoMsg}</div>`;
-        document.getElementById("insightV2").innerHTML = insightHTML;
-    }
-
-    // Eventos que disparam atualização do dashboard avançado
-    function initPowerBIWatcher() {
-        // Observa mudanças via clique em respostas (já chamamos em responderQuestao)
-        // Também em importação, reset, etc.
-        const originalApplyFilter = applyFilter;
-        window.applyFilter = applyFilter;
-        const events = [resetProgress, importQuestions];
-        // Garantir que sempre que o filtro for aplicado, atualiza o dashboard
-        const oldApplyFilter = applyFilter;
-        window.applyFilter = function() { oldApplyFilter(); atualizarDashboardPowerBI(); };
-        applyFilter = window.applyFilter;
-    }
-
-    function initTrainingModal() {
-        const modal = document.getElementById("configModal");
-        const openBtn = document.getElementById("configTreinoBtn");
-        const closeBtn = document.getElementById("closeConfigModal");
-        const applyBtn = document.getElementById("applyConfigBtn");
-        const resetConfigBtn = document.getElementById("resetConfigBtn");
-        if(openBtn) openBtn.onclick = () => { modal.classList.remove("hidden"); };
-        if(closeBtn) closeBtn.onclick = () => { modal.classList.add("hidden"); };
-        if(applyBtn) applyBtn.onclick = () => {
-            const diffSelected = document.querySelector("#difficultyOptions .config-option.selected")?.dataset.val || "balanced";
-            const typeSelected = document.querySelector("#typeOptions .config-option.selected")?.dataset.val || "cebraspe";
-            const depthSelected = document.querySelector("#depthOptions .config-option.selected")?.dataset.val || "standard";
-            let extrasSelected = [];
-            document.querySelectorAll("#extrasOptions .config-option.selected").forEach(el => extrasSelected.push(el.dataset.val));
-            trainingConfig = { difficulty: diffSelected, type: typeSelected, depth: depthSelected, extras: extrasSelected };
-            saveToLocal();
-            modal.classList.add("hidden");
-            applyTrainingStrategy();
-            showToast("Estratégia aplicada com sucesso!");
         };
-        if(resetConfigBtn) resetConfigBtn.onclick = () => {
-            trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] };
-            saveToLocal();
-            document.querySelectorAll("#difficultyOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-            document.querySelector("#difficultyOptions .config-option[data-val='balanced']").classList.add("selected");
-            document.querySelectorAll("#typeOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-            document.querySelector("#typeOptions .config-option[data-val='cebraspe']").classList.add("selected");
-            document.querySelectorAll("#depthOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-            document.querySelector("#depthOptions .config-option[data-val='standard']").classList.add("selected");
-            document.querySelectorAll("#extrasOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-            showToast("Configurações resetadas");
-            if(questions.length) applyFilter();
+        
+        // Funções de reset chamadas pelo app original
+        window.resetGamificationOnReset = function() {
+            currentStreak = 0;
+            lastBonus5 = false;
+            lastBonus10 = false;
+            jackpotTriggeredThisStreak = false;
+            updateUI();
+            saveData();
         };
-        document.querySelectorAll(".config-option").forEach(opt => {
-            opt.addEventListener("click", (e) => {
-                const parent = opt.parentNode;
-                if(parent.id === "extrasOptions") opt.classList.toggle("selected");
-                else { parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); }
-            });
-        });
-    }
-
-    function initFontControls() {
-        const fontBtn = document.getElementById("fontSettingsBtn");
-        const panel = document.getElementById("fontPanel");
-        fontBtn.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("hidden"); };
-        document.getElementById("fontDecreaseQuestion").onclick = () => changeFontSize('question', -0.05);
-        document.getElementById("fontIncreaseQuestion").onclick = () => changeFontSize('question', 0.05);
-        document.getElementById("fontDecreaseComment").onclick = () => changeFontSize('comment', -0.05);
-        document.getElementById("fontIncreaseComment").onclick = () => changeFontSize('comment', 0.05);
-        document.addEventListener("click", (e) => { if(!fontBtn.contains(e.target) && !panel.contains(e.target)) panel.classList.add("hidden"); });
-    }
-
-    // Eventos padrão
-    document.getElementById("timerStart").onclick = startTimer;
-    document.getElementById("timerPause").onclick = pauseTimer;
-    document.getElementById("timerStop").onclick = stopTimer;
-    document.getElementById("resetProgressBtn").onclick = resetProgress;
-    document.getElementById("clearAllBtn").onclick = clearAllData;
-    document.getElementById("exportDataBtn").onclick = exportJSON;
-    document.getElementById("focusModeBtn").onclick = () => document.body.classList.toggle("focus-mode");
-    document.getElementById("exitFocusBtn").onclick = () => document.body.classList.remove("focus-mode");
-    document.getElementById("themeToggleBtn").onclick = toggleTheme;
-    prevPageBtn.onclick = prevPage; nextPageBtn.onclick = nextPage;
-    applyFilterBtn.onclick = applyFilter;
-    importBtn.onclick = () => { if(rawInput.value.trim()) importQuestions(rawInput.value); };
-    previewBtn.onclick = () => { let parsed = parseQuestoes(rawInput.value); if(parsed.length) { document.getElementById("previewList").innerHTML = parsed.map(q=>`<div><strong>Q${q.number}:</strong> ${q.text.substring(0,80)}... <span class="text-xs">${q.answer}</span></div>`).join(""); document.getElementById("previewModal").style.display = "flex"; } else showToast("Nada detectado"); };
-    document.getElementById("cancelPreview").onclick = () => document.getElementById("previewModal").style.display = "none";
-    document.getElementById("confirmPreview").onclick = () => { importQuestions(rawInput.value); document.getElementById("previewModal").style.display = "none"; };
-    exampleBtn.onclick = () => { rawInput.value = `Questão 1: "A Declaração Universal dos Direitos Humanos foi adotada em 1948."\nComentário: "Adotada pela ONU em 10/12/1948."\nGabarito: Certo\n\nQuestão 2: "O Brasil foi descoberto em 1500 por Pedro Álvares Cabral."\nComentário: "Fato histórico consolidado."\nGabarito: Certo\n\nQuestão 3: "A auditoria interna é facultativa para empresas de capital aberto."\nComentário: "É obrigatória por lei."\nGabarito: Errado`; importQuestions(rawInput.value); };
-    importPdfBtn.onclick = () => pdfUpload.click();
-    pdfUpload.onchange = async(e) => { if(e.target.files[0]) { showToast("Extraindo PDF..."); let file = e.target.files[0]; let reader = new FileReader(); reader.onload = async(ev) => { let typedarray = new Uint8Array(ev.target.result); let pdf = await pdfjsLib.getDocument(typedarray).promise; let text=""; for(let i=1;i<=pdf.numPages;i++) { let page=await pdf.getPage(i); let content=await page.getTextContent(); text+=content.items.map(t=>t.str).join(" "); } rawInput.value = text; importQuestions(text); }; reader.readAsArrayBuffer(file); } };
-    document.getElementById("userMenuBtn").onclick = () => document.getElementById("userDropdown").classList.toggle("hidden");
-    document.addEventListener("click", (e) => { if(!document.getElementById("userMenuBtn").contains(e.target)) document.getElementById("userDropdown").classList.add("hidden"); });
-    document.getElementById("reportBtn").onclick = generateReport;
-    document.getElementById("downloadErrorsBtn").onclick = generateErrorNotebook;
-    document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt;
-    window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
-
-    loadFromLocal();
-    initTrainingModal();
-    initFontControls();
-    initPowerBIWatcher();
-    if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para importar questões.");
+        
+        window.resetGamificationOnImport = function() {
+            currentStreak = 0;
+            lastBonus5 = false;
+            lastBonus10 = false;
+            jackpotTriggeredThisStreak = false;
+            updateUI();
+            saveData();
+        };
+        
+        function saveData() {
+            localStorage.setItem("concursoCoins", totalCoins);
+            localStorage.setItem("concursoBestStreak", bestStreak);
+            localStorage.setItem("jackpotCount", jackpotCount);
+            localStorage.setItem("concursoStreak", currentStreak);
+            localStorage.setItem("lastBonus5", lastBonus5);
+            localStorage.setItem("lastBonus10", lastBonus10);
+            localStorage.setItem("jackpotTriggered", jackpotTriggeredThisStreak);
+            localStorage.setItem("concursoRodadaID", rodadaID);
+        }
+        
+        function loadData() {
+            totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0;
+            bestStreak = parseInt(localStorage.getItem("concursoBestStreak")) || 0;
+            jackpotCount = parseInt(localStorage.getItem("jackpotCount")) || 0;
+            currentStreak = parseInt(localStorage.getItem("concursoStreak")) || 0;
+            lastBonus5 = localStorage.getItem("lastBonus5") === "true";
+            lastBonus10 = localStorage.getItem("lastBonus10") === "true";
+            jackpotTriggeredThisStreak = localStorage.getItem("jackpotTriggered") === "true";
+            rodadaID = parseInt(localStorage.getItem("concursoRodadaID")) || 0;
+            updateUI();
+        }
+        
+        loadData();
+        updateUI();
+    })();
 </script>
 </body>
 </html>
