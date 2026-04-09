@@ -168,6 +168,30 @@
             100% { transform: scale(1); text-shadow: 0 0 0 gold; background-color: transparent; }
         }
         
+        /* NOVOS ESTILOS PARA EFEITO CASSINO PRO */
+        #saldo {
+            font-size: 2.8rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .ganhando {
+            color: #FFD700 !important;
+            text-shadow: 0 0 10px #FFD700, 0 0 25px #FFD700 !important;
+            transform: scale(1.15);
+            transition: all 0.1s ease;
+        }
+        /* Canvas overlay para partículas */
+        #canvasMoedas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
         .progress-goal {
             background: var(--bg-secondary);
             border-radius: 20px;
@@ -857,6 +881,11 @@
 <div id="configModal" class="modal-config hidden"><div class="modal-config-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-chess-board"></i> Estratégia de Prova</h3><button id="closeConfigModal" class="text-2xl leading-5">&times;</button></div><div class="config-group"><h4><i class="fas fa-chart-line"></i> Distribuição de dificuldade</h4><div class="config-options" id="difficultyOptions"><span data-val="balanced" class="config-option selected">Equilibrado (3F/3M/3D/1MD)</span><span data-val="progressive" class="config-option">Progressivo</span><span data-val="advanced" class="config-option">Avançado</span><span data-val="simulated" class="config-option">Simulado real</span><span data-val="errorFocus" class="config-option">Foco em erros</span></div></div><div class="config-group"><h4><i class="fas fa-check-double"></i> Tipo de cobrança</h4><div class="config-options" id="typeOptions"><span data-val="cebraspe" class="config-option selected">Certo ou Errado</span><span data-val="mixed" class="config-option">Misto</span></div></div><div class="config-group"><h4><i class="fas fa-layer-group"></i> Nível de profundidade</h4><div class="config-options" id="depthOptions"><span data-val="quick" class="config-option">Revisão rápida</span><span data-val="standard" class="config-option selected">Treino padrão</span><span data-val="advanced" class="config-option">Treino avançado</span></div></div><div class="config-group"><h4><i class="fas fa-gem"></i> Extras</h4><div class="config-options" id="extrasOptions"><span data-val="trick" class="config-option">Modo pegadinhas</span><span data-val="topics" class="config-option">Priorizar temas mais cobrados</span><span data-val="interpret" class="config-option">Foco em interpretação</span></div></div><div class="flex gap-3 mt-5"><button id="applyConfigBtn" class="btn-primary flex-1 py-2 rounded-xl">Aplicar estratégia</button><button id="resetConfigBtn" class="bg-gray-700 px-4 rounded-xl">Resetar</button></div></div></div>
 <div id="rewardPopup" class="reward-popup hide"><i id="rewardIcon" class="fas fa-trophy reward-icon"></i><span id="rewardText" class="reward-text"></span></div>
 
+<!-- NOVOS ELEMENTOS PARA EFEITO CASSINO PRO -->
+<canvas id="canvasMoedas"></canvas>
+<audio id="somContagem" src="https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.mp3" preload="auto"></audio>
+<audio id="somFinal" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+
 <script>
     // ================== CÓDIGO ORIGINAL COMPLETO (PRESERVADO) ==================
     (function() {
@@ -1107,7 +1136,7 @@
         const originalAddCoins = window.addCoins; if (originalAddCoins) { window.addCoins = function(valor) { const result = originalAddCoins(valor); playCoinSound(); return result; }; }
     })();
     
-    // ================== NOVA HOME: API + ANIMAÇÃO DE SALDO + META ==================
+    // ================== NOVA HOME + EFEITO CASSINO PRO ==================
     (function(){
         // Função para atualizar estatísticas internas na Home
         window.updateHomeStats = function() {
@@ -1122,7 +1151,6 @@
                 document.getElementById("homeTotalQuestions").innerText = totalQuestions;
                 document.getElementById("homeAccuracy").innerText = `${accuracy}%`;
                 document.getElementById("homeStreak").innerText = currentStreak;
-                // Conversão e meta (1 ConcursoCoin = R$ 0,01)
                 const realValue = totalCoins * 0.01;
                 document.getElementById("homeCoinToReal").innerHTML = `R$ ${realValue.toFixed(2)}`;
                 const goalReal = 1090;
@@ -1134,27 +1162,89 @@
             } catch(e) { console.warn("updateHomeStats",e); }
         };
         
-        // Animação de contagem estilo cassino
-        function animarSaldo(valorFinal, elementId = "saldo") {
-            const elemento = document.getElementById(elementId);
+        // ========== EFEITO CASSINO PRO (ANIMAÇÃO, SOM, PARTÍCULAS, VIBRAÇÃO) ==========
+        function animarSaldoCassinoPRO(valorFinal) {
+            const elemento = document.getElementById("saldo");
+            const somContagem = document.getElementById("somContagem");
+            const somFinal = document.getElementById("somFinal");
             if (!elemento) return;
             let valorAtual = 0;
-            const incremento = Math.max(1, Math.ceil(valorFinal / 50));
-            clearInterval(window._saldoInterval);
-            window._saldoInterval = setInterval(() => {
+            const duracao = 2000;
+            const incremento = valorFinal / (duracao / 30);
+            // efeito visual
+            elemento.classList.add("ganhando");
+            // som contagem
+            if (somContagem) {
+                try {
+                    somContagem.currentTime = 0;
+                    somContagem.play().catch(e=>console.warn("Áudio contagem não pode tocar", e));
+                } catch(e) {}
+            }
+            if (window._saldoIntervalCassino) clearInterval(window._saldoIntervalCassino);
+            window._saldoIntervalCassino = setInterval(() => {
                 valorAtual += incremento;
                 if (valorAtual >= valorFinal) {
                     valorAtual = valorFinal;
-                    clearInterval(window._saldoInterval);
+                    clearInterval(window._saldoIntervalCassino);
+                    // para som de contagem
+                    if (somContagem) { try { somContagem.pause(); somContagem.currentTime = 0; } catch(e) {} }
+                    // som de vitória
+                    if (somFinal) {
+                        try {
+                            somFinal.currentTime = 0;
+                            somFinal.play().catch(e=>console.warn("Som final não pode tocar", e));
+                        } catch(e) {}
+                    }
+                    efeitoMoedas(); // partículas
+                    // vibração (mobile)
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate([200, 100, 200]); } catch(e) {}
+                    }
+                    setTimeout(() => {
+                        elemento.classList.remove("ganhando");
+                    }, 1000);
                 }
-                elemento.innerText = valorAtual + " BTCC";
-                // Efeito visual de destaque
-                elemento.classList.add("highlight-gold");
-                setTimeout(() => elemento.classList.remove("highlight-gold"), 600);
+                elemento.innerText = Math.floor(valorAtual).toLocaleString() + " BTCC";
             }, 30);
         }
         
-        // Consumo da API externa
+        // Função de partículas de moedas (canvas)
+        function efeitoMoedas() {
+            const canvas = document.getElementById("canvasMoedas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let moedas = [];
+            for (let i = 0; i < 40; i++) {
+                moedas.push({
+                    x: Math.random() * canvas.width,
+                    y: -20,
+                    size: Math.random() * 10 + 5,
+                    speed: Math.random() * 5 + 2
+                });
+            }
+            function animar() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                moedas.forEach(m => {
+                    m.y += m.speed;
+                    ctx.beginPath();
+                    ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fill();
+                });
+                moedas = moedas.filter(m => m.y < canvas.height);
+                if (moedas.length > 0) {
+                    requestAnimationFrame(animar);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animar();
+        }
+        
+        // Consumo da API externa com animação cassino PRO
         async function carregarDadosAPI() {
             try {
                 const url = "https://script.google.com/macros/s/AKfycbzhcU1H-FjLNyi2dvzFoB1I4RbdsGzNQFJbrdLpeimvGxTJQnik8s6YQ141uYO26iVMug/exec";
@@ -1164,23 +1254,13 @@
                 let questoes = (data && data.questoes !== undefined && data.questoes !== null) ? Number(data.questoes) : 0;
                 if (isNaN(saldo)) saldo = 0;
                 if (isNaN(questoes)) questoes = 0;
-                // Exibir mensagem se saldo == 0
                 const saldoZeroMsg = document.getElementById("saldoZeroMsg");
                 if (saldo === 0 && saldoZeroMsg) saldoZeroMsg.classList.remove("hidden");
                 else if (saldoZeroMsg) saldoZeroMsg.classList.add("hidden");
-                // Atualiza elementos com animação
-                const elementoSaldo = document.getElementById("saldo");
-                if (elementoSaldo) {
-                    const saldoAtualTexto = elementoSaldo.innerText.replace(" BTCC", "");
-                    const saldoAtualNum = parseInt(saldoAtualTexto) || 0;
-                    if (saldoAtualNum !== saldo) {
-                        animarSaldo(saldo, "saldo");
-                    } else {
-                        elementoSaldo.innerText = saldo + " BTCC";
-                    }
-                }
                 const questoesEl = document.getElementById("questoes");
                 if (questoesEl) questoesEl.innerText = questoes;
+                // Chama a animação cassino PRO
+                animarSaldoCassinoPRO(saldo);
             } catch (error) {
                 console.warn("Erro ao carregar API externa:", error);
                 document.getElementById("saldo").innerText = "0 BTCC";
@@ -1214,6 +1294,15 @@
         carregarDadosAPI();
         setInterval(() => { if(window.updateHomeStats) window.updateHomeStats(); }, 2000);
         setInterval(() => carregarDadosAPI(), 30000);
+        
+        // Redimensionar canvas quando a janela for redimensionada (opcional)
+        window.addEventListener("resize", () => {
+            const canvas = document.getElementById("canvasMoedas");
+            if (canvas && canvas.width) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
     })();
 </script>
 </body>
