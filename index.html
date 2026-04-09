@@ -126,6 +126,62 @@
             margin: 0 auto;
         }
 
+        /* ========== ESTILOS DAS ABAS ========== */
+        .tab-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.5rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--accent-orange);
+            color: white;
+            box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+        }
+        .tab-container {
+            display: none;
+            animation: fadeSlide 0.25s ease;
+        }
+        .tab-container.active-tab {
+            display: block;
+        }
+        
+        /* Efeito destaque saldo */
+        .highlight-gold {
+            animation: goldPulse 0.6s ease-out;
+        }
+        @keyframes goldPulse {
+            0% { transform: scale(1); text-shadow: 0 0 0 gold; background-color: transparent; }
+            50% { transform: scale(1.05); text-shadow: 0 0 12px #fbbf24; background-color: rgba(251,191,36,0.2); border-radius: 20px; }
+            100% { transform: scale(1); text-shadow: 0 0 0 gold; background-color: transparent; }
+        }
+        
+        .progress-goal {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            height: 12px;
+            overflow: hidden;
+        }
+        .progress-goal-fill {
+            background: linear-gradient(90deg, #fbbf24, #f97316);
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        
         .question-card {
             background: var(--card-bg);
             border-radius: 20px;
@@ -455,7 +511,6 @@
         .diagnosis-text { font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         [data-theme="light"] .diagnosis-text { color: #334155; }
 
-        /* ========== ESTILOS GAMIFICAÇÃO ========== */
         .coin-notification {
             position: fixed;
             top: 30%;
@@ -631,6 +686,10 @@
         <div><h1 class="text-xl font-bold">Auditor<span class="text-orange-400">Quest</span></h1><p class="text-xs text-textSecondary">CESPE / CEBRASPE</p></div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
+        <!-- Botões de navegação entre abas -->
+        <button id="tabHomeBtn" class="tab-btn active"><i class="fas fa-home"></i> Home</button>
+        <button id="tabQuestoesBtn" class="tab-btn"><i class="fas fa-list-ul"></i> Questões</button>
+        
         <div class="coin-counter" id="coinCounterDisplay">💰 0</div>
         <div class="streak-badge" id="streakCounterDisplay">🔥 0</div>
         <button id="configTreinoBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-sliders-h"></i> Estratégia</button>
@@ -661,96 +720,145 @@
     </div>
 </div>
 
-<div class="gran-layout">
-    <div class="sidebar space-y-6">
-        <div class="card p-5">
-            <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-orange-400"></i><h2 class="font-semibold">Cronômetro</h2></div>
-            <div class="text-center"><div id="timerDisplay" class="text-2xl font-mono font-bold bg-black/30 inline-block px-4 py-1 rounded-xl">00:00:00</div>
-            <div class="flex justify-center gap-2 mt-2"><button id="timerStart" class="bg-emerald-700/70 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-play"></i> Iniciar</button><button id="timerPause" class="bg-yellow-600/70 hover:bg-yellow-500 px-3 py-1 rounded-lg text-xs"><i class="fas fa-pause"></i> Pausar</button><button id="timerStop" class="bg-red-600/70 hover:bg-red-500 px-3 py-1 rounded-lg text-xs"><i class="fas fa-stop"></i> Parar</button></div></div>
-            <div class="flex flex-col gap-2 mt-4">
-                <button id="downloadErrorsBtn" class="bg-rose-950/40 text-rose-300 border border-rose-800/40 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-rose-900/50"><i class="fas fa-book-open"></i> Caderno de erros</button>
-                <button id="downloadNotebookBtn" class="bg-sky-950/40 text-sky-300 border border-sky-800/40 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-sky-900/50"><i class="fas fa-robot"></i> Prompt NotebookLM</button>
+<!-- CONTAINER DAS ABAS -->
+<div id="tabHome" class="tab-container active-tab">
+    <div class="gran-layout" style="grid-template-columns: 1fr;">
+        <div class="space-y-6">
+            <!-- Card principal Home -->
+            <div class="card p-6">
+                <div class="flex items-center gap-3 mb-5"><i class="fas fa-chart-line text-3xl text-orange-400"></i><h2 class="text-2xl font-bold">📊 Painel do Concurseiro</h2></div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Moedas internas e meta -->
+                    <div class="bg-black/20 p-5 rounded-2xl">
+                        <h3 class="text-lg font-semibold flex items-center gap-2"><i class="fas fa-coins text-yellow-400"></i> Seu Tesouro</h3>
+                        <div class="text-3xl font-bold mt-2" id="homeCoinDisplay">💰 0</div>
+                        <div class="text-sm text-textSecondary mt-1">ConcursoCoins acumuladas</div>
+                        <div class="mt-3 text-md"><i class="fas fa-chart-simple"></i> Conversão: <span id="homeCoinToReal">R$ 0,00</span></div>
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm"><span>Meta: R$ 1.090,00</span><span id="goalProgressText">0%</span></div>
+                            <div class="progress-goal mt-1"><div id="goalProgressFill" class="progress-goal-fill" style="width:0%"></div></div>
+                            <div class="text-xs text-textSecondary mt-2" id="missingAmountMsg">Faltam R$ 1.090,00 para atingir a meta 🎯</div>
+                        </div>
+                    </div>
+                    <!-- Estatísticas rápidas -->
+                    <div class="bg-black/20 p-5 rounded-2xl">
+                        <h3 class="text-lg font-semibold flex items-center gap-2"><i class="fas fa-tasks"></i> Desempenho</h3>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <div><div class="text-2xl font-bold" id="homeAnsweredCount">0</div><div class="text-xs">Questões respondidas</div></div>
+                            <div><div class="text-2xl font-bold" id="homeTotalQuestions">0</div><div class="text-xs">Total importadas</div></div>
+                            <div><div class="text-2xl font-bold text-emerald-400" id="homeAccuracy">0%</div><div class="text-xs">Aproveitamento</div></div>
+                            <div><div class="text-2xl font-bold text-orange-400" id="homeStreak">0</div><div class="text-xs">Sequência atual 🔥</div></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- API Externa (Saldo e questões) -->
+                <div class="mt-6 border-t border-borderLight pt-5">
+                    <h3 class="text-lg font-semibold flex items-center gap-2"><i class="fas fa-cloud-upload-alt text-blue-400"></i> Dados da Comunidade (API)</h3>
+                    <div class="grid md:grid-cols-2 gap-4 mt-3">
+                        <div class="bg-gradient-to-r from-amber-900/20 to-orange-900/20 p-4 rounded-xl">
+                            <div class="text-sm text-textSecondary">🏦 Saldo externo</div>
+                            <div class="text-3xl font-mono font-bold" id="saldo">0 BTCC</div>
+                            <div id="saldoZeroMsg" class="text-xs text-orange-300 mt-1 hidden">Comece a estudar para ganhar moedas 💰</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 p-4 rounded-xl">
+                            <div class="text-sm text-textSecondary">📚 Questões realizadas (comunidade)</div>
+                            <div class="text-3xl font-mono font-bold" id="questoes">0</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="card p-5">
-            <div class="flex items-center gap-2 mb-3"><i class="fas fa-filter text-orange-400"></i><h2 class="font-semibold">Filtro</h2></div>
-            <select id="filterSelect" class="w-full rounded-xl p-2">
-                <option value="all">Todas</option>
-                <option value="unanswered">Não respondidas</option>
-                <option value="wrong">Só erradas</option>
-                <option value="starred">⭐ Marcadas</option>
-            </select>
-            <button id="applyFilterBtn" class="w-full mt-3 btn-primary py-2 rounded-xl text-sm">Aplicar</button>
-        </div>
-        <div class="card p-5 text-center">
-            <div class="flex justify-between items-center"><div><i class="fas fa-star text-yellow-500"></i> <span id="starredCount">0</span></div><div><i class="fas fa-fire text-orange-500"></i> <span id="streakCount">0</span> streak</div><div><i class="fas fa-trophy text-orange-400"></i> <span id="levelBadge">Iniciante</span></div></div>
-            <div class="mt-2 text-xs text-textSecondary">+10 acerto | erro não penaliza pontos (apenas zera streak)</div>
-        </div>
-    </div>
-
-    <div class="main-content space-y-6">
-        <div class="card p-5">
-            <div class="flex items-center gap-3 mb-3"><div class="bg-orange-500/10 p-2 rounded-xl"><i class="fas fa-file-upload text-orange-400 text-lg"></i></div><div><h2 class="font-semibold">Banco de questões</h2><p class="text-xs text-textSecondary">Importe até 20 itens (formato: Questão X: ... Comentário: ... Gabarito: Certo/Errado)</p></div></div>
-            <select id="disciplineSelect" class="w-full rounded-xl p-2.5 text-sm mb-3"></select>
-            <textarea id="questionsRaw" rows="3" class="w-full rounded-xl p-3 text-sm font-mono" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."\n\nComentário: "Adotada pela ONU em 10/12/1948."\n\nGabarito: Certo'></textarea>
-            <div class="flex flex-wrap gap-2 mt-3">
-                <button id="previewImportBtn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-eye"></i> Visualizar</button>
-                <button id="importBtn" class="flex-1 btn-primary py-2 rounded-xl text-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
-                <button id="exampleBtn" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-xl text-sm"><i class="fas fa-code-branch"></i> Exemplo</button>
-                <button id="importPdfBtn" class="bg-[#2D2D35] hover:bg-[#3A3A44] text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-file-pdf"></i> PDF</button>
-                <input type="file" id="pdfUpload" accept=".pdf" class="hidden">
+            <!-- Cards de conquistas e níveis (estrutura futura) -->
+            <div class="card p-5">
+                <div class="flex justify-between items-center"><h3 class="font-semibold"><i class="fas fa-medal"></i> Conquistas & Progresso</h3><i class="fas fa-lock-open text-orange-400/60"></i></div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-xs">🏅 Iniciante</span>
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-xs">📈 Evolução em breve</span>
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-xs">🎯 Missões diárias (em breve)</span>
+                </div>
+                <div class="mt-3 text-xs text-textSecondary">* Em breve: ranking, badges especiais e desafios semanais</div>
             </div>
-            <div class="flex justify-between text-xs text-textSecondary mt-2"><span>Máx 20</span><span id="questionCounter">0/20</span></div>
-        </div>
-
-        <div class="card p-5">
-            <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-2"><i class="fas fa-chart-pie text-orange-400 text-lg"></i><h2 class="font-semibold">Desempenho</h2></div><button id="reportBtn" class="text-orange-400 text-xs bg-orange-500/10 px-3 py-1.5 rounded-full"><i class="fas fa-chart-line"></i> Relatório</button></div>
-            <div id="dashboardArea" class="min-h-[100px]"></div>
-            <div id="insightMsg" class="mt-2 text-sm font-medium"></div>
-            <div class="mt-3 pt-2 border-t border-borderLight"><canvas id="disciplineChart" height="120"></canvas></div>
-        </div>
-
-        <div id="powerbiContainerV2" class="powerbi-dashboard">
-            <div class="flex items-center gap-2 mb-4"><i class="fas fa-chalkboard-user text-blue-400 text-xl"></i><h3 class="font-bold text-white/90">📊 Power BI - Rodada Atual (últimas 15 questões)</h3></div>
-            <div class="kpi-grid-v2" id="kpiGridV2"></div>
-            <div class="charts-row-v2">
-                <div class="chart-card-v2"><canvas id="doughnutRodadaV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos × Erros</p></div>
-                <div class="chart-card-v2"><canvas id="barDisciplinasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos por disciplina</p></div>
-                <div class="chart-card-v2"><canvas id="lineRodadasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Evolução % acerto (últimas 5 rodadas)</p></div>
-            </div>
-            <div class="insight-card-v2" id="insightV2"></div>
-        </div>
-
-        <div id="questionsGridContainer" class="questions-grid"></div>
-        <div class="pagination">
-            <button id="prevPageBtn" class="page-btn"><i class="fas fa-chevron-left"></i> Anterior</button>
-            <span id="pageIndicator" class="text-sm font-medium">Página 1</span>
-            <button id="nextPageBtn" class="page-btn">Próxima <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 </div>
+
+<div id="tabQuestoes" class="tab-container">
+    <div class="gran-layout">
+        <div class="sidebar space-y-6">
+            <div class="card p-5">
+                <div class="flex items-center gap-2 mb-2"><i class="fas fa-hourglass-half text-orange-400"></i><h2 class="font-semibold">Cronômetro</h2></div>
+                <div class="text-center"><div id="timerDisplay" class="text-2xl font-mono font-bold bg-black/30 inline-block px-4 py-1 rounded-xl">00:00:00</div>
+                <div class="flex justify-center gap-2 mt-2"><button id="timerStart" class="bg-emerald-700/70 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-play"></i> Iniciar</button><button id="timerPause" class="bg-yellow-600/70 hover:bg-yellow-500 px-3 py-1 rounded-lg text-xs"><i class="fas fa-pause"></i> Pausar</button><button id="timerStop" class="bg-red-600/70 hover:bg-red-500 px-3 py-1 rounded-lg text-xs"><i class="fas fa-stop"></i> Parar</button></div></div>
+                <div class="flex flex-col gap-2 mt-4">
+                    <button id="downloadErrorsBtn" class="bg-rose-950/40 text-rose-300 border border-rose-800/40 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-rose-900/50"><i class="fas fa-book-open"></i> Caderno de erros</button>
+                    <button id="downloadNotebookBtn" class="bg-sky-950/40 text-sky-300 border border-sky-800/40 font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-sky-900/50"><i class="fas fa-robot"></i> Prompt NotebookLM</button>
+                </div>
+            </div>
+            <div class="card p-5">
+                <div class="flex items-center gap-2 mb-3"><i class="fas fa-filter text-orange-400"></i><h2 class="font-semibold">Filtro</h2></div>
+                <select id="filterSelect" class="w-full rounded-xl p-2">
+                    <option value="all">Todas</option>
+                    <option value="unanswered">Não respondidas</option>
+                    <option value="wrong">Só erradas</option>
+                    <option value="starred">⭐ Marcadas</option>
+                </select>
+                <button id="applyFilterBtn" class="w-full mt-3 btn-primary py-2 rounded-xl text-sm">Aplicar</button>
+            </div>
+            <div class="card p-5 text-center">
+                <div class="flex justify-between items-center"><div><i class="fas fa-star text-yellow-500"></i> <span id="starredCount">0</span></div><div><i class="fas fa-fire text-orange-500"></i> <span id="streakCount">0</span> streak</div><div><i class="fas fa-trophy text-orange-400"></i> <span id="levelBadge">Iniciante</span></div></div>
+                <div class="mt-2 text-xs text-textSecondary">+10 acerto | erro não penaliza pontos (apenas zera streak)</div>
+            </div>
+        </div>
+
+        <div class="main-content space-y-6">
+            <div class="card p-5">
+                <div class="flex items-center gap-3 mb-3"><div class="bg-orange-500/10 p-2 rounded-xl"><i class="fas fa-file-upload text-orange-400 text-lg"></i></div><div><h2 class="font-semibold">Banco de questões</h2><p class="text-xs text-textSecondary">Importe até 20 itens (formato: Questão X: ... Comentário: ... Gabarito: Certo/Errado)</p></div></div>
+                <select id="disciplineSelect" class="w-full rounded-xl p-2.5 text-sm mb-3"></select>
+                <textarea id="questionsRaw" rows="3" class="w-full rounded-xl p-3 text-sm font-mono" placeholder='Questão 1: "A Declaração Universal foi adotada em 1948."\n\nComentário: "Adotada pela ONU em 10/12/1948."\n\nGabarito: Certo'></textarea>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <button id="previewImportBtn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-eye"></i> Visualizar</button>
+                    <button id="importBtn" class="flex-1 btn-primary py-2 rounded-xl text-sm"><i class="fas fa-cloud-upload-alt"></i> Importar</button>
+                    <button id="exampleBtn" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-xl text-sm"><i class="fas fa-code-branch"></i> Exemplo</button>
+                    <button id="importPdfBtn" class="bg-[#2D2D35] hover:bg-[#3A3A44] text-white px-3 py-2 rounded-xl text-sm"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <input type="file" id="pdfUpload" accept=".pdf" class="hidden">
+                </div>
+                <div class="flex justify-between text-xs text-textSecondary mt-2"><span>Máx 20</span><span id="questionCounter">0/20</span></div>
+            </div>
+
+            <div class="card p-5">
+                <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-2"><i class="fas fa-chart-pie text-orange-400 text-lg"></i><h2 class="font-semibold">Desempenho</h2></div><button id="reportBtn" class="text-orange-400 text-xs bg-orange-500/10 px-3 py-1.5 rounded-full"><i class="fas fa-chart-line"></i> Relatório</button></div>
+                <div id="dashboardArea" class="min-h-[100px]"></div>
+                <div id="insightMsg" class="mt-2 text-sm font-medium"></div>
+                <div class="mt-3 pt-2 border-t border-borderLight"><canvas id="disciplineChart" height="120"></canvas></div>
+            </div>
+
+            <div id="powerbiContainerV2" class="powerbi-dashboard">
+                <div class="flex items-center gap-2 mb-4"><i class="fas fa-chalkboard-user text-blue-400 text-xl"></i><h3 class="font-bold text-white/90">📊 Power BI - Rodada Atual (últimas 15 questões)</h3></div>
+                <div class="kpi-grid-v2" id="kpiGridV2"></div>
+                <div class="charts-row-v2">
+                    <div class="chart-card-v2"><canvas id="doughnutRodadaV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos × Erros</p></div>
+                    <div class="chart-card-v2"><canvas id="barDisciplinasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Acertos por disciplina</p></div>
+                    <div class="chart-card-v2"><canvas id="lineRodadasV2" width="300" height="200" style="max-height:200px; width:100%"></canvas><p class="text-center text-xs text-slate-400 mt-2">Evolução % acerto (últimas 5 rodadas)</p></div>
+                </div>
+                <div class="insight-card-v2" id="insightV2"></div>
+            </div>
+
+            <div id="questionsGridContainer" class="questions-grid"></div>
+            <div class="pagination">
+                <button id="prevPageBtn" class="page-btn"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <span id="pageIndicator" class="text-sm font-medium">Página 1</span>
+                <button id="nextPageBtn" class="page-btn">Próxima <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <button id="exitFocusBtn" class="exit-focus-btn"><i class="fas fa-times-circle"></i> Sair do modo foco</button>
-
 <div id="previewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4"><div class="bg-card rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6 border border-borderLight"><h3 class="text-xl font-bold mb-3">Pré-visualização</h3><div id="previewList" class="space-y-2 text-sm"></div><div class="flex justify-end gap-3 mt-4"><button id="cancelPreview" class="px-4 py-2 bg-gray-700 rounded-xl">Cancelar</button><button id="confirmPreview" class="px-4 py-2 bg-orange-600 text-white rounded-xl">Confirmar</button></div></div></div>
-
-<div id="configModal" class="modal-config hidden">
-    <div class="modal-config-content">
-        <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-chess-board"></i> Estratégia de Prova</h3><button id="closeConfigModal" class="text-2xl leading-5">&times;</button></div>
-        <div class="config-group"><h4><i class="fas fa-chart-line"></i> Distribuição de dificuldade</h4><div class="config-options" id="difficultyOptions"><span data-val="balanced" class="config-option selected">Equilibrado (3F/3M/3D/1MD)</span><span data-val="progressive" class="config-option">Progressivo</span><span data-val="advanced" class="config-option">Avançado</span><span data-val="simulated" class="config-option">Simulado real</span><span data-val="errorFocus" class="config-option">Foco em erros</span></div></div>
-        <div class="config-group"><h4><i class="fas fa-check-double"></i> Tipo de cobrança</h4><div class="config-options" id="typeOptions"><span data-val="cebraspe" class="config-option selected">Certo ou Errado</span><span data-val="mixed" class="config-option">Misto</span></div></div>
-        <div class="config-group"><h4><i class="fas fa-layer-group"></i> Nível de profundidade</h4><div class="config-options" id="depthOptions"><span data-val="quick" class="config-option">Revisão rápida</span><span data-val="standard" class="config-option selected">Treino padrão</span><span data-val="advanced" class="config-option">Treino avançado</span></div></div>
-        <div class="config-group"><h4><i class="fas fa-gem"></i> Extras</h4><div class="config-options" id="extrasOptions"><span data-val="trick" class="config-option">Modo pegadinhas</span><span data-val="topics" class="config-option">Priorizar temas mais cobrados</span><span data-val="interpret" class="config-option">Foco em interpretação</span></div></div>
-        <div class="flex gap-3 mt-5"><button id="applyConfigBtn" class="btn-primary flex-1 py-2 rounded-xl">Aplicar estratégia</button><button id="resetConfigBtn" class="bg-gray-700 px-4 rounded-xl">Resetar</button></div>
-    </div>
-</div>
-
-<div id="rewardPopup" class="reward-popup hide">
-    <i id="rewardIcon" class="fas fa-trophy reward-icon"></i>
-    <span id="rewardText" class="reward-text"></span>
-</div>
+<div id="configModal" class="modal-config hidden"><div class="modal-config-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-chess-board"></i> Estratégia de Prova</h3><button id="closeConfigModal" class="text-2xl leading-5">&times;</button></div><div class="config-group"><h4><i class="fas fa-chart-line"></i> Distribuição de dificuldade</h4><div class="config-options" id="difficultyOptions"><span data-val="balanced" class="config-option selected">Equilibrado (3F/3M/3D/1MD)</span><span data-val="progressive" class="config-option">Progressivo</span><span data-val="advanced" class="config-option">Avançado</span><span data-val="simulated" class="config-option">Simulado real</span><span data-val="errorFocus" class="config-option">Foco em erros</span></div></div><div class="config-group"><h4><i class="fas fa-check-double"></i> Tipo de cobrança</h4><div class="config-options" id="typeOptions"><span data-val="cebraspe" class="config-option selected">Certo ou Errado</span><span data-val="mixed" class="config-option">Misto</span></div></div><div class="config-group"><h4><i class="fas fa-layer-group"></i> Nível de profundidade</h4><div class="config-options" id="depthOptions"><span data-val="quick" class="config-option">Revisão rápida</span><span data-val="standard" class="config-option selected">Treino padrão</span><span data-val="advanced" class="config-option">Treino avançado</span></div></div><div class="config-group"><h4><i class="fas fa-gem"></i> Extras</h4><div class="config-options" id="extrasOptions"><span data-val="trick" class="config-option">Modo pegadinhas</span><span data-val="topics" class="config-option">Priorizar temas mais cobrados</span><span data-val="interpret" class="config-option">Foco em interpretação</span></div></div><div class="flex gap-3 mt-5"><button id="applyConfigBtn" class="btn-primary flex-1 py-2 rounded-xl">Aplicar estratégia</button><button id="resetConfigBtn" class="bg-gray-700 px-4 rounded-xl">Resetar</button></div></div></div>
+<div id="rewardPopup" class="reward-popup hide"><i id="rewardIcon" class="fas fa-trophy reward-icon"></i><span id="rewardText" class="reward-text"></span></div>
 
 <script>
-    // ----------------------------- CÓDIGO ORIGINAL COMPLETO (PRESERVADO) -----------------------------
+    // ================== CÓDIGO ORIGINAL COMPLETO (PRESERVADO) ==================
     (function() {
         // TEMA
         const savedTheme = localStorage.getItem("theme") || "dark";
@@ -765,7 +873,6 @@
             if(btn) btn.innerHTML = next === "dark" ? '<i class="fas fa-moon"></i> Tema' : '<i class="fas fa-sun"></i> Tema';
         };
         
-        // DADOS GLOBAIS
         let questions = [];
         let starredSet = new Set();
         let points = 0, streak = 0;
@@ -777,19 +884,10 @@
         const DISCIPLINAS = ["Língua Portuguesa","Raciocínio Lógico","Direito Constitucional","Direito Administrativo","Auditoria","Contabilidade"];
         
         let timerSeconds = 0, timerInterval = null, timerRunning = false;
-        
-        let trainingConfig = {
-            difficulty: "balanced",
-            type: "cebraspe",
-            depth: "standard",
-            extras: []
-        };
-        
-        let fontSizeQuestion = 1.125;
-        let fontSizeComment = 0.9;
+        let trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] };
+        let fontSizeQuestion = 1.125, fontSizeComment = 0.9;
         const FONT_STORAGE_KEY = "auditor_font_sizes";
         
-        // DOM
         const disciplineSelect = document.getElementById("disciplineSelect");
         const rawInput = document.getElementById("questionsRaw");
         const importBtn = document.getElementById("importBtn");
@@ -815,7 +913,6 @@
         DISCIPLINAS.forEach(d => { let opt = document.createElement("option"); opt.value = d; opt.textContent = d; disciplineSelect.appendChild(opt); });
         
         function showToast(msg) { let toast = document.createElement("div"); toast.className = "toast"; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
-        
         function parseQuestoes(texto) {
             const blocos = texto.split(/Questão\s+\d+:/g).filter(Boolean);
             const questoes = [];
@@ -823,32 +920,16 @@
             for(let bloco of blocos) {
                 const comentarioMatch = bloco.match(/Comentário:\s*(.*?)(?=Gabarito:|$)/is);
                 const gabaritoMatch = bloco.match(/Gabarito:\s*(Certo|Errado)/i);
-                let pergunta = bloco
-                    .replace(/Comentário:.*$/is, "")
-                    .replace(/Gabarito:.*$/is, "")
-                    .trim();
+                let pergunta = bloco.replace(/Comentário:.*$/is, "").replace(/Gabarito:.*$/is, "").trim();
                 if(pergunta.startsWith('"') && pergunta.endsWith('"')) pergunta = pergunta.slice(1,-1);
                 const comentario = comentarioMatch ? comentarioMatch[1].trim() : "Sem comentário adicional.";
                 const respostaCorreta = gabaritoMatch ? (gabaritoMatch[1].toUpperCase().startsWith("C") ? "Certo" : "Errado") : null;
                 if(pergunta && respostaCorreta) {
-                    questoes.push({
-                        id: idCounter++,
-                        number: questoes.length+1,
-                        text: pergunta,
-                        comment: comentario,
-                        answer: respostaCorreta,
-                        discipline: disciplineSelect.value,
-                        responded: false,
-                        userChoice: null,
-                        showComment: false,
-                        isStarred: false,
-                        responseTimestamp: null
-                    });
+                    questoes.push({ id: idCounter++, number: questoes.length+1, text: pergunta, comment: comentario, answer: respostaCorreta, discipline: disciplineSelect.value, responded: false, userChoice: null, showComment: false, isStarred: false, responseTimestamp: null });
                 }
             }
             return questoes;
         }
-        
         function importQuestions(rawText) {
             let parsed = parseQuestoes(rawText);
             if(parsed.length === 0) { showToast("Nenhuma questão válida encontrada"); return false; }
@@ -861,9 +942,9 @@
             showToast(`${parsed.length} questões importadas`);
             if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
             if(window.resetGamificationOnImport) window.resetGamificationOnImport();
+            if(window.updateHomeStats) window.updateHomeStats();
             return true;
         }
-        
         function saveToLocal() {
             const toSave = questions.map(q => ({ ...q }));
             localStorage.setItem("auditor_questions_v2", JSON.stringify(toSave));
@@ -876,7 +957,6 @@
             localStorage.setItem("auditor_training_config", JSON.stringify(trainingConfig));
             localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
         }
-        
         function loadFromLocal() {
             const savedQ = localStorage.getItem("auditor_questions_v2");
             if(savedQ) {
@@ -898,24 +978,14 @@
             if(filt) currentFilter = filt;
             filterSelect.value = currentFilter;
             let savedConfig = localStorage.getItem("auditor_training_config");
-            if(savedConfig) {
-                try {
-                    trainingConfig = JSON.parse(savedConfig);
-                    if(!trainingConfig.extras) trainingConfig.extras = [];
-                } catch(e) {}
-            }
+            if(savedConfig) { try { trainingConfig = JSON.parse(savedConfig); if(!trainingConfig.extras) trainingConfig.extras = []; } catch(e) {} }
             let fontSizes = localStorage.getItem(FONT_STORAGE_KEY);
-            if(fontSizes) {
-                let sizes = JSON.parse(fontSizes);
-                fontSizeQuestion = sizes.question || 1.125;
-                fontSizeComment = sizes.comment || 0.9;
-            }
+            if(fontSizes) { let sizes = JSON.parse(fontSizes); fontSizeQuestion = sizes.question || 1.125; fontSizeComment = sizes.comment || 0.9; }
             applyFontSizesToCSS();
             updatePointsAndStreak();
             applyFilter();
             if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
         }
-        
         function updatePointsAndStreak() {
             let totalPoints = 0, currentStreak = 0;
             for(let q of questions) {
@@ -929,8 +999,8 @@
             levelBadge.innerText = level;
             streakCountSpan.innerText = streak;
             saveToLocal();
+            if(window.updateHomeStats) window.updateHomeStats();
         }
-        
         window.responderQuestao = function(id, resposta) {
             const q = questions.find(qq => qq.id === id);
             if(!q || q.responded) return;
@@ -946,145 +1016,25 @@
             if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI();
             if(window.onQuestionAnswered) window.onQuestionAnswered(q.number, wasCorrect);
         };
-        
-        function toggleComentario(id) {
-            const q = questions.find(qq => qq.id === id);
-            if(q && q.responded) {
-                q.showComment = !q.showComment;
-                renderAll();
-            }
-        }
-        
-        function toggleStar(id) {
-            if(starredSet.has(id)) starredSet.delete(id);
-            else starredSet.add(id);
-            saveToLocal();
-            renderAll();
-        }
-        
-        function applyTrainingStrategy() {
-            if(!filteredList.length) return;
-            let workingList = [...filteredList];
-            if(trainingConfig.difficulty === "errorFocus") {
-                workingList.sort((a,b) => {
-                    let aErr = a.responded && a.userChoice !== a.answer ? 1 : 0;
-                    let bErr = b.responded && b.userChoice !== b.answer ? 1 : 0;
-                    return bErr - aErr;
-                });
-            } else if(trainingConfig.difficulty === "progressive") {
-                workingList.sort((a,b) => {
-                    let aWeight = a.responded ? (a.userChoice === a.answer ? 2 : 1) : 0;
-                    let bWeight = b.responded ? (b.userChoice === b.answer ? 2 : 1) : 0;
-                    return aWeight - bWeight;
-                });
-            } else if(trainingConfig.difficulty === "advanced") {
-                workingList.sort((a,b) => b.id - a.id);
-            } else if(trainingConfig.difficulty === "simulated") {
-                workingList.sort(() => Math.random() - 0.5);
-            }
-            if(trainingConfig.extras.includes("trick")) showToast("Modo pegadinhas ativado: atenção às sutilezas!");
-            if(trainingConfig.extras.includes("interpret")) showToast("Foco em interpretação: leia com atenção cada detalhe.");
-            filteredList = workingList;
-            currentPage = 0;
-            renderAll();
-            saveToLocal();
-        }
-        
-        function applyFontSizesToCSS() {
-            document.documentElement.style.setProperty('--font-size-question', `${fontSizeQuestion}rem`);
-            document.documentElement.style.setProperty('--font-size-comment', `${fontSizeComment}rem`);
-            localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment}));
-        }
-        
-        function changeFontSize(type, delta) {
-            if(type === 'question') fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta));
-            else if(type === 'comment') fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta));
-            applyFontSizesToCSS();
-        }
-        
-        function applyFilter() {
-            if(!questions.length) { filteredList = []; currentPage = 0; renderAll(); return; }
-            let filter = filterSelect.value;
-            currentFilter = filter;
-            let filtered = [...questions];
-            if(filter === "unanswered") filtered = filtered.filter(q => !q.responded);
-            else if(filter === "wrong") filtered = filtered.filter(q => q.responded && q.userChoice !== q.answer);
-            else if(filter === "starred") filtered = filtered.filter(q => starredSet.has(q.id));
-            filteredList = filtered;
-            if(trainingConfig.difficulty !== "balanced" || trainingConfig.extras.length) {
-                let working = [...filteredList];
-                if(trainingConfig.difficulty === "errorFocus") working.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0));
-                else if(trainingConfig.difficulty === "progressive") working.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0));
-                else if(trainingConfig.difficulty === "advanced") working.sort((a,b) => b.id - a.id);
-                else if(trainingConfig.difficulty === "simulated") working.sort(() => Math.random() - 0.5);
-                filteredList = working;
-            }
-            currentPage = 0;
-            renderAll();
-        }
-        
-        function renderDashboard() {
-            let total = questions.filter(q => q.responded).length;
-            let correct = questions.filter(q => q.responded && q.userChoice === q.answer).length;
-            dashboardArea.innerHTML = `<div class="grid grid-cols-2 gap-3"><div class="bg-emerald-950/40 p-3 rounded-xl text-center border border-emerald-800/30"><i class="fas fa-check-circle text-emerald-500 text-xl"></i><div class="text-2xl font-bold">${correct}</div><div class="text-xs">Acertos</div></div><div class="bg-red-950/40 p-3 rounded-xl text-center border border-red-800/30"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${total-correct}</div><div class="text-xs">Erros</div></div></div>`;
-            if(window.disChart) window.disChart.destroy();
-            let ctx = disciplineChartCanvas.getContext("2d");
-            window.disChart = new Chart(ctx, { type:"bar", data:{ labels:["Acertos","Erros"], datasets:[{ label:"", data:[correct, total-correct], backgroundColor: ["#F97316","#EF4444"], borderRadius: 8 }] }, options:{ responsive: true, maintainAspectRatio: true, scales: { y: { grid: { color: "rgba(255,255,255,0.05)" } }, x: { ticks: { color: "var(--text-secondary)" } } } } });
-            let insight = "";
-            let last5 = questions.filter(q => q.responded).slice(-5);
-            let lastCorrect = last5.filter(q => q.userChoice === q.answer).length;
-            if(last5.length>=3 && lastCorrect/last5.length>0.6) insight = "🔥 Bom rendimento! Continue assim.";
-            else if(last5.length>=3 && lastCorrect/last5.length<0.4) insight = "⚠️ Atenção! Revise os conceitos.";
-            document.getElementById("insightMsg").innerHTML = insight ? `<div class="p-2 rounded-lg bg-orange-500/10 text-orange-300">${insight}</div>` : "";
-        }
-        
-        function renderQuestionsPage() {
-            if(!filteredList.length) { questionsGrid.innerHTML = `<div class="card p-8 text-center text-textSecondary"><i class="fas fa-inbox text-4xl mb-2"></i><p>Nenhuma questão para exibir.</p></div>`; return; }
-            const start = currentPage * PAGE_SIZE;
-            const end = Math.min(start + PAGE_SIZE, filteredList.length);
-            const pageQuestions = filteredList.slice(start, end);
-            let html = '';
-            for(let q of pageQuestions) {
-                const isStarred = starredSet.has(q.id);
-                const starIcon = isStarred ? "fas fa-star text-yellow-500" : "far fa-star";
-                let cardClass = '';
-                if(q.responded) cardClass = q.userChoice === q.answer ? 'correta' : 'errada';
-                let botoesResposta = '';
-                if(!q.responded) {
-                    botoesResposta = `<div class="flex gap-3 mt-4"><button class="btn-resposta btn-certo" data-id="${q.id}" data-resp="Certo"><i class="fas fa-check-circle"></i> Certo</button><button class="btn-resposta btn-errado" data-id="${q.id}" data-resp="Errado"><i class="fas fa-times-circle"></i> Errado</button></div>`;
-                } else {
-                    const resultado = q.userChoice === q.answer ? "Correto!" : "Errado!";
-                    const resultClass = q.userChoice === q.answer ? "bg-emerald-900/40 text-emerald-300" : "bg-red-900/40 text-red-300";
-                    botoesResposta = `<div class="mt-3 p-3 rounded-xl bg-gray-800/30"><div class="flex items-center gap-2"><span class="result-badge ${resultClass}"><i class="fas ${q.userChoice === q.answer ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> Gabarito: ${q.userChoice}</span></div><button class="btn-comentario" data-id="${q.id}"><i class="far fa-comment-dots mr-1"></i> ${q.showComment ? 'Esconder Comentário' : 'Mostrar Comentário'}</button>${q.showComment ? `<div class="comentario-content"><strong>Comentário:</strong> ${q.comment}<br><span class="text-xs mt-1 block">Gabarito oficial: ${q.answer}</span></div>` : ''}</div>`;
-                }
-                html += `<div class="question-card ${cardClass}" id="question-card-${q.id}"><div class="questao-numero"><span class="bg-orange-500/15 text-orange-300 text-xs px-2 py-0.5 rounded-full">Questão ${q.number}</span><span class="text-xs text-textSecondary">${q.discipline}</span><button class="star-btn ml-auto text-lg" data-id="${q.id}"><i class="${starIcon}"></i></button></div><div class="questao-texto">${q.text}</div>${botoesResposta}</div>`;
-            }
-            questionsGrid.innerHTML = html;
-            document.querySelectorAll('.btn-resposta').forEach(btn => {
-                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const resp = btn.dataset.resp; window.responderQuestao(id, resp); });
-            });
-            document.querySelectorAll('.btn-comentario').forEach(btn => {
-                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleComentario(id); });
-            });
-            document.querySelectorAll('.star-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleStar(id); });
-            });
-            updatePaginationControls();
-            updateCounterAndProgress();
-        }
-        
+        function toggleComentario(id) { const q = questions.find(qq => qq.id === id); if(q && q.responded) { q.showComment = !q.showComment; renderAll(); } }
+        function toggleStar(id) { if(starredSet.has(id)) starredSet.delete(id); else starredSet.add(id); saveToLocal(); renderAll(); }
+        function applyTrainingStrategy() { if(!filteredList.length) return; let workingList = [...filteredList]; if(trainingConfig.difficulty === "errorFocus") workingList.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0)); else if(trainingConfig.difficulty === "progressive") workingList.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0)); else if(trainingConfig.difficulty === "advanced") workingList.sort((a,b) => b.id - a.id); else if(trainingConfig.difficulty === "simulated") workingList.sort(() => Math.random() - 0.5); if(trainingConfig.extras.includes("trick")) showToast("Modo pegadinhas ativado: atenção às sutilezas!"); if(trainingConfig.extras.includes("interpret")) showToast("Foco em interpretação: leia com atenção cada detalhe."); filteredList = workingList; currentPage = 0; renderAll(); saveToLocal(); }
+        function applyFontSizesToCSS() { document.documentElement.style.setProperty('--font-size-question', `${fontSizeQuestion}rem`); document.documentElement.style.setProperty('--font-size-comment', `${fontSizeComment}rem`); localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({question: fontSizeQuestion, comment: fontSizeComment})); }
+        function changeFontSize(type, delta) { if(type === 'question') fontSizeQuestion = Math.min(1.8, Math.max(0.85, fontSizeQuestion + delta)); else if(type === 'comment') fontSizeComment = Math.min(1.5, Math.max(0.75, fontSizeComment + delta)); applyFontSizesToCSS(); }
+        function applyFilter() { if(!questions.length) { filteredList = []; currentPage = 0; renderAll(); return; } let filter = filterSelect.value; currentFilter = filter; let filtered = [...questions]; if(filter === "unanswered") filtered = filtered.filter(q => !q.responded); else if(filter === "wrong") filtered = filtered.filter(q => q.responded && q.userChoice !== q.answer); else if(filter === "starred") filtered = filtered.filter(q => starredSet.has(q.id)); filteredList = filtered; if(trainingConfig.difficulty !== "balanced" || trainingConfig.extras.length) { let working = [...filteredList]; if(trainingConfig.difficulty === "errorFocus") working.sort((a,b) => (b.responded && b.userChoice !== b.answer ? 1:0) - (a.responded && a.userChoice !== a.answer ? 1:0)); else if(trainingConfig.difficulty === "progressive") working.sort((a,b) => (a.responded ? (a.userChoice === a.answer ? 2:1):0) - (b.responded ? (b.userChoice === b.answer ? 2:1):0)); else if(trainingConfig.difficulty === "advanced") working.sort((a,b) => b.id - a.id); else if(trainingConfig.difficulty === "simulated") working.sort(() => Math.random() - 0.5); filteredList = working; } currentPage = 0; renderAll(); }
+        function renderDashboard() { let total = questions.filter(q => q.responded).length; let correct = questions.filter(q => q.responded && q.userChoice === q.answer).length; dashboardArea.innerHTML = `<div class="grid grid-cols-2 gap-3"><div class="bg-emerald-950/40 p-3 rounded-xl text-center border border-emerald-800/30"><i class="fas fa-check-circle text-emerald-500 text-xl"></i><div class="text-2xl font-bold">${correct}</div><div class="text-xs">Acertos</div></div><div class="bg-red-950/40 p-3 rounded-xl text-center border border-red-800/30"><i class="fas fa-times-circle text-red-500 text-xl"></i><div class="text-2xl font-bold">${total-correct}</div><div class="text-xs">Erros</div></div></div>`; if(window.disChart) window.disChart.destroy(); let ctx = disciplineChartCanvas.getContext("2d"); window.disChart = new Chart(ctx, { type:"bar", data:{ labels:["Acertos","Erros"], datasets:[{ label:"", data:[correct, total-correct], backgroundColor: ["#F97316","#EF4444"], borderRadius: 8 }] }, options:{ responsive: true, maintainAspectRatio: true, scales: { y: { grid: { color: "rgba(255,255,255,0.05)" } }, x: { ticks: { color: "var(--text-secondary)" } } } } }); let insight = ""; let last5 = questions.filter(q => q.responded).slice(-5); let lastCorrect = last5.filter(q => q.userChoice === q.answer).length; if(last5.length>=3 && lastCorrect/last5.length>0.6) insight = "🔥 Bom rendimento! Continue assim."; else if(last5.length>=3 && lastCorrect/last5.length<0.4) insight = "⚠️ Atenção! Revise os conceitos."; document.getElementById("insightMsg").innerHTML = insight ? `<div class="p-2 rounded-lg bg-orange-500/10 text-orange-300">${insight}</div>` : ""; }
+        function renderQuestionsPage() { if(!filteredList.length) { questionsGrid.innerHTML = `<div class="card p-8 text-center text-textSecondary"><i class="fas fa-inbox text-4xl mb-2"></i><p>Nenhuma questão para exibir.</p></div>`; return; } const start = currentPage * PAGE_SIZE; const end = Math.min(start + PAGE_SIZE, filteredList.length); const pageQuestions = filteredList.slice(start, end); let html = ''; for(let q of pageQuestions) { const isStarred = starredSet.has(q.id); const starIcon = isStarred ? "fas fa-star text-yellow-500" : "far fa-star"; let cardClass = ''; if(q.responded) cardClass = q.userChoice === q.answer ? 'correta' : 'errada'; let botoesResposta = ''; if(!q.responded) { botoesResposta = `<div class="flex gap-3 mt-4"><button class="btn-resposta btn-certo" data-id="${q.id}" data-resp="Certo"><i class="fas fa-check-circle"></i> Certo</button><button class="btn-resposta btn-errado" data-id="${q.id}" data-resp="Errado"><i class="fas fa-times-circle"></i> Errado</button></div>`; } else { const resultado = q.userChoice === q.answer ? "Correto!" : "Errado!"; const resultClass = q.userChoice === q.answer ? "bg-emerald-900/40 text-emerald-300" : "bg-red-900/40 text-red-300"; botoesResposta = `<div class="mt-3 p-3 rounded-xl bg-gray-800/30"><div class="flex items-center gap-2"><span class="result-badge ${resultClass}"><i class="fas ${q.userChoice === q.answer ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> Gabarito: ${q.userChoice}</span></div><button class="btn-comentario" data-id="${q.id}"><i class="far fa-comment-dots mr-1"></i> ${q.showComment ? 'Esconder Comentário' : 'Mostrar Comentário'}</button>${q.showComment ? `<div class="comentario-content"><strong>Comentário:</strong> ${q.comment}<br><span class="text-xs mt-1 block">Gabarito oficial: ${q.answer}</span></div>` : ''}</div>`; } html += `<div class="question-card ${cardClass}" id="question-card-${q.id}"><div class="questao-numero"><span class="bg-orange-500/15 text-orange-300 text-xs px-2 py-0.5 rounded-full">Questão ${q.number}</span><span class="text-xs text-textSecondary">${q.discipline}</span><button class="star-btn ml-auto text-lg" data-id="${q.id}"><i class="${starIcon}"></i></button></div><div class="questao-texto">${q.text}</div>${botoesResposta}</div>`; } questionsGrid.innerHTML = html; document.querySelectorAll('.btn-resposta').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const resp = btn.dataset.resp; window.responderQuestao(id, resp); }); }); document.querySelectorAll('.btn-comentario').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleComentario(id); }); }); document.querySelectorAll('.star-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); toggleStar(id); }); }); updatePaginationControls(); updateCounterAndProgress(); }
         function updatePaginationControls() { const totalPages = Math.ceil(filteredList.length / PAGE_SIZE); pageIndicator.innerText = `Página ${currentPage+1} de ${totalPages || 1}`; prevPageBtn.disabled = currentPage === 0; nextPageBtn.disabled = currentPage >= totalPages-1; }
         function updateCounterAndProgress() { questionCounterSpan.innerText = `${filteredList.length}/${MAX_QUESTIONS}`; starredCountSpan.innerText = starredSet.size; let answeredCount = questions.filter(q => q.responded).length; let progressPercent = questions.length ? (answeredCount / questions.length) * 100 : 0; topProgressFill.style.width = `${progressPercent}%`; }
         function renderAll() { renderDashboard(); renderQuestionsPage(); saveToLocal(); }
         function nextPage() { if(currentPage < Math.ceil(filteredList.length / PAGE_SIZE)-1) { currentPage++; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
         function prevPage() { if(currentPage > 0) { currentPage--; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
-        function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; q.responseTimestamp = null; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI(); if(window.resetGamificationOnReset) window.resetGamificationOnReset(); } }
+        function resetProgress() { if(questions.length) { questions.forEach(q => { q.responded = false; q.userChoice = null; q.showComment = false; q.responseTimestamp = null; }); starredSet.clear(); points = 0; streak = 0; saveToLocal(); applyFilter(); showToast("Progresso resetado"); if(window.atualizarDashboardPowerBI) window.atualizarDashboardPowerBI(); if(window.resetGamificationOnReset) window.resetGamificationOnReset(); if(window.updateHomeStats) window.updateHomeStats(); } }
         function clearAllData() { if(confirm("Apagar todos os dados?")) { localStorage.clear(); location.reload(); } }
         function exportJSON() { let data = { questions, starred: [...starredSet] }; let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"})); a.download="auditorquest_backup.json"; a.click(); showToast("Backup exportado"); }
         function generateErrorNotebook() { let wrongs = questions.filter(q => q.responded && q.userChoice !== q.answer); if(wrongs.length===0) { showToast("Nenhum erro"); return; } let content = "CADERNO DE ERROS\n\n"; wrongs.forEach(q=>{ content += `Questão ${q.number}: ${q.text}\nGabarito: ${q.answer}\nComentário: ${q.comment}\n\n---\n\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:"text/plain"})); a.download="caderno_erros.txt"; a.click(); showToast("Caderno de erros gerado"); }
         function generateNotebookLMPrompt() { let prompt = `# Prompt para NotebookLM - Estudo CESPE\n\n## Questões:\n`; questions.forEach((q,idx)=>{ prompt += `\n${idx+1}. ${q.text}\n   Gabarito: ${q.answer}\n   Minha resposta: ${q.responded ? q.userChoice : "Não respondida"}\n   Comentário: ${q.comment}\n`; }); let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([prompt],{type:"text/markdown"})); a.download="prompt_notebooklm.md"; a.click(); showToast("Prompt baixado"); }
         function generateReport() { let total=questions.filter(q=>q.responded).length, correct=questions.filter(q=>q.responded && q.userChoice===q.answer).length; let pct=total?((correct/total)*100).toFixed(1):0; alert(`RELATÓRIO\nAcertos: ${correct}\nErros: ${total-correct}\nAproveitamento: ${pct}%\nStreak: ${streak}\nPontos: ${points}`); }
-        
         function startTimerInterval() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if(timerRunning) { timerSeconds++; updateTimerDisplay(); saveToLocal(); } }, 1000); }
         function updateTimerDisplay() { let h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; timerDisplay.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
         function startTimer() { if(!timerRunning){ timerRunning=true; if(!timerInterval) startTimerInterval(); saveToLocal(); showToast("Cronômetro iniciado"); } }
@@ -1092,646 +1042,178 @@
         function stopTimer() { timerRunning=false; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } timerSeconds=0; updateTimerDisplay(); saveToLocal(); showToast("Zerado"); }
         
         let doughnutChartV2 = null, barChartV2 = null, lineChartV2 = null;
-        function obterRodadaAtual() {
-            const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
-            return respondidas.slice(-15);
-        }
-        function obterHistoricoRodadas() {
-            const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0));
-            const rodadas = [];
-            for(let i=0; i<respondidas.length; i+=15) {
-                const bloco = respondidas.slice(i, i+15);
-                const acertos = bloco.filter(q => q.userChoice === q.answer).length;
-                const taxa = (acertos / bloco.length) * 100;
-                rodadas.push({ acertos, total: bloco.length, taxa });
-            }
-            return rodadas.slice(-5);
-        }
-        function calcularTempoMedioRodada(rodada) {
-            if(rodada.length < 2) return 0;
-            const tempos = rodada.map(q => q.responseTimestamp);
-            const minTime = Math.min(...tempos);
-            const maxTime = Math.max(...tempos);
-            const diffSeg = (maxTime - minTime) / 1000;
-            return Math.round(diffSeg / rodada.length);
-        }
-        window.atualizarDashboardPowerBI = function() {
-            const rodada = obterRodadaAtual();
-            const totalRodada = rodada.length;
-            const acertosRodada = rodada.filter(q => q.userChoice === q.answer).length;
-            const taxaAcerto = totalRodada ? (acertosRodada / totalRodada * 100).toFixed(1) : 0;
-            const tempoMedio = calcularTempoMedioRodada(rodada);
-            const streakAtual = streak;
-            const kpiHtml = `
-                <div class="kpi-card-v2"><div class="kpi-title-v2">🎯 ACERTOS</div><div class="kpi-value-v2">${acertosRodada}<span class="kpi-unit-v2">/${totalRodada}</span></div><div class="kpi-trend-v2">${taxaAcerto}% de aproveitamento</div></div>
-                <div class="kpi-card-v2"><div class="kpi-title-v2">⏱️ TEMPO MÉDIO</div><div class="kpi-value-v2">${tempoMedio}<span class="kpi-unit-v2">s</span></div><div class="kpi-trend-v2">por questão</div></div>
-                <div class="kpi-card-v2"><div class="kpi-title-v2">🔥 SEQUÊNCIA</div><div class="kpi-value-v2">${streakAtual}<span class="kpi-unit-v2"> acertos</span></div><div class="kpi-trend-v2">streak atual</div></div>
-                <div class="kpi-card-v2"><div class="kpi-title-v2">📊 TAXA GERAL</div><div class="kpi-value-v2">${taxaAcerto}<span class="kpi-unit-v2">%</span></div><div class="kpi-trend-v2">rodada atual</div></div>
-            `;
-            document.getElementById("kpiGridV2").innerHTML = kpiHtml;
-            if(doughnutChartV2) doughnutChartV2.destroy();
-            const ctxDoughnut = document.getElementById("doughnutRodadaV2").getContext("2d");
-            doughnutChartV2 = new Chart(ctxDoughnut, { type: 'doughnut', data: { labels: ['Acertos', 'Erros'], datasets: [{ data: [acertosRodada, totalRodada - acertosRodada], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } } });
-            const disciplinasMap = new Map();
-            rodada.forEach(q => {
-                const disc = q.discipline;
-                if(!disciplinasMap.has(disc)) disciplinasMap.set(disc, { acertos:0, total:0 });
-                const val = disciplinasMap.get(disc);
-                val.total++;
-                if(q.userChoice === q.answer) val.acertos++;
-                disciplinasMap.set(disc, val);
-            });
-            const labelsDisciplinas = Array.from(disciplinasMap.keys());
-            const acertosPorDisciplina = labelsDisciplinas.map(d => disciplinasMap.get(d).acertos);
-            if(barChartV2) barChartV2.destroy();
-            const ctxBar = document.getElementById("barDisciplinasV2").getContext("2d");
-            barChartV2 = new Chart(ctxBar, { type: 'bar', data: { labels: labelsDisciplinas, datasets: [{ label: 'Acertos na rodada', data: acertosPorDisciplina, backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1', maxRotation: 30 } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } } });
-            const historico = obterHistoricoRodadas();
-            const taxas = historico.map(r => r.taxa);
-            const rodadasLabels = historico.map((_, idx) => `Rodada ${idx+1}`);
-            if(lineChartV2) lineChartV2.destroy();
-            const ctxLine = document.getElementById("lineRodadasV2").getContext("2d");
-            lineChartV2 = new Chart(ctxLine, { type: 'line', data: { labels: rodadasLabels, datasets: [{ label: '% Acertos', data: taxas, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { min: 0, max: 100, ticks: { callback: (val) => val+'%', color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1' } } }, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } } } } });
-            const errosPorDisciplina = new Map();
-            rodada.forEach(q => { if(q.userChoice !== q.answer) errosPorDisciplina.set(q.discipline, (errosPorDisciplina.get(q.discipline)||0) + 1); });
-            let piorDisciplina = "nenhuma", maxErros = 0;
-            for(let [disc, err] of errosPorDisciplina.entries()) { if(err > maxErros) { maxErros = err; piorDisciplina = disc; } }
-            let tendenciaMsg = "";
-            if(historico.length >= 2) {
-                const ultima = historico[historico.length-1].taxa;
-                const penultima = historico[historico.length-2].taxa;
-                if(ultima > penultima) tendenciaMsg = "📈 Tendência de melhora na última rodada!";
-                else if(ultima < penultima) tendenciaMsg = "📉 Atenção: desempenho caiu na última rodada.";
-                else tendenciaMsg = "➡️ Desempenho estável nas últimas rodadas.";
-            }
-            const tempoMsg = tempoMedio > 90 ? "⏳ Tempo médio elevado. Tente ganhar agilidade." : (tempoMedio > 45 ? "⏱️ Tempo médio moderado, pode melhorar." : "⚡ Bom ritmo de resolução.");
-            const insightHTML = `<div class="diagnosis-text"><i class="fas fa-microphone-alt text-orange-400 mr-2"></i> <strong>Diagnóstico automático</strong><br>🔴 Disciplina com mais erros: <strong>${piorDisciplina}</strong> (${maxErros} erro(s)).<br>${tendenciaMsg}<br>${tempoMsg}</div>`;
-            document.getElementById("insightV2").innerHTML = insightHTML;
-        };
+        function obterRodadaAtual() { const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0)); return respondidas.slice(-15); }
+        function obterHistoricoRodadas() { const respondidas = questions.filter(q => q.responded && q.responseTimestamp).sort((a,b) => (a.responseTimestamp||0) - (b.responseTimestamp||0)); const rodadas = []; for(let i=0; i<respondidas.length; i+=15) { const bloco = respondidas.slice(i, i+15); const acertos = bloco.filter(q => q.userChoice === q.answer).length; const taxa = (acertos / bloco.length) * 100; rodadas.push({ acertos, total: bloco.length, taxa }); } return rodadas.slice(-5); }
+        function calcularTempoMedioRodada(rodada) { if(rodada.length < 2) return 0; const tempos = rodada.map(q => q.responseTimestamp); const minTime = Math.min(...tempos); const maxTime = Math.max(...tempos); const diffSeg = (maxTime - minTime) / 1000; return Math.round(diffSeg / rodada.length); }
+        window.atualizarDashboardPowerBI = function() { const rodada = obterRodadaAtual(); const totalRodada = rodada.length; const acertosRodada = rodada.filter(q => q.userChoice === q.answer).length; const taxaAcerto = totalRodada ? (acertosRodada / totalRodada * 100).toFixed(1) : 0; const tempoMedio = calcularTempoMedioRodada(rodada); const streakAtual = streak; const kpiHtml = `<div class="kpi-card-v2"><div class="kpi-title-v2">🎯 ACERTOS</div><div class="kpi-value-v2">${acertosRodada}<span class="kpi-unit-v2">/${totalRodada}</span></div><div class="kpi-trend-v2">${taxaAcerto}% de aproveitamento</div></div><div class="kpi-card-v2"><div class="kpi-title-v2">⏱️ TEMPO MÉDIO</div><div class="kpi-value-v2">${tempoMedio}<span class="kpi-unit-v2">s</span></div><div class="kpi-trend-v2">por questão</div></div><div class="kpi-card-v2"><div class="kpi-title-v2">🔥 SEQUÊNCIA</div><div class="kpi-value-v2">${streakAtual}<span class="kpi-unit-v2"> acertos</span></div><div class="kpi-trend-v2">streak atual</div></div><div class="kpi-card-v2"><div class="kpi-title-v2">📊 TAXA GERAL</div><div class="kpi-value-v2">${taxaAcerto}<span class="kpi-unit-v2">%</span></div><div class="kpi-trend-v2">rodada atual</div></div>`; document.getElementById("kpiGridV2").innerHTML = kpiHtml; if(doughnutChartV2) doughnutChartV2.destroy(); const ctxDoughnut = document.getElementById("doughnutRodadaV2").getContext("2d"); doughnutChartV2 = new Chart(ctxDoughnut, { type: 'doughnut', data: { labels: ['Acertos', 'Erros'], datasets: [{ data: [acertosRodada, totalRodada - acertosRodada], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } } }); const disciplinasMap = new Map(); rodada.forEach(q => { const disc = q.discipline; if(!disciplinasMap.has(disc)) disciplinasMap.set(disc, { acertos:0, total:0 }); const val = disciplinasMap.get(disc); val.total++; if(q.userChoice === q.answer) val.acertos++; disciplinasMap.set(disc, val); }); const labelsDisciplinas = Array.from(disciplinasMap.keys()); const acertosPorDisciplina = labelsDisciplinas.map(d => disciplinasMap.get(d).acertos); if(barChartV2) barChartV2.destroy(); const ctxBar = document.getElementById("barDisciplinasV2").getContext("2d"); barChartV2 = new Chart(ctxBar, { type: 'bar', data: { labels: labelsDisciplinas, datasets: [{ label: 'Acertos na rodada', data: acertosPorDisciplina, backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1', maxRotation: 30 } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } } }); const historico = obterHistoricoRodadas(); const taxas = historico.map(r => r.taxa); const rodadasLabels = historico.map((_, idx) => `Rodada ${idx+1}`); if(lineChartV2) lineChartV2.destroy(); const ctxLine = document.getElementById("lineRodadasV2").getContext("2d"); lineChartV2 = new Chart(ctxLine, { type: 'line', data: { labels: rodadasLabels, datasets: [{ label: '% Acertos', data: taxas, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { min: 0, max: 100, ticks: { callback: (val) => val+'%', color: '#94a3b8' } }, x: { ticks: { color: '#cbd5e1' } } }, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } } } } }); const errosPorDisciplina = new Map(); rodada.forEach(q => { if(q.userChoice !== q.answer) errosPorDisciplina.set(q.discipline, (errosPorDisciplina.get(q.discipline)||0) + 1); }); let piorDisciplina = "nenhuma", maxErros = 0; for(let [disc, err] of errosPorDisciplina.entries()) { if(err > maxErros) { maxErros = err; piorDisciplina = disc; } } let tendenciaMsg = ""; if(historico.length >= 2) { const ultima = historico[historico.length-1].taxa; const penultima = historico[historico.length-2].taxa; if(ultima > penultima) tendenciaMsg = "📈 Tendência de melhora na última rodada!"; else if(ultima < penultima) tendenciaMsg = "📉 Atenção: desempenho caiu na última rodada."; else tendenciaMsg = "➡️ Desempenho estável nas últimas rodadas."; } const tempoMsg = tempoMedio > 90 ? "⏳ Tempo médio elevado. Tente ganhar agilidade." : (tempoMedio > 45 ? "⏱️ Tempo médio moderado, pode melhorar." : "⚡ Bom ritmo de resolução."); const insightHTML = `<div class="diagnosis-text"><i class="fas fa-microphone-alt text-orange-400 mr-2"></i> <strong>Diagnóstico automático</strong><br>🔴 Disciplina com mais erros: <strong>${piorDisciplina}</strong> (${maxErros} erro(s)).<br>${tendenciaMsg}<br>${tempoMsg}</div>`; document.getElementById("insightV2").innerHTML = insightHTML; };
         
-        function initTrainingModal() {
-            const modal = document.getElementById("configModal");
-            const openBtn = document.getElementById("configTreinoBtn");
-            const closeBtn = document.getElementById("closeConfigModal");
-            const applyBtn = document.getElementById("applyConfigBtn");
-            const resetConfigBtn = document.getElementById("resetConfigBtn");
-            if(openBtn) openBtn.onclick = () => { modal.classList.remove("hidden"); };
-            if(closeBtn) closeBtn.onclick = () => { modal.classList.add("hidden"); };
-            if(applyBtn) applyBtn.onclick = () => {
-                const diffSelected = document.querySelector("#difficultyOptions .config-option.selected")?.dataset.val || "balanced";
-                const typeSelected = document.querySelector("#typeOptions .config-option.selected")?.dataset.val || "cebraspe";
-                const depthSelected = document.querySelector("#depthOptions .config-option.selected")?.dataset.val || "standard";
-                let extrasSelected = [];
-                document.querySelectorAll("#extrasOptions .config-option.selected").forEach(el => extrasSelected.push(el.dataset.val));
-                trainingConfig = { difficulty: diffSelected, type: typeSelected, depth: depthSelected, extras: extrasSelected };
-                saveToLocal();
-                modal.classList.add("hidden");
-                applyTrainingStrategy();
-                showToast("Estratégia aplicada com sucesso!");
-            };
-            if(resetConfigBtn) resetConfigBtn.onclick = () => {
-                trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] };
-                saveToLocal();
-                document.querySelectorAll("#difficultyOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-                document.querySelector("#difficultyOptions .config-option[data-val='balanced']").classList.add("selected");
-                document.querySelectorAll("#typeOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-                document.querySelector("#typeOptions .config-option[data-val='cebraspe']").classList.add("selected");
-                document.querySelectorAll("#depthOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-                document.querySelector("#depthOptions .config-option[data-val='standard']").classList.add("selected");
-                document.querySelectorAll("#extrasOptions .config-option").forEach(opt => opt.classList.remove("selected"));
-                showToast("Configurações resetadas");
-                if(questions.length) applyFilter();
-            };
-            document.querySelectorAll(".config-option").forEach(opt => {
-                opt.addEventListener("click", (e) => {
-                    const parent = opt.parentNode;
-                    if(parent.id === "extrasOptions") opt.classList.toggle("selected");
-                    else { parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); }
-                });
-            });
-        }
-        
-        function initFontControls() {
-            const fontBtn = document.getElementById("fontSettingsBtn");
-            const panel = document.getElementById("fontPanel");
-            fontBtn.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("hidden"); };
-            document.getElementById("fontDecreaseQuestion").onclick = () => changeFontSize('question', -0.05);
-            document.getElementById("fontIncreaseQuestion").onclick = () => changeFontSize('question', 0.05);
-            document.getElementById("fontDecreaseComment").onclick = () => changeFontSize('comment', -0.05);
-            document.getElementById("fontIncreaseComment").onclick = () => changeFontSize('comment', 0.05);
-            document.addEventListener("click", (e) => { if(!fontBtn.contains(e.target) && !panel.contains(e.target)) panel.classList.add("hidden"); });
-        }
-        
-        document.getElementById("timerStart").onclick = startTimer;
-        document.getElementById("timerPause").onclick = pauseTimer;
-        document.getElementById("timerStop").onclick = stopTimer;
-        document.getElementById("resetProgressBtn").onclick = resetProgress;
-        document.getElementById("clearAllBtn").onclick = clearAllData;
-        document.getElementById("exportDataBtn").onclick = exportJSON;
-        document.getElementById("focusModeBtn").onclick = () => document.body.classList.toggle("focus-mode");
-        document.getElementById("exitFocusBtn").onclick = () => document.body.classList.remove("focus-mode");
-        document.getElementById("themeToggleBtn").onclick = toggleTheme;
-        prevPageBtn.onclick = prevPage; nextPageBtn.onclick = nextPage;
-        applyFilterBtn.onclick = applyFilter;
-        importBtn.onclick = () => { if(rawInput.value.trim()) importQuestions(rawInput.value); };
-        previewBtn.onclick = () => { let parsed = parseQuestoes(rawInput.value); if(parsed.length) { document.getElementById("previewList").innerHTML = parsed.map(q=>`<div><strong>Q${q.number}:</strong> ${q.text.substring(0,80)}... <span class="text-xs">${q.answer}</span></div>`).join(""); document.getElementById("previewModal").style.display = "flex"; } else showToast("Nada detectado"); };
-        document.getElementById("cancelPreview").onclick = () => document.getElementById("previewModal").style.display = "none";
-        document.getElementById("confirmPreview").onclick = () => { importQuestions(rawInput.value); document.getElementById("previewModal").style.display = "none"; };
-        exampleBtn.onclick = () => { rawInput.value = `Questão 1: "A Declaração Universal dos Direitos Humanos foi adotada em 1948."\nComentário: "Adotada pela ONU em 10/12/1948."\nGabarito: Certo\n\nQuestão 2: "O Brasil foi descoberto em 1500 por Pedro Álvares Cabral."\nComentário: "Fato histórico consolidado."\nGabarito: Certo\n\nQuestão 3: "A auditoria interna é facultativa para empresas de capital aberto."\nComentário: "É obrigatória por lei."\nGabarito: Errado`; importQuestions(rawInput.value); };
-        importPdfBtn.onclick = () => pdfUpload.click();
-        pdfUpload.onchange = async(e) => { if(e.target.files[0]) { showToast("Extraindo PDF..."); let file = e.target.files[0]; let reader = new FileReader(); reader.onload = async(ev) => { let typedarray = new Uint8Array(ev.target.result); let pdf = await pdfjsLib.getDocument(typedarray).promise; let text=""; for(let i=1;i<=pdf.numPages;i++) { let page=await pdf.getPage(i); let content=await page.getTextContent(); text+=content.items.map(t=>t.str).join(" "); } rawInput.value = text; importQuestions(text); }; reader.readAsArrayBuffer(file); } };
-        document.getElementById("userMenuBtn").onclick = () => document.getElementById("userDropdown").classList.toggle("hidden");
-        document.addEventListener("click", (e) => { if(!document.getElementById("userMenuBtn").contains(e.target)) document.getElementById("userDropdown").classList.add("hidden"); });
-        document.getElementById("reportBtn").onclick = generateReport;
-        document.getElementById("downloadErrorsBtn").onclick = generateErrorNotebook;
-        document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt;
-        window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
-        
-        loadFromLocal();
-        initTrainingModal();
-        initFontControls();
-        if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para importar questões.");
+        function initTrainingModal() { const modal = document.getElementById("configModal"); const openBtn = document.getElementById("configTreinoBtn"); const closeBtn = document.getElementById("closeConfigModal"); const applyBtn = document.getElementById("applyConfigBtn"); const resetConfigBtn = document.getElementById("resetConfigBtn"); if(openBtn) openBtn.onclick = () => { modal.classList.remove("hidden"); }; if(closeBtn) closeBtn.onclick = () => { modal.classList.add("hidden"); }; if(applyBtn) applyBtn.onclick = () => { const diffSelected = document.querySelector("#difficultyOptions .config-option.selected")?.dataset.val || "balanced"; const typeSelected = document.querySelector("#typeOptions .config-option.selected")?.dataset.val || "cebraspe"; const depthSelected = document.querySelector("#depthOptions .config-option.selected")?.dataset.val || "standard"; let extrasSelected = []; document.querySelectorAll("#extrasOptions .config-option.selected").forEach(el => extrasSelected.push(el.dataset.val)); trainingConfig = { difficulty: diffSelected, type: typeSelected, depth: depthSelected, extras: extrasSelected }; saveToLocal(); modal.classList.add("hidden"); applyTrainingStrategy(); showToast("Estratégia aplicada com sucesso!"); }; if(resetConfigBtn) resetConfigBtn.onclick = () => { trainingConfig = { difficulty: "balanced", type: "cebraspe", depth: "standard", extras: [] }; saveToLocal(); document.querySelectorAll("#difficultyOptions .config-option").forEach(opt => opt.classList.remove("selected")); document.querySelector("#difficultyOptions .config-option[data-val='balanced']").classList.add("selected"); document.querySelectorAll("#typeOptions .config-option").forEach(opt => opt.classList.remove("selected")); document.querySelector("#typeOptions .config-option[data-val='cebraspe']").classList.add("selected"); document.querySelectorAll("#depthOptions .config-option").forEach(opt => opt.classList.remove("selected")); document.querySelector("#depthOptions .config-option[data-val='standard']").classList.add("selected"); document.querySelectorAll("#extrasOptions .config-option").forEach(opt => opt.classList.remove("selected")); showToast("Configurações resetadas"); if(questions.length) applyFilter(); }; document.querySelectorAll(".config-option").forEach(opt => { opt.addEventListener("click", (e) => { const parent = opt.parentNode; if(parent.id === "extrasOptions") opt.classList.toggle("selected"); else { parent.querySelectorAll(".config-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); } }); }); }
+        function initFontControls() { const fontBtn = document.getElementById("fontSettingsBtn"); const panel = document.getElementById("fontPanel"); fontBtn.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("hidden"); }; document.getElementById("fontDecreaseQuestion").onclick = () => changeFontSize('question', -0.05); document.getElementById("fontIncreaseQuestion").onclick = () => changeFontSize('question', 0.05); document.getElementById("fontDecreaseComment").onclick = () => changeFontSize('comment', -0.05); document.getElementById("fontIncreaseComment").onclick = () => changeFontSize('comment', 0.05); document.addEventListener("click", (e) => { if(!fontBtn.contains(e.target) && !panel.contains(e.target)) panel.classList.add("hidden"); }); }
+        document.getElementById("timerStart").onclick = startTimer; document.getElementById("timerPause").onclick = pauseTimer; document.getElementById("timerStop").onclick = stopTimer; document.getElementById("resetProgressBtn").onclick = resetProgress; document.getElementById("clearAllBtn").onclick = clearAllData; document.getElementById("exportDataBtn").onclick = exportJSON; document.getElementById("focusModeBtn").onclick = () => document.body.classList.toggle("focus-mode"); document.getElementById("exitFocusBtn").onclick = () => document.body.classList.remove("focus-mode"); document.getElementById("themeToggleBtn").onclick = toggleTheme; prevPageBtn.onclick = prevPage; nextPageBtn.onclick = nextPage; applyFilterBtn.onclick = applyFilter; importBtn.onclick = () => { if(rawInput.value.trim()) importQuestions(rawInput.value); }; previewBtn.onclick = () => { let parsed = parseQuestoes(rawInput.value); if(parsed.length) { document.getElementById("previewList").innerHTML = parsed.map(q=>`<div><strong>Q${q.number}:</strong> ${q.text.substring(0,80)}... <span class="text-xs">${q.answer}</span></div>`).join(""); document.getElementById("previewModal").style.display = "flex"; } else showToast("Nada detectado"); }; document.getElementById("cancelPreview").onclick = () => document.getElementById("previewModal").style.display = "none"; document.getElementById("confirmPreview").onclick = () => { importQuestions(rawInput.value); document.getElementById("previewModal").style.display = "none"; }; exampleBtn.onclick = () => { rawInput.value = `Questão 1: "A Declaração Universal dos Direitos Humanos foi adotada em 1948."\nComentário: "Adotada pela ONU em 10/12/1948."\nGabarito: Certo\n\nQuestão 2: "O Brasil foi descoberto em 1500 por Pedro Álvares Cabral."\nComentário: "Fato histórico consolidado."\nGabarito: Certo\n\nQuestão 3: "A auditoria interna é facultativa para empresas de capital aberto."\nComentário: "É obrigatória por lei."\nGabarito: Errado`; importQuestions(rawInput.value); }; importPdfBtn.onclick = () => pdfUpload.click(); pdfUpload.onchange = async(e) => { if(e.target.files[0]) { showToast("Extraindo PDF..."); let file = e.target.files[0]; let reader = new FileReader(); reader.onload = async(ev) => { let typedarray = new Uint8Array(ev.target.result); let pdf = await pdfjsLib.getDocument(typedarray).promise; let text=""; for(let i=1;i<=pdf.numPages;i++) { let page=await pdf.getPage(i); let content=await page.getTextContent(); text+=content.items.map(t=>t.str).join(" "); } rawInput.value = text; importQuestions(text); }; reader.readAsArrayBuffer(file); } }; document.getElementById("userMenuBtn").onclick = () => document.getElementById("userDropdown").classList.toggle("hidden"); document.addEventListener("click", (e) => { if(!document.getElementById("userMenuBtn").contains(e.target)) document.getElementById("userDropdown").classList.add("hidden"); }); document.getElementById("reportBtn").onclick = generateReport; document.getElementById("downloadErrorsBtn").onclick = generateErrorNotebook; document.getElementById("downloadNotebookBtn").onclick = generateNotebookLMPrompt; window.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") nextPage(); if(e.key==="ArrowLeft") prevPage(); });
+        loadFromLocal(); initTrainingModal(); initFontControls(); if(!questions.length) showToast("Bem-vindo! Clique em 'Exemplo' para importar questões.");
     })();
     
-    // ================== SISTEMA CONCURSOCOIN (GAMIFICAÇÃO ISOLADA) ==================
+    // ================== SISTEMA CONCURSOCOIN (GAMIFICAÇÃO) ==================
     (function() {
-        let totalCoins = 0;
-        let currentStreak = 0;
-        let bestStreak = 0;
-        let jackpotCount = 0;
-        let lastBonus5 = false;
-        let lastBonus10 = false;
-        let jackpotTriggeredThisStreak = false;
-        let rodadaID = 0;
-        
-        const mensagensAcerto = [
-            "+{valor} ConcursoCoins 💰",
-            "Boa! +{valor} moedas!",
-            "Acertou! Ganho de {valor} 💰",
-            "Mandou bem! +{valor}",
-            "💰 +{valor} coins! Continue!",
-            "Show! +{valor} moedas!"
-        ];
-        const mensagensBonus = [
-            "🔥 Sequência ativada! +100 moedas!",
-            "💥 Combo! Você ganhou +100!",
-            "⚡ Incrível! +100 moedas!",
-            "🎯 Bônus de sequência! +100",
-            "🚀 +100 por 5 acertos seguidos!"
-        ];
-        const mensagensBonus10 = [
-            "🏆 MEGA COMBO! +300 moedas!",
-            "💎 Sequência de 10! +300 coins!",
-            "⚡ LENDÁRIO! +300 moedas!",
-            "🔥 10 ACERTOS SEGUIDOS! +300"
-        ];
-        
+        let totalCoins = 0; let currentStreak = 0; let bestStreak = 0; let jackpotCount = 0; let lastBonus5 = false; let lastBonus10 = false; let jackpotTriggeredThisStreak = false; let rodadaID = 0;
+        const mensagensAcerto = ["+{valor} ConcursoCoins 💰","Boa! +{valor} moedas!","Acertou! Ganho de {valor} 💰","Mandou bem! +{valor}","💰 +{valor} coins! Continue!","Show! +{valor} moedas!"];
+        const mensagensBonus = ["🔥 Sequência ativada! +100 moedas!","💥 Combo! Você ganhou +100!","⚡ Incrível! +100 moedas!","🎯 Bônus de sequência! +100","🚀 +100 por 5 acertos seguidos!"];
+        const mensagensBonus10 = ["🏆 MEGA COMBO! +300 moedas!","💎 Sequência de 10! +300 coins!","⚡ LENDÁRIO! +300 moedas!","🔥 10 ACERTOS SEGUIDOS! +300"];
         let coinDisplay, streakDisplay;
-        
-        function updateUI() {
-            if (!coinDisplay) coinDisplay = document.getElementById("coinCounterDisplay");
-            if (!streakDisplay) streakDisplay = document.getElementById("streakCounterDisplay");
-            if (coinDisplay) {
-                coinDisplay.classList.add("coin-value-update");
-                setTimeout(() => coinDisplay.classList.remove("coin-value-update"), 300);
-                coinDisplay.innerHTML = `💰 ${totalCoins.toLocaleString()}`;
-            }
-            if (streakDisplay) {
-                streakDisplay.innerHTML = `🔥 ${currentStreak}`;
-                streakDisplay.style.background = currentStreak >= 5 ? "#f59e0b" : "#f97316";
-            }
-        }
-        
-        function addCoins(valor) {
-            totalCoins += valor;
-            updateUI();
-            saveData();
-            return totalCoins;
-        }
-        
-        function getRandomMessage(lista) {
-            return lista[Math.floor(Math.random() * lista.length)];
-        }
-        
-        function showCoinNotification(valor) {
-            let template = getRandomMessage(mensagensAcerto);
-            let mensagem = template.replace("{valor}", valor);
-            const notif = document.createElement("div");
-            notif.className = "coin-notification";
-            notif.innerHTML = `<i class="fas fa-coins"></i> ${mensagem}`;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 800);
-        }
-        
-        function showBonusNotification(valor) {
-            let msgList = valor === 100 ? mensagensBonus : mensagensBonus10;
-            const msg = getRandomMessage(msgList);
-            const notif = document.createElement("div");
-            notif.className = "coin-notification";
-            notif.style.background = "linear-gradient(135deg, #f97316, #ea580c)";
-            notif.style.color = "white";
-            notif.innerHTML = `<i class="fas fa-trophy"></i> ${msg}`;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 1000);
-            addCoins(valor);
-        }
-        
-        function createConfetti() {
-            for (let i = 0; i < 120; i++) {
-                const conf = document.createElement("div");
-                conf.classList.add("confetti");
-                conf.style.left = Math.random() * 100 + "%";
-                conf.style.width = Math.random() * 8 + 4 + "px";
-                conf.style.height = Math.random() * 12 + 6 + "px";
-                conf.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
-                conf.style.position = "fixed";
-                conf.style.top = "-20px";
-                conf.style.borderRadius = "2px";
-                conf.style.animationDuration = Math.random() * 2 + 1.5 + "s";
-                conf.style.animationDelay = Math.random() * 0.5 + "s";
-                document.body.appendChild(conf);
-                setTimeout(() => conf.remove(), 4000);
-            }
-        }
-        
-        function showJackpot() {
-            addCoins(10000);
-            jackpotCount++;
-            saveData();
-            const modal = document.createElement("div");
-            modal.className = "jackpot-modal";
-            modal.innerHTML = `
-                <div class="jackpot-content">
-                    <i class="fas fa-crown" style="font-size: 4rem; color: #fbbf24;"></i>
-                    <h2>🎰 JACKPOT ATIVADO 🎰</h2>
-                    <h3>🔥 SEQUÊNCIA PERFEITA 🔥</h3>
-                    <h3>🏆 15/15 QUESTÕES 🏆</h3>
-                    <div style="font-size: 2rem; margin: 1rem;">+10.000 ConcursoCoins 💰</div>
-                    <button id="closeJackpotBtn" class="btn-primary px-6 py-2 rounded-full">FECHAR</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            createConfetti();
-            const closeBtn = modal.querySelector("#closeJackpotBtn");
-            closeBtn.onclick = () => modal.remove();
-            setTimeout(() => { if(modal) modal.remove(); }, 6000);
-        }
-        
-        function checkStreakBonus(streak) {
-            if (streak === 5 && !lastBonus5) {
-                showBonusNotification(100);
-                lastBonus5 = true;
-                saveData();
-            } else if (streak === 10 && !lastBonus10) {
-                showBonusNotification(300);
-                lastBonus10 = true;
-                saveData();
-            }
-        }
-        
-        function checkJackpot(streak) {
-            if (streak === 15 && !jackpotTriggeredThisStreak) {
-                jackpotTriggeredThisStreak = true;
-                showJackpot();
-                saveData();
-            }
-        }
-        
-        function showNearJackpotAlert(streak) {
-            if (streak === 13 || streak === 14) {
-                const alertDiv = document.createElement("div");
-                alertDiv.className = "coin-notification";
-                alertDiv.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
-                alertDiv.style.color = "white";
-                alertDiv.style.fontSize = "1rem";
-                alertDiv.innerHTML = "🚨 ATENÇÃO: VOCÊ ESTÁ PERTO DO JACKPOT 🚨";
-                document.body.appendChild(alertDiv);
-                setTimeout(() => alertDiv.remove(), 2000);
-            }
-        }
-        
-        window.onQuestionAnswered = function(questionNumber, wasCorrect) {
-            if (wasCorrect) {
-                const ganho = questionNumber;
-                addCoins(ganho);
-                showCoinNotification(ganho);
-                currentStreak++;
-                if (currentStreak > bestStreak) bestStreak = currentStreak;
-                updateUI();
-                checkStreakBonus(currentStreak);
-                checkJackpot(currentStreak);
-                showNearJackpotAlert(currentStreak);
-                saveData();
-                rodadaID++;
-            } else {
-                if (currentStreak > 0) {
-                    const notif = document.createElement("div");
-                    notif.className = "coin-notification";
-                    notif.style.background = "linear-gradient(135deg, #6b7280, #4b5563)";
-                    notif.innerHTML = "💔 Streak quebrado! Recomece.";
-                    document.body.appendChild(notif);
-                    setTimeout(() => notif.remove(), 1000);
-                }
-                currentStreak = 0;
-                lastBonus5 = false;
-                lastBonus10 = false;
-                jackpotTriggeredThisStreak = false;
-                updateUI();
-                saveData();
-                rodadaID++;
-            }
-        };
-        
-        window.resetGamificationOnReset = function() {
-            currentStreak = 0;
-            lastBonus5 = false;
-            lastBonus10 = false;
-            jackpotTriggeredThisStreak = false;
-            updateUI();
-            saveData();
-        };
-        
-        window.resetGamificationOnImport = function() {
-            currentStreak = 0;
-            lastBonus5 = false;
-            lastBonus10 = false;
-            jackpotTriggeredThisStreak = false;
-            updateUI();
-            saveData();
-        };
-        
-        function saveData() {
-            localStorage.setItem("concursoCoins", totalCoins);
-            localStorage.setItem("concursoBestStreak", bestStreak);
-            localStorage.setItem("jackpotCount", jackpotCount);
-            localStorage.setItem("concursoStreak", currentStreak);
-            localStorage.setItem("lastBonus5", lastBonus5);
-            localStorage.setItem("lastBonus10", lastBonus10);
-            localStorage.setItem("jackpotTriggered", jackpotTriggeredThisStreak);
-            localStorage.setItem("concursoRodadaID", rodadaID);
-        }
-        
-        function loadData() {
-            totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0;
-            bestStreak = parseInt(localStorage.getItem("concursoBestStreak")) || 0;
-            jackpotCount = parseInt(localStorage.getItem("jackpotCount")) || 0;
-            currentStreak = parseInt(localStorage.getItem("concursoStreak")) || 0;
-            lastBonus5 = localStorage.getItem("lastBonus5") === "true";
-            lastBonus10 = localStorage.getItem("lastBonus10") === "true";
-            jackpotTriggeredThisStreak = localStorage.getItem("jackpotTriggered") === "true";
-            rodadaID = parseInt(localStorage.getItem("concursoRodadaID")) || 0;
-            updateUI();
-        }
-        
-        loadData();
-        updateUI();
+        function updateUI() { if (!coinDisplay) coinDisplay = document.getElementById("coinCounterDisplay"); if (!streakDisplay) streakDisplay = document.getElementById("streakCounterDisplay"); if (coinDisplay) { coinDisplay.classList.add("coin-value-update"); setTimeout(() => coinDisplay.classList.remove("coin-value-update"), 300); coinDisplay.innerHTML = `💰 ${totalCoins.toLocaleString()}`; } if (streakDisplay) { streakDisplay.innerHTML = `🔥 ${currentStreak}`; streakDisplay.style.background = currentStreak >= 5 ? "#f59e0b" : "#f97316"; } if(window.updateHomeStats) window.updateHomeStats(); }
+        function addCoins(valor) { totalCoins += valor; updateUI(); saveData(); return totalCoins; }
+        function getRandomMessage(lista) { return lista[Math.floor(Math.random() * lista.length)]; }
+        function showCoinNotification(valor) { let template = getRandomMessage(mensagensAcerto); let mensagem = template.replace("{valor}", valor); const notif = document.createElement("div"); notif.className = "coin-notification"; notif.innerHTML = `<i class="fas fa-coins"></i> ${mensagem}`; document.body.appendChild(notif); setTimeout(() => notif.remove(), 800); }
+        function showBonusNotification(valor) { let msgList = valor === 100 ? mensagensBonus : mensagensBonus10; const msg = getRandomMessage(msgList); const notif = document.createElement("div"); notif.className = "coin-notification"; notif.style.background = "linear-gradient(135deg, #f97316, #ea580c)"; notif.style.color = "white"; notif.innerHTML = `<i class="fas fa-trophy"></i> ${msg}`; document.body.appendChild(notif); setTimeout(() => notif.remove(), 1000); addCoins(valor); }
+        function createConfetti() { for (let i = 0; i < 120; i++) { const conf = document.createElement("div"); conf.classList.add("confetti"); conf.style.left = Math.random() * 100 + "%"; conf.style.width = Math.random() * 8 + 4 + "px"; conf.style.height = Math.random() * 12 + 6 + "px"; conf.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`; conf.style.position = "fixed"; conf.style.top = "-20px"; conf.style.borderRadius = "2px"; conf.style.animationDuration = Math.random() * 2 + 1.5 + "s"; conf.style.animationDelay = Math.random() * 0.5 + "s"; document.body.appendChild(conf); setTimeout(() => conf.remove(), 4000); } }
+        function showJackpot() { addCoins(10000); jackpotCount++; saveData(); const modal = document.createElement("div"); modal.className = "jackpot-modal"; modal.innerHTML = `<div class="jackpot-content"><i class="fas fa-crown" style="font-size: 4rem; color: #fbbf24;"></i><h2>🎰 JACKPOT ATIVADO 🎰</h2><h3>🔥 SEQUÊNCIA PERFEITA 🔥</h3><h3>🏆 15/15 QUESTÕES 🏆</h3><div style="font-size: 2rem; margin: 1rem;">+10.000 ConcursoCoins 💰</div><button id="closeJackpotBtn" class="btn-primary px-6 py-2 rounded-full">FECHAR</button></div>`; document.body.appendChild(modal); createConfetti(); const closeBtn = modal.querySelector("#closeJackpotBtn"); closeBtn.onclick = () => modal.remove(); setTimeout(() => { if(modal) modal.remove(); }, 6000); }
+        function checkStreakBonus(streak) { if (streak === 5 && !lastBonus5) { showBonusNotification(100); lastBonus5 = true; saveData(); } else if (streak === 10 && !lastBonus10) { showBonusNotification(300); lastBonus10 = true; saveData(); } }
+        function checkJackpot(streak) { if (streak === 15 && !jackpotTriggeredThisStreak) { jackpotTriggeredThisStreak = true; showJackpot(); saveData(); } }
+        function showNearJackpotAlert(streak) { if (streak === 13 || streak === 14) { const alertDiv = document.createElement("div"); alertDiv.className = "coin-notification"; alertDiv.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)"; alertDiv.style.color = "white"; alertDiv.style.fontSize = "1rem"; alertDiv.innerHTML = "🚨 ATENÇÃO: VOCÊ ESTÁ PERTO DO JACKPOT 🚨"; document.body.appendChild(alertDiv); setTimeout(() => alertDiv.remove(), 2000); } }
+        window.onQuestionAnswered = function(questionNumber, wasCorrect) { if (wasCorrect) { const ganho = questionNumber; addCoins(ganho); showCoinNotification(ganho); currentStreak++; if (currentStreak > bestStreak) bestStreak = currentStreak; updateUI(); checkStreakBonus(currentStreak); checkJackpot(currentStreak); showNearJackpotAlert(currentStreak); saveData(); rodadaID++; } else { if (currentStreak > 0) { const notif = document.createElement("div"); notif.className = "coin-notification"; notif.style.background = "linear-gradient(135deg, #6b7280, #4b5563)"; notif.innerHTML = "💔 Streak quebrado! Recomece."; document.body.appendChild(notif); setTimeout(() => notif.remove(), 1000); } currentStreak = 0; lastBonus5 = false; lastBonus10 = false; jackpotTriggeredThisStreak = false; updateUI(); saveData(); rodadaID++; } };
+        window.resetGamificationOnReset = function() { currentStreak = 0; lastBonus5 = false; lastBonus10 = false; jackpotTriggeredThisStreak = false; updateUI(); saveData(); };
+        window.resetGamificationOnImport = function() { currentStreak = 0; lastBonus5 = false; lastBonus10 = false; jackpotTriggeredThisStreak = false; updateUI(); saveData(); };
+        function saveData() { localStorage.setItem("concursoCoins", totalCoins); localStorage.setItem("concursoBestStreak", bestStreak); localStorage.setItem("jackpotCount", jackpotCount); localStorage.setItem("concursoStreak", currentStreak); localStorage.setItem("lastBonus5", lastBonus5); localStorage.setItem("lastBonus10", lastBonus10); localStorage.setItem("jackpotTriggered", jackpotTriggeredThisStreak); localStorage.setItem("concursoRodadaID", rodadaID); }
+        function loadData() { totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0; bestStreak = parseInt(localStorage.getItem("concursoBestStreak")) || 0; jackpotCount = parseInt(localStorage.getItem("jackpotCount")) || 0; currentStreak = parseInt(localStorage.getItem("concursoStreak")) || 0; lastBonus5 = localStorage.getItem("lastBonus5") === "true"; lastBonus10 = localStorage.getItem("lastBonus10") === "true"; jackpotTriggeredThisStreak = localStorage.getItem("jackpotTriggered") === "true"; rodadaID = parseInt(localStorage.getItem("concursoRodadaID")) || 0; updateUI(); }
+        loadData(); updateUI();
     })();
     
-    // ================== MENSAGENS DE FINAL DE RODADA ==================
+    // ================== MENSAGENS DE FINAL DE RODADA (mantido) ==================
     (function() {
-        let moedasGanhasRodada = 0;
-        let rodadaFinalizadaExibida = false;
-        
-        const estilos = [
-            { nome: "premio", iconClass: "fas fa-trophy", frases: ["💰 Rodada concluída! +{moedas} ConcursoCoins", "🏆 Você finalizou a bateria! Ganho: +{moedas} moedas", "🎯 Missão cumprida! +{moedas} ConcursoCoins adicionadas"] },
-            { nome: "motivacional", iconClass: "fas fa-medal", frases: ["📚 Mais perto da aprovação! +{moedas} moedas", "🧠 Conhecimento acumulado! +{moedas} ConcursoCoins", "🚀 Você está evoluindo! +{moedas} moedas"] },
-            { nome: "cassino", iconClass: "fas fa-coins", frases: ["🎰 Rodada encerrada! Você faturou +{moedas} moedas!", "💥 Resultado da rodada: +{moedas} ConcursoCoins!", "⚡ Pagamento liberado! +{moedas} moedas creditadas!"] },
-            { nome: "conquista", iconClass: "fas fa-crown", frases: ["👑 Execução de alto nível! +{moedas} moedas", "🏅 Desempenho sólido! +{moedas} ConcursoCoins", "🏆 Mais uma vitória! +{moedas} moedas na conta"] },
-            { nome: "foco", iconClass: "fas fa-briefcase", frases: ["💼 Mentalidade de aprovado! +{moedas} ConcursoCoins", "💰 Você acabou de pagar mais um pedaço do relógio! +{moedas}", "📊 Progresso real! +{moedas} moedas pro relógio", "⌚ Esse relógio tá mais perto! +{moedas} moedas"] },
-            { nome: "impacto", iconClass: "fas fa-bolt", frases: ["⚡ Você veio pra jogar! +{moedas} moedas!", "📈 Progresso consistente! +{moedas} moedas"] }
-        ];
-        
-        function getRandomMessageAndIcon(moedas) {
-            const estilo = estilos[Math.floor(Math.random() * estilos.length)];
-            const fraseTemplate = estilo.frases[Math.floor(Math.random() * estilo.frases.length)];
-            const frase = fraseTemplate.replace("{moedas}", moedas.toLocaleString());
-            return { frase, iconClass: estilo.iconClass };
-        }
-        
-        function showRewardPopup(moedas) {
-            const popup = document.getElementById("rewardPopup");
-            const iconElement = document.getElementById("rewardIcon");
-            const textSpan = document.getElementById("rewardText");
-            if (!popup || !iconElement || !textSpan) return;
-            
-            const { frase, iconClass } = getRandomMessageAndIcon(moedas);
-            iconElement.className = `reward-icon ${iconClass}`;
-            textSpan.innerText = frase;
-            
-            popup.classList.remove("hide");
-            popup.classList.add("show");
-            
-            for (let i = 0; i < 40; i++) {
-                const conf = document.createElement("div");
-                conf.classList.add("confetti");
-                conf.style.left = Math.random() * 100 + "%";
-                conf.style.width = Math.random() * 6 + 3 + "px";
-                conf.style.height = Math.random() * 10 + 5 + "px";
-                conf.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
-                conf.style.position = "fixed";
-                conf.style.top = "-20px";
-                conf.style.borderRadius = "2px";
-                conf.style.animationDuration = Math.random() * 1.5 + 1 + "s";
-                conf.style.animationDelay = Math.random() * 0.3 + "s";
-                document.body.appendChild(conf);
-                setTimeout(() => conf.remove(), 3000);
-            }
-            
-            setTimeout(() => {
-                popup.classList.remove("show");
-                popup.classList.add("hide");
-            }, 4500);
-        }
-        
+        let moedasGanhasRodada = 0; let rodadaFinalizadaExibida = false;
+        const estilos = [ { nome: "premio", iconClass: "fas fa-trophy", frases: ["💰 Rodada concluída! +{moedas} ConcursoCoins", "🏆 Você finalizou a bateria! Ganho: +{moedas} moedas", "🎯 Missão cumprida! +{moedas} ConcursoCoins adicionadas"] }, { nome: "motivacional", iconClass: "fas fa-medal", frases: ["📚 Mais perto da aprovação! +{moedas} moedas", "🧠 Conhecimento acumulado! +{moedas} ConcursoCoins", "🚀 Você está evoluindo! +{moedas} moedas"] }, { nome: "cassino", iconClass: "fas fa-coins", frases: ["🎰 Rodada encerrada! Você faturou +{moedas} moedas!", "💥 Resultado da rodada: +{moedas} ConcursoCoins!", "⚡ Pagamento liberado! +{moedas} moedas creditadas!"] }, { nome: "conquista", iconClass: "fas fa-crown", frases: ["👑 Execução de alto nível! +{moedas} moedas", "🏅 Desempenho sólido! +{moedas} ConcursoCoins", "🏆 Mais uma vitória! +{moedas} moedas na conta"] }, { nome: "foco", iconClass: "fas fa-briefcase", frases: ["💼 Mentalidade de aprovado! +{moedas} ConcursoCoins", "💰 Você acabou de pagar mais um pedaço do relógio! +{moedas}", "📊 Progresso real! +{moedas} moedas pro relógio", "⌚ Esse relógio tá mais perto! +{moedas} moedas"] }, { nome: "impacto", iconClass: "fas fa-bolt", frases: ["⚡ Você veio pra jogar! +{moedas} moedas!", "📈 Progresso consistente! +{moedas} moedas"] } ];
+        function getRandomMessageAndIcon(moedas) { const estilo = estilos[Math.floor(Math.random() * estilos.length)]; const fraseTemplate = estilo.frases[Math.floor(Math.random() * estilo.frases.length)]; const frase = fraseTemplate.replace("{moedas}", moedas.toLocaleString()); return { frase, iconClass: estilo.iconClass }; }
+        function showRewardPopup(moedas) { const popup = document.getElementById("rewardPopup"); const iconElement = document.getElementById("rewardIcon"); const textSpan = document.getElementById("rewardText"); if (!popup || !iconElement || !textSpan) return; const { frase, iconClass } = getRandomMessageAndIcon(moedas); iconElement.className = `reward-icon ${iconClass}`; textSpan.innerText = frase; popup.classList.remove("hide"); popup.classList.add("show"); for (let i = 0; i < 40; i++) { const conf = document.createElement("div"); conf.classList.add("confetti"); conf.style.left = Math.random() * 100 + "%"; conf.style.width = Math.random() * 6 + 3 + "px"; conf.style.height = Math.random() * 10 + 5 + "px"; conf.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`; conf.style.position = "fixed"; conf.style.top = "-20px"; conf.style.borderRadius = "2px"; conf.style.animationDuration = Math.random() * 1.5 + 1 + "s"; conf.style.animationDelay = Math.random() * 0.3 + "s"; document.body.appendChild(conf); setTimeout(() => conf.remove(), 3000); } setTimeout(() => { popup.classList.remove("show"); popup.classList.add("hide"); }, 4500); }
         function resetRodadaState() { moedasGanhasRodada = 0; rodadaFinalizadaExibida = false; }
-        function verificarRodadaCompleta() {
-            const cards = document.querySelectorAll('.question-card');
-            if (cards.length === 0) return false;
-            const respondidos = document.querySelectorAll('.question-card.correta, .question-card.errada');
-            return respondidos.length === cards.length;
-        }
-        
-        const originalOnQA = window.onQuestionAnswered;
-        window.onQuestionAnswered = function(questionNumber, wasCorrect) {
-            if (originalOnQA) originalOnQA(questionNumber, wasCorrect);
-            if (wasCorrect) moedasGanhasRodada += questionNumber;
-            setTimeout(() => {
-                if (verificarRodadaCompleta() && !rodadaFinalizadaExibida && moedasGanhasRodada > 0) {
-                    rodadaFinalizadaExibida = true;
-                    showRewardPopup(moedasGanhasRodada);
-                    // Tocar jingle de vitória (implementado na seção de sons)
-                    if (window.playVictoryJingle) window.playVictoryJingle();
-                }
-            }, 100);
+        function verificarRodadaCompleta() { const cards = document.querySelectorAll('.question-card'); if (cards.length === 0) return false; const respondidos = document.querySelectorAll('.question-card.correta, .question-card.errada'); return respondidos.length === cards.length; }
+        const originalOnQA = window.onQuestionAnswered; window.onQuestionAnswered = function(questionNumber, wasCorrect) { if (originalOnQA) originalOnQA(questionNumber, wasCorrect); if (wasCorrect) moedasGanhasRodada += questionNumber; setTimeout(() => { if (verificarRodadaCompleta() && !rodadaFinalizadaExibida && moedasGanhasRodada > 0) { rodadaFinalizadaExibida = true; showRewardPopup(moedasGanhasRodada); if (window.playVictoryJingle) window.playVictoryJingle(); } }, 100); }; function attachResetEvents() { ['importBtn', 'exampleBtn', 'resetProgressBtn', 'clearAllBtn', 'confirmPreview'].forEach(id => { const btn = document.getElementById(id); if (btn) btn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 200)); }); const pdfBtn = document.getElementById('importPdfBtn'); if (pdfBtn) pdfBtn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 500)); const pdfUploadEl = document.getElementById('pdfUpload'); if (pdfUploadEl) pdfUploadEl.addEventListener('change', () => setTimeout(() => resetRodadaState(), 800)); } attachResetEvents(); resetRodadaState();
+    })();
+    
+    // ================== SONS TEMÁTICOS ==================
+    (function(){
+        let somAtivo = true; let audioCtx = null; let audioUnlocked = false;
+        function unlockAudio() { if (audioUnlocked) return; if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') { audioCtx.resume().then(() => { audioUnlocked = true; }).catch(e => console.warn(e)); } else { audioUnlocked = true; } }
+        function playTone(freq, duration, volume = 0.3, type = 'sine') { if (!somAtivo) return; if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') { audioCtx.resume().then(() => playToneNow(freq, duration, volume, type)).catch(e=>console.warn(e)); } else { playToneNow(freq, duration, volume, type); } }
+        function playToneNow(freq, duration, volume, type) { try { const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = type; osc.frequency.value = freq; gain.gain.setValueAtTime(volume, now); gain.gain.exponentialRampToValueAtTime(0.00001, now + duration); osc.start(); osc.stop(now + duration); } catch(e) { console.warn("Erro ao tocar tom", e); } }
+        function playCoinSound() { playTone(1200, 0.08, 0.25, 'sine'); setTimeout(() => playTone(1500, 0.1, 0.25, 'sine'), 80); setTimeout(() => playTone(1800, 0.12, 0.2, 'sine'), 180); }
+        function playCorrectNormal() { playTone(880, 0.15, 0.3, 'sine'); }
+        function playCorrectStreak() { playTone(1046, 0.12, 0.35, 'sine'); setTimeout(() => playTone(1318, 0.12, 0.35, 'sine'), 120); setTimeout(() => playTone(1568, 0.2, 0.3, 'sine'), 240); }
+        function playError() { playTone(440, 0.25, 0.2, 'sine'); }
+        function playVictoryJingle() { if (!somAtivo) return; playTone(523, 0.2, 0.3, 'sine'); setTimeout(() => playTone(659, 0.2, 0.3, 'sine'), 220); setTimeout(() => playTone(784, 0.2, 0.3, 'sine'), 440); setTimeout(() => playTone(1046, 0.4, 0.35, 'sine'), 660); }
+        window.playVictoryJingle = playVictoryJingle;
+        const soundBtn = document.getElementById("soundToggleBtn"); if (soundBtn) { const saved = localStorage.getItem("somAtivoAuditor"); if (saved !== null) somAtivo = saved === "true"; soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som'; soundBtn.onclick = () => { somAtivo = !somAtivo; localStorage.setItem("somAtivoAuditor", somAtivo); soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som'; if (somAtivo && !audioUnlocked) unlockAudio(); }; }
+        const testBtn = document.getElementById("testSoundBtn"); if (testBtn) { testBtn.onclick = () => { unlockAudio(); playCoinSound(); setTimeout(() => playCorrectNormal(), 300); setTimeout(() => playCorrectStreak(), 800); setTimeout(() => playVictoryJingle(), 1500); }; }
+        const originalResponder = window.responderQuestao; if (originalResponder) { window.responderQuestao = function(id, resposta) { unlockAudio(); originalResponder(id, resposta); try { const q = window.questions?.find(qq => qq.id === id); if (q && q.responded) { const wasCorrect = (resposta === q.answer); if (wasCorrect) { playCorrectNormal(); if (typeof streak !== 'undefined' && streak % 5 === 0 && streak > 0) { playCorrectStreak(); } playCoinSound(); } else { playError(); } } } catch(e) {} }; }
+        const originalAddCoins = window.addCoins; if (originalAddCoins) { window.addCoins = function(valor) { const result = originalAddCoins(valor); playCoinSound(); return result; }; }
+    })();
+    
+    // ================== NOVA HOME: API + ANIMAÇÃO DE SALDO + META ==================
+    (function(){
+        // Função para atualizar estatísticas internas na Home
+        window.updateHomeStats = function() {
+            try {
+                const totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0;
+                const totalQuestions = window.questions ? window.questions.length : 0;
+                const answered = window.questions ? window.questions.filter(q => q.responded).length : 0;
+                const accuracy = answered ? ((window.questions.filter(q => q.responded && q.userChoice === q.answer).length / answered) * 100).toFixed(1) : 0;
+                const currentStreak = parseInt(localStorage.getItem("concursoStreak")) || 0;
+                document.getElementById("homeCoinDisplay").innerHTML = `💰 ${totalCoins.toLocaleString()}`;
+                document.getElementById("homeAnsweredCount").innerText = answered;
+                document.getElementById("homeTotalQuestions").innerText = totalQuestions;
+                document.getElementById("homeAccuracy").innerText = `${accuracy}%`;
+                document.getElementById("homeStreak").innerText = currentStreak;
+                // Conversão e meta (1 ConcursoCoin = R$ 0,01)
+                const realValue = totalCoins * 0.01;
+                document.getElementById("homeCoinToReal").innerHTML = `R$ ${realValue.toFixed(2)}`;
+                const goalReal = 1090;
+                const percent = Math.min(100, (realValue / goalReal) * 100);
+                document.getElementById("goalProgressFill").style.width = `${percent}%`;
+                document.getElementById("goalProgressText").innerText = `${percent.toFixed(1)}%`;
+                const missing = Math.max(0, goalReal - realValue);
+                document.getElementById("missingAmountMsg").innerHTML = missing <= 0 ? "🎉 Meta alcançada! Parabéns! 🎉" : `Faltam R$ ${missing.toFixed(2)} para atingir a meta 🎯`;
+            } catch(e) { console.warn("updateHomeStats",e); }
         };
         
-        function attachResetEvents() {
-            ['importBtn', 'exampleBtn', 'resetProgressBtn', 'clearAllBtn', 'confirmPreview'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) btn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 200));
-            });
-            const pdfBtn = document.getElementById('importPdfBtn');
-            if (pdfBtn) pdfBtn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 500));
-            const pdfUploadEl = document.getElementById('pdfUpload');
-            if (pdfUploadEl) pdfUploadEl.addEventListener('change', () => setTimeout(() => resetRodadaState(), 800));
-        }
-        attachResetEvents();
-        resetRodadaState();
-    })();
-
-    // ================== SONS TEMÁTICOS (DINHEIRO, ACERTOS VARIADOS, JINGLE DE VITÓRIA) ==================
-    (function(){
-        let somAtivo = true;
-        let audioCtx = null;
-        let audioUnlocked = false;
-        
-        function unlockAudio() {
-            if (audioUnlocked) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume().then(() => { audioUnlocked = true; console.log("🔊 Áudio destravado!"); }).catch(e => console.warn(e));
-            } else { audioUnlocked = true; }
+        // Animação de contagem estilo cassino
+        function animarSaldo(valorFinal, elementId = "saldo") {
+            const elemento = document.getElementById(elementId);
+            if (!elemento) return;
+            let valorAtual = 0;
+            const incremento = Math.max(1, Math.ceil(valorFinal / 50));
+            clearInterval(window._saldoInterval);
+            window._saldoInterval = setInterval(() => {
+                valorAtual += incremento;
+                if (valorAtual >= valorFinal) {
+                    valorAtual = valorFinal;
+                    clearInterval(window._saldoInterval);
+                }
+                elemento.innerText = valorAtual + " BTCC";
+                // Efeito visual de destaque
+                elemento.classList.add("highlight-gold");
+                setTimeout(() => elemento.classList.remove("highlight-gold"), 600);
+            }, 30);
         }
         
-        function playTone(freq, duration, volume = 0.3, type = 'sine') {
-            if (!somAtivo) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume().then(() => playToneNow(freq, duration, volume, type)).catch(e=>console.warn(e));
-            } else { playToneNow(freq, duration, volume, type); }
-        }
-        
-        function playToneNow(freq, duration, volume, type) {
+        // Consumo da API externa
+        async function carregarDadosAPI() {
             try {
-                const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(volume, now);
-                gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
-                osc.start();
-                osc.stop(now + duration);
-            } catch(e) { console.warn("Erro ao tocar tom", e); }
-        }
-        
-        // Som de dinheiro (caixa registradora / moedas)
-        function playCoinSound() {
-            playTone(1200, 0.08, 0.25, 'sine');
-            setTimeout(() => playTone(1500, 0.1, 0.25, 'sine'), 80);
-            setTimeout(() => playTone(1800, 0.12, 0.2, 'sine'), 180);
-        }
-        
-        // Som de acerto normal (pop alegre)
-        function playCorrectNormal() {
-            playTone(880, 0.15, 0.3, 'sine');
-        }
-        
-        // Som de acerto com streak (fanfarra curta)
-        function playCorrectStreak() {
-            playTone(1046, 0.12, 0.35, 'sine');
-            setTimeout(() => playTone(1318, 0.12, 0.35, 'sine'), 120);
-            setTimeout(() => playTone(1568, 0.2, 0.3, 'sine'), 240);
-        }
-        
-        // Som de erro (suave, não punitivo)
-        function playError() {
-            playTone(440, 0.25, 0.2, 'sine');
-        }
-        
-        // Jingle de vitória (4 notas ascendentes)
-        function playVictoryJingle() {
-            if (!somAtivo) return;
-            playTone(523, 0.2, 0.3, 'sine');   // Dó
-            setTimeout(() => playTone(659, 0.2, 0.3, 'sine'), 220);  // Mi
-            setTimeout(() => playTone(784, 0.2, 0.3, 'sine'), 440);  // Sol
-            setTimeout(() => playTone(1046, 0.4, 0.35, 'sine'), 660); // Dó agudo
-        }
-        window.playVictoryJingle = playVictoryJingle;
-        
-        // Botão de som
-        const soundBtn = document.getElementById("soundToggleBtn");
-        if (soundBtn) {
-            const saved = localStorage.getItem("somAtivoAuditor");
-            if (saved !== null) somAtivo = saved === "true";
-            soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som';
-            soundBtn.onclick = () => {
-                somAtivo = !somAtivo;
-                localStorage.setItem("somAtivoAuditor", somAtivo);
-                soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som';
-                if (somAtivo && !audioUnlocked) unlockAudio();
-            };
-        }
-        
-        // Botão de teste
-        const testBtn = document.getElementById("testSoundBtn");
-        if (testBtn) {
-            testBtn.onclick = () => {
-                unlockAudio();
-                playCoinSound();
-                setTimeout(() => playCorrectNormal(), 300);
-                setTimeout(() => playCorrectStreak(), 800);
-                setTimeout(() => playVictoryJingle(), 1500);
-            };
-        }
-        
-        // Integrar sons com as respostas e ganho de moedas
-        const originalResponder = window.responderQuestao;
-        if (originalResponder) {
-            window.responderQuestao = function(id, resposta) {
-                unlockAudio();
-                originalResponder(id, resposta);
-                try {
-                    const q = window.questions?.find(qq => qq.id === id);
-                    if (q && q.responded) {
-                        const wasCorrect = (resposta === q.answer);
-                        if (wasCorrect) {
-                            // Som de acerto normal
-                            playCorrectNormal();
-                            // Se streak for múltiplo de 5 e maior que 0, toca fanfarra extra
-                            if (typeof streak !== 'undefined' && streak % 5 === 0 && streak > 0) {
-                                playCorrectStreak();
-                            }
-                            // Som de moedas (ganho) - toca junto
-                            playCoinSound();
-                        } else {
-                            playError();
-                        }
+                const url = "https://script.google.com/macros/s/AKfycbzhcU1H-FjLNyi2dvzFoB1I4RbdsGzNQFJbrdLpeimvGxTJQnik8s6YQ141uYO26iVMug/exec";
+                const response = await fetch(url);
+                const data = await response.json();
+                let saldo = (data && data.saldo !== undefined && data.saldo !== null) ? Number(data.saldo) : 0;
+                let questoes = (data && data.questoes !== undefined && data.questoes !== null) ? Number(data.questoes) : 0;
+                if (isNaN(saldo)) saldo = 0;
+                if (isNaN(questoes)) questoes = 0;
+                // Exibir mensagem se saldo == 0
+                const saldoZeroMsg = document.getElementById("saldoZeroMsg");
+                if (saldo === 0 && saldoZeroMsg) saldoZeroMsg.classList.remove("hidden");
+                else if (saldoZeroMsg) saldoZeroMsg.classList.add("hidden");
+                // Atualiza elementos com animação
+                const elementoSaldo = document.getElementById("saldo");
+                if (elementoSaldo) {
+                    const saldoAtualTexto = elementoSaldo.innerText.replace(" BTCC", "");
+                    const saldoAtualNum = parseInt(saldoAtualTexto) || 0;
+                    if (saldoAtualNum !== saldo) {
+                        animarSaldo(saldo, "saldo");
+                    } else {
+                        elementoSaldo.innerText = saldo + " BTCC";
                     }
-                } catch(e) {}
-            };
+                }
+                const questoesEl = document.getElementById("questoes");
+                if (questoesEl) questoesEl.innerText = questoes;
+            } catch (error) {
+                console.warn("Erro ao carregar API externa:", error);
+                document.getElementById("saldo").innerText = "0 BTCC";
+                document.getElementById("questoes").innerText = "0";
+                document.getElementById("saldoZeroMsg")?.classList.remove("hidden");
+            }
         }
         
-        // Interceptar adição de moedas no sistema concursoCoins para tocar som de dinheiro
-        const originalAddCoins = window.addCoins;
-        if (originalAddCoins) {
-            window.addCoins = function(valor) {
-                const result = originalAddCoins(valor);
-                playCoinSound();
-                return result;
-            };
+        // Sistema de abas
+        const tabHome = document.getElementById("tabHome");
+        const tabQuestoes = document.getElementById("tabQuestoes");
+        const btnHome = document.getElementById("tabHomeBtn");
+        const btnQuestoes = document.getElementById("tabQuestoesBtn");
+        if(btnHome && btnQuestoes && tabHome && tabQuestoes) {
+            btnHome.addEventListener("click", () => {
+                btnHome.classList.add("active");
+                btnQuestoes.classList.remove("active");
+                tabHome.classList.add("active-tab");
+                tabQuestoes.classList.remove("active-tab");
+                if(window.updateHomeStats) window.updateHomeStats();
+            });
+            btnQuestoes.addEventListener("click", () => {
+                btnQuestoes.classList.add("active");
+                btnHome.classList.remove("active");
+                tabQuestoes.classList.add("active-tab");
+                tabHome.classList.remove("active-tab");
+            });
         }
-        
-        // Conversão Btcc → Real
-        function btccToReal(btcc) { return (btcc * 0.0005).toFixed(2); }
-        function updateCoinDisplayWithReal() {
-            const el = document.getElementById("coinCounterDisplay");
-            if (!el) return;
-            let totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0;
-            let btcc = (typeof points !== 'undefined') ? points : 0;
-            let real = btccToReal(btcc);
-            el.innerHTML = `💰 ${totalCoins.toLocaleString()} <span style="font-size:0.7rem;opacity:0.7">(${btcc} Btcc ≈ R$ ${real})</span>`;
-            el.classList.add("coin-value-update");
-            setTimeout(() => el.classList.remove("coin-value-update"), 300);
-        }
-        const originalUpdatePoints = window.updatePointsAndStreak;
-        if (originalUpdatePoints) {
-            window.updatePointsAndStreak = function() { originalUpdatePoints(); updateCoinDisplayWithReal(); };
-        }
-        setInterval(updateCoinDisplayWithReal, 1000);
-        updateCoinDisplayWithReal();
+        // Inicializa Home e API
+        if(window.updateHomeStats) window.updateHomeStats();
+        carregarDadosAPI();
+        setInterval(() => { if(window.updateHomeStats) window.updateHomeStats(); }, 2000);
+        setInterval(() => carregarDadosAPI(), 30000);
     })();
 </script>
 </body>
