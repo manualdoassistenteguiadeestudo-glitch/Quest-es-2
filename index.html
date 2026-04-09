@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AuditorQuest — Simulador CESPE/CEBRASPE</title>
+    <title>AuditorQuest — Simulador CESPE/CEBRASPE (Sons Temáticos)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -455,7 +455,7 @@
         .diagnosis-text { font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         [data-theme="light"] .diagnosis-text { color: #334155; }
 
-        /* ========== ESTILOS GAMIFICAÇÃO CONCURSOCOIN ========== */
+        /* ========== ESTILOS GAMIFICAÇÃO ========== */
         .coin-notification {
             position: fixed;
             top: 30%;
@@ -557,7 +557,6 @@
             animation: countUp 0.3s ease-out;
         }
         
-        /* ========== POPUP DE FINAL DE RODADA (com ícones Font Awesome) ========== */
         .reward-popup {
             position: fixed;
             bottom: 20%;
@@ -650,6 +649,8 @@
         <button id="focusModeBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-expand-alt"></i> Modo Foco</button>
         <button id="themeToggleBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-moon"></i> Tema</button>
         <button id="resetProgressBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-undo-alt"></i> Reset</button>
+        <button id="soundToggleBtn" class="bg-white/5 hover:bg-white/10 text-current px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-volume-up"></i> Som</button>
+        <button id="testSoundBtn" class="bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2"><i class="fas fa-headphones"></i> Testar Som</button>
         <div class="relative">
             <button id="userMenuBtn" class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full"><i class="fas fa-user-circle"></i><span id="userNameDisplay" class="text-sm">Usuário</span><i class="fas fa-chevron-down text-xs"></i></button>
             <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-card rounded-xl shadow-lg hidden z-50 border border-borderLight">
@@ -683,7 +684,7 @@
         </div>
         <div class="card p-5 text-center">
             <div class="flex justify-between items-center"><div><i class="fas fa-star text-yellow-500"></i> <span id="starredCount">0</span></div><div><i class="fas fa-fire text-orange-500"></i> <span id="streakCount">0</span> streak</div><div><i class="fas fa-trophy text-orange-400"></i> <span id="levelBadge">Iniciante</span></div></div>
-            <div class="mt-2 text-xs text-textSecondary">+10 acerto | -5 erro</div>
+            <div class="mt-2 text-xs text-textSecondary">+10 acerto | erro não penaliza pontos (apenas zera streak)</div>
         </div>
     </div>
 
@@ -743,7 +744,6 @@
     </div>
 </div>
 
-<!-- POPUP DE RECOMPENSA (FINAL DE RODADA) com ícone Font Awesome -->
 <div id="rewardPopup" class="reward-popup hide">
     <i id="rewardIcon" class="fas fa-trophy reward-icon"></i>
     <span id="rewardText" class="reward-text"></span>
@@ -921,7 +921,7 @@
             for(let q of questions) {
                 if(q.responded) {
                     if(q.userChoice === q.answer) { totalPoints += 10; currentStreak++; }
-                    else { totalPoints = Math.max(0, totalPoints-5); currentStreak = 0; }
+                    else { currentStreak = 0; }
                 }
             }
             points = totalPoints; streak = currentStreak;
@@ -1487,67 +1487,18 @@
         updateUI();
     })();
     
-    // ================== MENSAGENS DE FINAL DE RODADA (com ícones Font Awesome) ==================
+    // ================== MENSAGENS DE FINAL DE RODADA ==================
     (function() {
         let moedasGanhasRodada = 0;
         let rodadaFinalizadaExibida = false;
         
-        // Estilos com ícones Font Awesome (classes)
         const estilos = [
-            {
-                nome: "premio",
-                iconClass: "fas fa-trophy",
-                frases: [
-                    "💰 Rodada concluída! +{moedas} ConcursoCoins",
-                    "🏆 Você finalizou a bateria! Ganho: +{moedas} moedas",
-                    "🎯 Missão cumprida! +{moedas} ConcursoCoins adicionadas"
-                ]
-            },
-            {
-                nome: "motivacional",
-                iconClass: "fas fa-medal",
-                frases: [
-                    "📚 Mais perto da aprovação! +{moedas} moedas",
-                    "🧠 Conhecimento acumulado! +{moedas} ConcursoCoins",
-                    "🚀 Você está evoluindo! +{moedas} moedas"
-                ]
-            },
-            {
-                nome: "cassino",
-                iconClass: "fas fa-coins",
-                frases: [
-                    "🎰 Rodada encerrada! Você faturou +{moedas} moedas!",
-                    "💥 Resultado da rodada: +{moedas} ConcursoCoins!",
-                    "⚡ Pagamento liberado! +{moedas} moedas creditadas!"
-                ]
-            },
-            {
-                nome: "conquista",
-                iconClass: "fas fa-crown",
-                frases: [
-                    "👑 Execução de alto nível! +{moedas} moedas",
-                    "🏅 Desempenho sólido! +{moedas} ConcursoCoins",
-                    "🏆 Mais uma vitória! +{moedas} moedas na conta"
-                ]
-            },
-            {
-                nome: "foco",
-                iconClass: "fas fa-briefcase",
-                frases: [
-                    "💼 Mentalidade de aprovado! +{moedas} ConcursoCoins",
-                    "💰 Você acabou de pagar mais um pedaço do relógio! +{moedas}",
-                    "📊 Progresso real! +{moedas} moedas pro relógio",
-                    "⌚ Esse relógio tá mais perto! +{moedas} moedas"
-                ]
-            },
-            {
-                nome: "impacto",
-                iconClass: "fas fa-bolt",
-                frases: [
-                    "⚡ Você veio pra jogar! +{moedas} moedas!",
-                    "📈 Progresso consistente! +{moedas} moedas"
-                ]
-            }
+            { nome: "premio", iconClass: "fas fa-trophy", frases: ["💰 Rodada concluída! +{moedas} ConcursoCoins", "🏆 Você finalizou a bateria! Ganho: +{moedas} moedas", "🎯 Missão cumprida! +{moedas} ConcursoCoins adicionadas"] },
+            { nome: "motivacional", iconClass: "fas fa-medal", frases: ["📚 Mais perto da aprovação! +{moedas} moedas", "🧠 Conhecimento acumulado! +{moedas} ConcursoCoins", "🚀 Você está evoluindo! +{moedas} moedas"] },
+            { nome: "cassino", iconClass: "fas fa-coins", frases: ["🎰 Rodada encerrada! Você faturou +{moedas} moedas!", "💥 Resultado da rodada: +{moedas} ConcursoCoins!", "⚡ Pagamento liberado! +{moedas} moedas creditadas!"] },
+            { nome: "conquista", iconClass: "fas fa-crown", frases: ["👑 Execução de alto nível! +{moedas} moedas", "🏅 Desempenho sólido! +{moedas} ConcursoCoins", "🏆 Mais uma vitória! +{moedas} moedas na conta"] },
+            { nome: "foco", iconClass: "fas fa-briefcase", frases: ["💼 Mentalidade de aprovado! +{moedas} ConcursoCoins", "💰 Você acabou de pagar mais um pedaço do relógio! +{moedas}", "📊 Progresso real! +{moedas} moedas pro relógio", "⌚ Esse relógio tá mais perto! +{moedas} moedas"] },
+            { nome: "impacto", iconClass: "fas fa-bolt", frases: ["⚡ Você veio pra jogar! +{moedas} moedas!", "📈 Progresso consistente! +{moedas} moedas"] }
         ];
         
         function getRandomMessageAndIcon(moedas) {
@@ -1564,14 +1515,12 @@
             if (!popup || !iconElement || !textSpan) return;
             
             const { frase, iconClass } = getRandomMessageAndIcon(moedas);
-            // Remove classes antigas e adiciona a nova + classe base
             iconElement.className = `reward-icon ${iconClass}`;
             textSpan.innerText = frase;
             
             popup.classList.remove("hide");
             popup.classList.add("show");
             
-            // Confetes extras para celebrar
             for (let i = 0; i < 40; i++) {
                 const conf = document.createElement("div");
                 conf.classList.add("confetti");
@@ -1594,11 +1543,7 @@
             }, 4500);
         }
         
-        function resetRodadaState() {
-            moedasGanhasRodada = 0;
-            rodadaFinalizadaExibida = false;
-        }
-        
+        function resetRodadaState() { moedasGanhasRodada = 0; rodadaFinalizadaExibida = false; }
         function verificarRodadaCompleta() {
             const cards = document.querySelectorAll('.question-card');
             if (cards.length === 0) return false;
@@ -1609,39 +1554,184 @@
         const originalOnQA = window.onQuestionAnswered;
         window.onQuestionAnswered = function(questionNumber, wasCorrect) {
             if (originalOnQA) originalOnQA(questionNumber, wasCorrect);
-            if (wasCorrect) {
-                moedasGanhasRodada += questionNumber;
-            }
+            if (wasCorrect) moedasGanhasRodada += questionNumber;
             setTimeout(() => {
                 if (verificarRodadaCompleta() && !rodadaFinalizadaExibida && moedasGanhasRodada > 0) {
                     rodadaFinalizadaExibida = true;
                     showRewardPopup(moedasGanhasRodada);
+                    // Tocar jingle de vitória (implementado na seção de sons)
+                    if (window.playVictoryJingle) window.playVictoryJingle();
                 }
             }, 100);
         };
         
         function attachResetEvents() {
-            const botoesReset = ['importBtn', 'exampleBtn', 'resetProgressBtn', 'clearAllBtn', 'confirmPreview'];
-            botoesReset.forEach(id => {
+            ['importBtn', 'exampleBtn', 'resetProgressBtn', 'clearAllBtn', 'confirmPreview'].forEach(id => {
                 const btn = document.getElementById(id);
-                if (btn) {
-                    btn.addEventListener('click', () => {
-                        setTimeout(() => resetRodadaState(), 200);
-                    });
-                }
+                if (btn) btn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 200));
             });
             const pdfBtn = document.getElementById('importPdfBtn');
-            if (pdfBtn) {
-                pdfBtn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 500));
-            }
+            if (pdfBtn) pdfBtn.addEventListener('click', () => setTimeout(() => resetRodadaState(), 500));
             const pdfUploadEl = document.getElementById('pdfUpload');
-            if (pdfUploadEl) {
-                pdfUploadEl.addEventListener('change', () => setTimeout(() => resetRodadaState(), 800));
-            }
+            if (pdfUploadEl) pdfUploadEl.addEventListener('change', () => setTimeout(() => resetRodadaState(), 800));
         }
-        
         attachResetEvents();
         resetRodadaState();
+    })();
+
+    // ================== SONS TEMÁTICOS (DINHEIRO, ACERTOS VARIADOS, JINGLE DE VITÓRIA) ==================
+    (function(){
+        let somAtivo = true;
+        let audioCtx = null;
+        let audioUnlocked = false;
+        
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => { audioUnlocked = true; console.log("🔊 Áudio destravado!"); }).catch(e => console.warn(e));
+            } else { audioUnlocked = true; }
+        }
+        
+        function playTone(freq, duration, volume = 0.3, type = 'sine') {
+            if (!somAtivo) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => playToneNow(freq, duration, volume, type)).catch(e=>console.warn(e));
+            } else { playToneNow(freq, duration, volume, type); }
+        }
+        
+        function playToneNow(freq, duration, volume, type) {
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(volume, now);
+                gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
+                osc.start();
+                osc.stop(now + duration);
+            } catch(e) { console.warn("Erro ao tocar tom", e); }
+        }
+        
+        // Som de dinheiro (caixa registradora / moedas)
+        function playCoinSound() {
+            playTone(1200, 0.08, 0.25, 'sine');
+            setTimeout(() => playTone(1500, 0.1, 0.25, 'sine'), 80);
+            setTimeout(() => playTone(1800, 0.12, 0.2, 'sine'), 180);
+        }
+        
+        // Som de acerto normal (pop alegre)
+        function playCorrectNormal() {
+            playTone(880, 0.15, 0.3, 'sine');
+        }
+        
+        // Som de acerto com streak (fanfarra curta)
+        function playCorrectStreak() {
+            playTone(1046, 0.12, 0.35, 'sine');
+            setTimeout(() => playTone(1318, 0.12, 0.35, 'sine'), 120);
+            setTimeout(() => playTone(1568, 0.2, 0.3, 'sine'), 240);
+        }
+        
+        // Som de erro (suave, não punitivo)
+        function playError() {
+            playTone(440, 0.25, 0.2, 'sine');
+        }
+        
+        // Jingle de vitória (4 notas ascendentes)
+        function playVictoryJingle() {
+            if (!somAtivo) return;
+            playTone(523, 0.2, 0.3, 'sine');   // Dó
+            setTimeout(() => playTone(659, 0.2, 0.3, 'sine'), 220);  // Mi
+            setTimeout(() => playTone(784, 0.2, 0.3, 'sine'), 440);  // Sol
+            setTimeout(() => playTone(1046, 0.4, 0.35, 'sine'), 660); // Dó agudo
+        }
+        window.playVictoryJingle = playVictoryJingle;
+        
+        // Botão de som
+        const soundBtn = document.getElementById("soundToggleBtn");
+        if (soundBtn) {
+            const saved = localStorage.getItem("somAtivoAuditor");
+            if (saved !== null) somAtivo = saved === "true";
+            soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som';
+            soundBtn.onclick = () => {
+                somAtivo = !somAtivo;
+                localStorage.setItem("somAtivoAuditor", somAtivo);
+                soundBtn.innerHTML = somAtivo ? '<i class="fas fa-volume-up"></i> Som' : '<i class="fas fa-volume-mute"></i> Som';
+                if (somAtivo && !audioUnlocked) unlockAudio();
+            };
+        }
+        
+        // Botão de teste
+        const testBtn = document.getElementById("testSoundBtn");
+        if (testBtn) {
+            testBtn.onclick = () => {
+                unlockAudio();
+                playCoinSound();
+                setTimeout(() => playCorrectNormal(), 300);
+                setTimeout(() => playCorrectStreak(), 800);
+                setTimeout(() => playVictoryJingle(), 1500);
+            };
+        }
+        
+        // Integrar sons com as respostas e ganho de moedas
+        const originalResponder = window.responderQuestao;
+        if (originalResponder) {
+            window.responderQuestao = function(id, resposta) {
+                unlockAudio();
+                originalResponder(id, resposta);
+                try {
+                    const q = window.questions?.find(qq => qq.id === id);
+                    if (q && q.responded) {
+                        const wasCorrect = (resposta === q.answer);
+                        if (wasCorrect) {
+                            // Som de acerto normal
+                            playCorrectNormal();
+                            // Se streak for múltiplo de 5 e maior que 0, toca fanfarra extra
+                            if (typeof streak !== 'undefined' && streak % 5 === 0 && streak > 0) {
+                                playCorrectStreak();
+                            }
+                            // Som de moedas (ganho) - toca junto
+                            playCoinSound();
+                        } else {
+                            playError();
+                        }
+                    }
+                } catch(e) {}
+            };
+        }
+        
+        // Interceptar adição de moedas no sistema concursoCoins para tocar som de dinheiro
+        const originalAddCoins = window.addCoins;
+        if (originalAddCoins) {
+            window.addCoins = function(valor) {
+                const result = originalAddCoins(valor);
+                playCoinSound();
+                return result;
+            };
+        }
+        
+        // Conversão Btcc → Real
+        function btccToReal(btcc) { return (btcc * 0.0005).toFixed(2); }
+        function updateCoinDisplayWithReal() {
+            const el = document.getElementById("coinCounterDisplay");
+            if (!el) return;
+            let totalCoins = parseInt(localStorage.getItem("concursoCoins")) || 0;
+            let btcc = (typeof points !== 'undefined') ? points : 0;
+            let real = btccToReal(btcc);
+            el.innerHTML = `💰 ${totalCoins.toLocaleString()} <span style="font-size:0.7rem;opacity:0.7">(${btcc} Btcc ≈ R$ ${real})</span>`;
+            el.classList.add("coin-value-update");
+            setTimeout(() => el.classList.remove("coin-value-update"), 300);
+        }
+        const originalUpdatePoints = window.updatePointsAndStreak;
+        if (originalUpdatePoints) {
+            window.updatePointsAndStreak = function() { originalUpdatePoints(); updateCoinDisplayWithReal(); };
+        }
+        setInterval(updateCoinDisplayWithReal, 1000);
+        updateCoinDisplayWithReal();
     })();
 </script>
 </body>
