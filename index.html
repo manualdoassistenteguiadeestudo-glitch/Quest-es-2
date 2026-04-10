@@ -166,7 +166,7 @@
 </head>
 <body>
 
-<!-- TELA SPLASH INICIAL -->
+<!-- TELA SPLASH INICIAL - AGORA SEMPRE VISÍVEL AO CARREGAR A PÁGINA -->
 <div id="splashScreen" class="splash-screen">
     <img src="https://cdn-icons-png.flaticon.com/512/3305/3305803.png" alt="Carregando" class="spinner-img">
     <h1 class="splash-title">Seja Bem-vindo</h1>
@@ -359,7 +359,7 @@
 <audio id="victorySoundAudio" src="Final das questões.mp3" preload="auto"></audio>
 
 <script>
-    // ================== AUDIOMANAGER HÍBRIDO COM FADE-IN E FALLBACK CHIPTUNE ==================
+    // ================== AUDIOMANAGER HÍBRIDO (MANTIDO) ==================
     const AudioManager = (function() {
         const elements = {
             splash: document.getElementById("splashSoundAudio"),
@@ -465,7 +465,6 @@
             osc.stop(now + 0.5);
         }
 
-        // Chiptune menu music (loop infinito estilo Mega Man)
         let menuLoopInterval = null;
         function playChiptuneMenu() {
             if (!audioCtx) return;
@@ -625,20 +624,22 @@
     }
     window.finalizarRodada = finalizarRodada;
 
-    // ================== INICIALIZAÇÃO DA SPLASH ==================
+    // ================== INICIALIZAÇÃO DA SPLASH - SEMPRE EXIBIDA ==================
     (function() {
         const splash = document.getElementById('splashScreen');
         const pressStart = document.getElementById('pressStartBtn');
+        // Garantir que a splash seja exibida sempre (sem verificação de localStorage)
+        splash.style.display = 'flex';
+        
         pressStart.addEventListener('click', () => {
             AudioManager.init();
             AudioManager.playSplash();
             AudioManager.playBgMusic();
             splash.classList.add('fade-out');
-            localStorage.setItem('splashShown', 'true');
-            setTimeout(() => splash.style.display = 'none', 800);
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 800);
         });
-        if (localStorage.getItem('splashShown') === 'true') splash.style.display = 'none';
-        else splash.style.display = 'flex';
     })();
 
     // ================== CÓDIGO ORIGINAL COMPLETO (PRESERVADO) ==================
